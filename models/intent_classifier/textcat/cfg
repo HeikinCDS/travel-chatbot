@@ -1,0 +1,14 @@
+{
+  "labels":[
+    "greeting",
+    "request_recommendation",
+    "refine_preferences",
+    "request_information",
+    "request_alternative",
+    "reset_conversation",
+    "help",
+    "goodbye"
+  ],
+  "threshold":0.0,
+  "positive_label":null
+}

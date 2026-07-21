@@ -1,0 +1,138 @@
+{
+  "accuracy": 0.625,
+  "macro_f1_score": 0.6184,
+  "correct_predictions": 25,
+  "test_examples": 40,
+  "per_intent": {
+    "greeting": {
+      "precision": 1.0,
+      "recall": 0.6,
+      "f1_score": 0.75,
+      "support": 5
+    },
+    "request_recommendation": {
+      "precision": 0.2,
+      "recall": 0.2,
+      "f1_score": 0.2,
+      "support": 5
+    },
+    "refine_preferences": {
+      "precision": 0.6667,
+      "recall": 0.4,
+      "f1_score": 0.5,
+      "support": 5
+    },
+    "request_information": {
+      "precision": 0.6667,
+      "recall": 0.8,
+      "f1_score": 0.7273,
+      "support": 5
+    },
+    "request_alternative": {
+      "precision": 0.6667,
+      "recall": 0.4,
+      "f1_score": 0.5,
+      "support": 5
+    },
+    "reset_conversation": {
+      "precision": 0.5556,
+      "recall": 1.0,
+      "f1_score": 0.7143,
+      "support": 5
+    },
+    "help": {
+      "precision": 0.5714,
+      "recall": 0.8,
+      "f1_score": 0.6667,
+      "support": 5
+    },
+    "goodbye": {
+      "precision": 1.0,
+      "recall": 0.8,
+      "f1_score": 0.8889,
+      "support": 5
+    }
+  },
+  "confusion_matrix": {
+    "greeting": {
+      "greeting": 3,
+      "request_recommendation": 0,
+      "refine_preferences": 0,
+      "request_information": 0,
+      "request_alternative": 0,
+      "reset_conversation": 2,
+      "help": 0,
+      "goodbye": 0
+    },
+    "request_recommendation": {
+      "greeting": 0,
+      "request_recommendation": 1,
+      "refine_preferences": 1,
+      "request_information": 2,
+      "request_alternative": 0,
+      "reset_conversation": 0,
+      "help": 1,
+      "goodbye": 0
+    },
+    "refine_preferences": {
+      "greeting": 0,
+      "request_recommendation": 2,
+      "refine_preferences": 2,
+      "request_information": 0,
+      "request_alternative": 0,
+      "reset_conversation": 1,
+      "help": 0,
+      "goodbye": 0
+    },
+    "request_information": {
+      "greeting": 0,
+      "request_recommendation": 0,
+      "refine_preferences": 0,
+      "request_information": 4,
+      "request_alternative": 0,
+      "reset_conversation": 0,
+      "help": 1,
+      "goodbye": 0
+    },
+    "request_alternative": {
+      "greeting": 0,
+      "request_recommendation": 2,
+      "refine_preferences": 0,
+      "request_information": 0,
+      "request_alternative": 2,
+      "reset_conversation": 0,
+      "help": 1,
+      "goodbye": 0
+    },
+    "reset_conversation": {
+      "greeting": 0,
+      "request_recommendation": 0,
+      "refine_preferences": 0,
+      "request_information": 0,
+      "request_alternative": 0,
+      "reset_conversation": 5,
+      "help": 0,
+      "goodbye": 0
+    },
+    "help": {
+      "greeting": 0,
+      "request_recommendation": 0,
+      "refine_preferences": 0,
+      "request_information": 0,
+      "request_alternative": 0,
+      "reset_conversation": 1,
+      "help": 4,
+      "goodbye": 0
+    },
+    "goodbye": {
+      "greeting": 0,
+      "request_recommendation": 0,
+      "refine_preferences": 0,
+      "request_information": 0,
+      "request_alternative": 1,
+      "reset_conversation": 0,
+      "help": 0,
+      "goodbye": 4
+    }
+  }
+}

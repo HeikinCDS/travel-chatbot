@@ -1,0 +1,242 @@
+[
+  {
+    "text": "Is the attraction indoors or outdoors?",
+    "actual": "request_information",
+    "predicted": "request_information",
+    "confidence": 0.975629
+  },
+  {
+    "text": "Please recommend somewhere else",
+    "actual": "request_alternative",
+    "predicted": "request_recommendation",
+    "confidence": 0.998504
+  },
+  {
+    "text": "Forget the current trip plan",
+    "actual": "reset_conversation",
+    "predicted": "reset_conversation",
+    "confidence": 0.999921
+  },
+  {
+    "text": "Show me the next option",
+    "actual": "request_alternative",
+    "predicted": "request_alternative",
+    "confidence": 0.999988
+  },
+  {
+    "text": "Evening",
+    "actual": "greeting",
+    "predicted": "reset_conversation",
+    "confidence": 0.427826
+  },
+  {
+    "text": "I would rather visit a beach",
+    "actual": "refine_preferences",
+    "predicted": "request_recommendation",
+    "confidence": 0.998783
+  },
+  {
+    "text": "Can you explain how recommendations work?",
+    "actual": "help",
+    "predicted": "help",
+    "confidence": 0.999636
+  },
+  {
+    "text": "What kind of questions can I ask?",
+    "actual": "help",
+    "predicted": "help",
+    "confidence": 0.997987
+  },
+  {
+    "text": "Make it cheaper",
+    "actual": "refine_preferences",
+    "predicted": "refine_preferences",
+    "confidence": 0.999967
+  },
+  {
+    "text": "Morning",
+    "actual": "greeting",
+    "predicted": "reset_conversation",
+    "confidence": 0.865958
+  },
+  {
+    "text": "Can we restart?",
+    "actual": "reset_conversation",
+    "predicted": "reset_conversation",
+    "confidence": 0.999887
+  },
+  {
+    "text": "Show me the available commands",
+    "actual": "help",
+    "predicted": "reset_conversation",
+    "confidence": 0.990724
+  },
+  {
+    "text": "I want somewhere suitable for my family",
+    "actual": "request_recommendation",
+    "predicted": "refine_preferences",
+    "confidence": 0.998352
+  },
+  {
+    "text": "I want somewhere in Johor instead",
+    "actual": "refine_preferences",
+    "predicted": "request_recommendation",
+    "confidence": 0.999992
+  },
+  {
+    "text": "Hey travel bot",
+    "actual": "greeting",
+    "predicted": "greeting",
+    "confidence": 0.99996
+  },
+  {
+    "text": "Let us try again from scratch",
+    "actual": "reset_conversation",
+    "predicted": "reset_conversation",
+    "confidence": 0.999929
+  },
+  {
+    "text": "Can you make the recommendations child friendly?",
+    "actual": "refine_preferences",
+    "predicted": "refine_preferences",
+    "confidence": 0.990354
+  },
+  {
+    "text": "Hello, how are you?",
+    "actual": "greeting",
+    "predicted": "greeting",
+    "confidence": 0.999997
+  },
+  {
+    "text": "Greetings",
+    "actual": "greeting",
+    "predicted": "greeting",
+    "confidence": 0.446824
+  },
+  {
+    "text": "Begin a new search",
+    "actual": "reset_conversation",
+    "predicted": "reset_conversation",
+    "confidence": 0.999826
+  },
+  {
+    "text": "Does this place charge an admission fee?",
+    "actual": "request_information",
+    "predicted": "request_information",
+    "confidence": 0.999964
+  },
+  {
+    "text": "Bye for now",
+    "actual": "goodbye",
+    "predicted": "goodbye",
+    "confidence": 0.999996
+  },
+  {
+    "text": "See you next time",
+    "actual": "goodbye",
+    "predicted": "request_alternative",
+    "confidence": 0.996606
+  },
+  {
+    "text": "What else can you recommend?",
+    "actual": "request_alternative",
+    "predicted": "help",
+    "confidence": 0.859344
+  },
+  {
+    "text": "Find a different attraction",
+    "actual": "request_alternative",
+    "predicted": "request_recommendation",
+    "confidence": 0.999989
+  },
+  {
+    "text": "Forget what I said earlier",
+    "actual": "reset_conversation",
+    "predicted": "reset_conversation",
+    "confidence": 0.538583
+  },
+  {
+    "text": "I want something related to history instead",
+    "actual": "refine_preferences",
+    "predicted": "reset_conversation",
+    "confidence": 0.684684
+  },
+  {
+    "text": "Show me another place",
+    "actual": "request_alternative",
+    "predicted": "request_alternative",
+    "confidence": 0.999902
+  },
+  {
+    "text": "What preferences can I provide?",
+    "actual": "help",
+    "predicted": "help",
+    "confidence": 0.998839
+  },
+  {
+    "text": "I am done planning",
+    "actual": "goodbye",
+    "predicted": "goodbye",
+    "confidence": 0.619437
+  },
+  {
+    "text": "How do I use this chatbot?",
+    "actual": "help",
+    "predicted": "help",
+    "confidence": 0.999824
+  },
+  {
+    "text": "What type of attraction is this?",
+    "actual": "request_information",
+    "predicted": "request_information",
+    "confidence": 0.972353
+  },
+  {
+    "text": "Where should my friends and I go this weekend?",
+    "actual": "request_recommendation",
+    "predicted": "request_information",
+    "confidence": 0.96099
+  },
+  {
+    "text": "Have a nice day",
+    "actual": "goodbye",
+    "predicted": "goodbye",
+    "confidence": 0.500064
+  },
+  {
+    "text": "Where can I go with my children?",
+    "actual": "request_recommendation",
+    "predicted": "request_information",
+    "confidence": 0.972882
+  },
+  {
+    "text": "Can you show me the description?",
+    "actual": "request_information",
+    "predicted": "help",
+    "confidence": 0.996173
+  },
+  {
+    "text": "What are some good places to visit in Malaysia?",
+    "actual": "request_recommendation",
+    "predicted": "help",
+    "confidence": 0.624571
+  },
+  {
+    "text": "I am looking for a beach in Terengganu",
+    "actual": "request_recommendation",
+    "predicted": "request_recommendation",
+    "confidence": 0.951658
+  },
+  {
+    "text": "Which state is this attraction in?",
+    "actual": "request_information",
+    "predicted": "request_information",
+    "confidence": 0.925477
+  },
+  {
+    "text": "Goodbye",
+    "actual": "goodbye",
+    "predicted": "goodbye",
+    "confidence": 0.998011
+  }
+]
