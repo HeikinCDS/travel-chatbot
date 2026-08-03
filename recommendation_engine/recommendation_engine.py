@@ -107,6 +107,41 @@ def recommend_from_text(text, limit=5):
     }
 
 
+def get_attraction_by_id(attraction_id):
+    """Return one attraction for information requests, or ``None``."""
+    if not isinstance(attraction_id, str) or not attraction_id.strip():
+        raise ValueError("attraction_id must be a non-empty string")
+
+    query = """
+        SELECT
+            attraction_id,
+            attraction_name,
+            state_territory,
+            city_district,
+            primary_category,
+            interests_tags,
+            short_description,
+            entrance_fee_status,
+            min_fee_myr,
+            max_fee_myr,
+            recommended_duration_hours,
+            family_friendly,
+            elderly_friendly,
+            wheelchair_accessible,
+            accessibility_notes,
+            official_url,
+            source_url
+        FROM attractions
+        WHERE attraction_id = ?
+    """
+
+    with sqlite3.connect(DATABASE_PATH) as connection:
+        connection.row_factory = sqlite3.Row
+        result = connection.execute(query, (attraction_id,)).fetchone()
+
+    return dict(result) if result else None
+
+
 if __name__ == "__main__":
     recommendations = recommend_attractions(
         state="W.P. Putrajaya",

@@ -5,9 +5,12 @@ from .entity_extractor import (
     extract_preferences,
     to_recommendation_filters,
 )
+from .intent_classifier import IntentClassifier, IntentPrediction
 
 __all__ = [
     "TravelPreferences",
     "extract_preferences",
     "to_recommendation_filters",
+    "IntentClassifier",
+    "IntentPrediction",
 ]
