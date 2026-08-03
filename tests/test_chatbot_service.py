@@ -53,6 +53,33 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertEqual(session.context.to_dict(), {})
         self.assertEqual(session.shown_attraction_ids, [])
 
+    def test_recognised_interest_is_not_mistaken_for_reset(self):
+        session = ChatSession(
+            context=ConversationContext(state="Penang")
+        )
+        response = self.make_service("reset_conversation").process_message(
+            "Relaxation",
+            session,
+        )
+        self.assertEqual(response.action, "no_results")
+        self.assertEqual(session.context.state, "Penang")
+        self.assertEqual(session.context.interests, ["relaxation"])
+        self.assertIn("still saved", response.reply)
+
+    def test_reset_prediction_without_reset_words_does_not_clear_context(self):
+        session = ChatSession(
+            context=ConversationContext(
+                state="Johor",
+                interests=["nature"],
+            )
+        )
+        response = self.make_service("reset_conversation").process_message(
+            "Something else",
+            session,
+        )
+        self.assertNotEqual(response.action, "reset")
+        self.assertEqual(session.context.state, "Johor")
+
     def test_first_slot_answer_triggers_clarification(self):
         session = ChatSession()
         response = self.make_service("request_recommendation").process_message(
@@ -151,7 +178,10 @@ class ChatbotServiceTests(unittest.TestCase):
             session,
         )
         self.assertEqual(response.action, "no_results")
-        self.assertIn("changing", response.reply)
+        self.assertIn("Kuala Lumpur", response.reply)
+        self.assertIn("hot spring", response.reply)
+        self.assertIn("still saved", response.reply)
+        self.assertGreater(len(response.suggestions), 0)
 
     def test_session_round_trip(self):
         original = ChatSession(

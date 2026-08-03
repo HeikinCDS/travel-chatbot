@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import re
 from typing import Any, Mapping, Protocol
 
 from dialogue.context_manager import ConversationContext
@@ -16,6 +17,39 @@ from recommendation_engine.recommendation_engine import (
 class IntentPredictor(Protocol):
     def predict(self, text: str) -> IntentPrediction:
         """Return an intent prediction for one message."""
+
+
+EXPLICIT_RESET_PATTERN = re.compile(
+    r"^\s*(?:reset|start\s+over|begin\s+again|new\s+search|"
+    r"clear\s+(?:everything|all\s+preferences|my\s+preferences))"
+    r"\s*(?:please)?[.!]?\s*$",
+    re.IGNORECASE,
+)
+
+STATE_SUGGESTIONS = (
+    {"label": "Johor", "message": "Johor"},
+    {"label": "Penang", "message": "Penang"},
+    {"label": "Perak", "message": "Perak"},
+    {"label": "Pahang", "message": "Pahang"},
+    {"label": "Sabah", "message": "Sabah"},
+    {"label": "Sarawak", "message": "Sarawak"},
+)
+
+INTEREST_SUGGESTIONS = (
+    {"label": "Nature", "message": "Nature"},
+    {"label": "Beach", "message": "Beach"},
+    {"label": "History", "message": "History"},
+    {"label": "Wildlife", "message": "Wildlife"},
+    {"label": "Relaxation", "message": "Relaxation"},
+)
+
+CHANGE_INTEREST_SUGGESTIONS = tuple(
+    {
+        "label": suggestion["label"],
+        "message": f"Actually change my interest to {suggestion['message'].lower()}",
+    }
+    for suggestion in INTEREST_SUGGESTIONS[:-1]
+)
 
 
 @dataclass
@@ -63,6 +97,7 @@ class ChatbotResponse:
     confidence: float
     context: Mapping[str, Any]
     recommendations: tuple[Mapping[str, Any], ...] = ()
+    suggestions: tuple[Mapping[str, str], ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -72,6 +107,7 @@ class ChatbotResponse:
             "confidence": self.confidence,
             "context": dict(self.context),
             "recommendations": [dict(item) for item in self.recommendations],
+            "suggestions": [dict(item) for item in self.suggestions],
         }
 
 
@@ -114,13 +150,22 @@ class ChatbotService:
         prediction = self.classifier.predict(text)
         intent = prediction.label
 
-        if intent == "reset_conversation":
+        # Extract recognised travel details before trusting the classifier.
+        # A short answer such as "Relaxation" can otherwise be mistaken for
+        # "reset conversation" and unexpectedly erase the user's choices.
+        changes = session.context.update_from_text(text)
+        if changes:
+            session.shown_attraction_ids.clear()
+            session.latest_recommendation_ids.clear()
+
+        if intent == "reset_conversation" and EXPLICIT_RESET_PATTERN.fullmatch(text):
             session.reset()
             return self._response(
                 "Your travel preferences have been cleared. Where would you like to go?",
                 "reset",
                 prediction,
                 session,
+                suggestions=STATE_SUGGESTIONS,
             )
 
         if intent == "goodbye":
@@ -130,11 +175,6 @@ class ChatbotService:
                 prediction,
                 session,
             )
-
-        changes = session.context.update_from_text(text)
-        if changes:
-            session.shown_attraction_ids.clear()
-            session.latest_recommendation_ids.clear()
 
         if intent == "request_information":
             return self._information_response(prediction, session)
@@ -161,6 +201,7 @@ class ChatbotService:
                 "greeting",
                 prediction,
                 session,
+                suggestions=STATE_SUGGESTIONS,
             )
 
         if intent == "help":
@@ -210,11 +251,17 @@ class ChatbotService:
         session: ChatSession,
     ) -> ChatbotResponse:
         question = session.context.next_clarification_question()
+        suggestions = (
+            STATE_SUGGESTIONS
+            if not session.context.state
+            else INTEREST_SUGGESTIONS
+        )
         return self._response(
             question or "Please provide another travel preference.",
             "clarify_preferences",
             prediction,
             session,
+            suggestions=suggestions,
         )
 
     def _recommendation_response(
@@ -231,12 +278,17 @@ class ChatbotService:
 
         if not candidates:
             session.latest_recommendation_ids.clear()
+            state = session.context.state or "that location"
+            interest = ", ".join(session.context.interests) or "selected"
             return self._response(
-                "I could not find an exact match. Try changing the state, "
-                "interest, budget or accessibility requirement.",
+                f"I could not find an exact match for {interest} attractions "
+                f"in {state} in the current verified collection. Your "
+                "preferences are still saved. Please choose another attraction "
+                "type, or tell me a different state.",
                 "no_results",
                 prediction,
                 session,
+                suggestions=CHANGE_INTEREST_SUGGESTIONS,
             )
 
         unseen = [
@@ -318,6 +370,7 @@ class ChatbotService:
         prediction: IntentPrediction,
         session: ChatSession,
         recommendations: list[Mapping[str, Any]] | None = None,
+        suggestions: tuple[Mapping[str, str], ...] | None = None,
     ) -> ChatbotResponse:
         return ChatbotResponse(
             reply=reply,
@@ -326,4 +379,5 @@ class ChatbotService:
             confidence=prediction.confidence,
             context=session.context.to_dict(),
             recommendations=tuple(recommendations or []),
+            suggestions=tuple(suggestions or ()),
         )

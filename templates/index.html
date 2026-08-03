@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An elderly-friendly chatbot for discovering Malaysian attractions.">
+  <title>Malaysia Travel Companion</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#message-input">Skip to the message box</a>
+
+  <main class="page-frame">
+    <section class="chat-window" aria-labelledby="app-title">
+      <header class="chat-header">
+        <div class="assistant-identity">
+          <div class="assistant-avatar" aria-hidden="true">🤖</div>
+          <div>
+            <h1 id="app-title">Malaysia Travel Companion</h1>
+            <p><span class="online-dot" aria-hidden="true"></span> Ready to help</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="text-size-button" class="header-button" type="button" aria-pressed="false">
+            <span aria-hidden="true">A+</span> Larger text
+          </button>
+          <button id="reset-button" class="header-button" type="button">
+            Start over
+          </button>
+        </div>
+      </header>
+
+      <div class="information-strip">
+        <details class="help-details">
+          <summary>How to use this chatbot</summary>
+          <p>Choose a state, attraction type, budget, or accessibility requirement. You can type or use the large choice buttons.</p>
+        </details>
+        <details class="preference-details">
+          <summary>My saved preferences</summary>
+          <dl id="preference-list" class="preference-list">
+            <div><dt>Status</dt><dd>Not provided yet</dd></div>
+          </dl>
+        </details>
+      </div>
+
+      <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions">
+        <article class="message-row bot-row">
+          <div class="message-avatar" aria-hidden="true">🤖</div>
+          <div>
+            <p class="speaker-name">Travel Companion</p>
+            <div class="message bot-message">
+              <p>Hello! Which Malaysian state would you like to visit?</p>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div id="recommendations" class="recommendations" aria-live="polite"></div>
+
+      <section class="choice-area" aria-labelledby="choice-heading">
+        <h2 id="choice-heading">Tap a choice or type your own answer</h2>
+        <div id="quick-replies" class="quick-replies">
+          <button type="button" data-message="Johor">Johor</button>
+          <button type="button" data-message="Penang">Penang</button>
+          <button type="button" data-message="Perak">Perak</button>
+          <button type="button" data-message="Pahang">Pahang</button>
+          <button type="button" data-message="Sabah">Sabah</button>
+          <button type="button" data-message="Sarawak">Sarawak</button>
+        </div>
+      </section>
+
+      <form id="chat-form" class="chat-form">
+        <label for="message-input">Your message</label>
+        <div class="input-row">
+          <input
+            id="message-input"
+            name="message"
+            type="text"
+            maxlength="500"
+            autocomplete="off"
+            placeholder="Type your answer here"
+            required
+          >
+          <button id="send-button" class="send-button" type="submit">Send</button>
+        </div>
+        <p id="form-status" class="form-status" role="status"></p>
+      </form>
+
+      <footer class="app-note">
+        Attraction details should be confirmed with official sources before travelling.
+      </footer>
+    </section>
+  </main>
+
+  <noscript>This chatbot requires JavaScript to send messages.</noscript>
+  <script src="{{ url_for('static', filename='chat.js') }}" defer></script>
+</body>
+</html>
