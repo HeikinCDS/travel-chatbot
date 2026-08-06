@@ -61,10 +61,14 @@ class ChatbotServiceTests(unittest.TestCase):
             "Relaxation",
             session,
         )
-        self.assertEqual(response.action, "no_results")
+        self.assertEqual(response.action, "recommend")
         self.assertEqual(session.context.state, "Penang")
         self.assertEqual(session.context.interests, ["relaxation"])
-        self.assertIn("still saved", response.reply)
+        self.assertGreater(len(response.recommendations), 0)
+        self.assertTrue(all(
+            item["state_territory"] == "Penang"
+            for item in response.recommendations
+        ))
 
     def test_reset_prediction_without_reset_words_does_not_clear_context(self):
         session = ChatSession(
