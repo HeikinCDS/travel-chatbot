@@ -3,36 +3,83 @@ const input = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-button");
 const resetButton = document.querySelector("#reset-button");
 const textSizeButton = document.querySelector("#text-size-button");
+const contrastButton = document.querySelector("#contrast-button");
 const messages = document.querySelector("#messages");
 const recommendations = document.querySelector("#recommendations");
 const quickReplies = document.querySelector("#quick-replies");
 const preferences = document.querySelector("#preference-list");
 const formStatus = document.querySelector("#form-status");
+let preferredSpeechVoice = null;
+
+function chooseGentleVoice() {
+  if (!("speechSynthesis" in window)) return null;
+  const englishVoices = window.speechSynthesis.getVoices().filter(voice => {
+    return voice.lang.toLowerCase().startsWith("en");
+  });
+  const preferences = [
+    /Microsoft Sonia.*Natural/i,
+    /Microsoft Jenny.*Natural/i,
+    /Microsoft Aria.*Natural/i,
+    /Microsoft Natasha.*Natural/i,
+    /Google UK English Female/i,
+    /Microsoft Zira/i,
+    /female/i,
+  ];
+  for (const pattern of preferences) {
+    const voice = englishVoices.find(candidate => pattern.test(candidate.name));
+    if (voice) return voice;
+  }
+  return englishVoices.find(voice => /natural/i.test(voice.name))
+    || englishVoices[0]
+    || null;
+}
+
+function refreshPreferredVoice() {
+  preferredSpeechVoice = chooseGentleVoice();
+}
+
+if ("speechSynthesis" in window) {
+  refreshPreferredVoice();
+  window.speechSynthesis.addEventListener("voiceschanged", refreshPreferredVoice);
+}
 
 function addMessage(text, sender) {
   const row = document.createElement("article");
-  row.className = `message-row ${sender === "user" ? "user-row" : "bot-row"}`;
+  row.className = `message-row ${sender === "user" ? "user-row" : "assistant-row"}`;
 
   const content = document.createElement("div");
+  content.className = "message-content";
+
   if (sender === "bot") {
     const avatar = document.createElement("div");
-    avatar.className = "message-avatar";
+    avatar.className = "assistant-mark";
     avatar.setAttribute("aria-hidden", "true");
-    avatar.textContent = "🤖";
+    avatar.textContent = "MY";
     row.appendChild(avatar);
 
     const name = document.createElement("p");
     name.className = "speaker-name";
-    name.textContent = "Travel Companion";
+    name.textContent = "Maya";
     content.appendChild(name);
   }
 
-  const bubble = document.createElement("div");
-  bubble.className = `message ${sender === "user" ? "user-message" : "bot-message"}`;
+  const message = document.createElement("div");
+  message.className = sender === "user" ? "user-message" : "assistant-message";
   const paragraph = document.createElement("p");
   paragraph.textContent = text;
-  bubble.appendChild(paragraph);
-  content.appendChild(bubble);
+  message.appendChild(paragraph);
+  content.appendChild(message);
+
+  if (sender === "bot" && "speechSynthesis" in window) {
+    const speakButton = document.createElement("button");
+    speakButton.className = "speak-button";
+    speakButton.type = "button";
+    speakButton.dataset.speak = text;
+    speakButton.textContent = "Read aloud";
+    speakButton.setAttribute("aria-label", "Read Maya's latest reply aloud");
+    content.appendChild(speakButton);
+  }
+
   row.appendChild(content);
   messages.appendChild(row);
   row.scrollIntoView({ block: "nearest" });
@@ -80,8 +127,32 @@ function showRecommendations(items) {
     const category = document.createElement("p");
     category.textContent = item.primary_category ? `Category: ${item.primary_category}` : "";
     const description = document.createElement("p");
-    description.textContent = item.short_description || "";
+    description.className = "recommendation-description";
+    description.textContent = item.display_description || item.short_description || "";
     card.append(title, location, category, description);
+
+    const facts = [
+      item.cost_summary,
+      item.duration_summary,
+      item.accessibility_summary,
+    ].filter(Boolean);
+    if (facts.length) {
+      const factList = document.createElement("ul");
+      factList.className = "recommendation-facts";
+      for (const fact of facts) {
+        const listItem = document.createElement("li");
+        listItem.textContent = fact;
+        factList.appendChild(listItem);
+      }
+      card.appendChild(factList);
+    }
+
+    if (item.verification_note) {
+      const note = document.createElement("p");
+      note.className = "verification-note";
+      note.textContent = item.verification_note;
+      card.appendChild(note);
+    }
 
     const source = item.official_url || item.source_url;
     if (source) {
@@ -89,7 +160,7 @@ function showRecommendations(items) {
       link.href = source;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-      link.textContent = "Check official information";
+      link.textContent = "Check visitor information";
       card.appendChild(link);
     }
     recommendations.appendChild(card);
@@ -121,7 +192,8 @@ async function sendJson(url, body) {
 async function submitMessage(message) {
   addMessage(message, "user");
   input.value = "";
-  formStatus.textContent = "Finding a helpful response…";
+  input.style.height = "auto";
+  formStatus.textContent = "Finding a helpful response...";
   sendButton.disabled = true;
   quickReplies.querySelectorAll("button").forEach(button => { button.disabled = true; });
 
@@ -146,13 +218,42 @@ form.addEventListener("submit", event => {
   if (message) submitMessage(message);
 });
 
+input.addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    form.requestSubmit();
+  }
+});
+
+input.addEventListener("input", () => {
+  input.style.height = "auto";
+  input.style.height = `${Math.min(input.scrollHeight, 160)}px`;
+});
+
 quickReplies.addEventListener("click", event => {
   const button = event.target.closest("button[data-message]");
   if (button) submitMessage(button.dataset.message);
 });
 
+messages.addEventListener("click", event => {
+  const button = event.target.closest("button[data-speak]");
+  if (!button || !("speechSynthesis" in window)) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(button.dataset.speak);
+  if (preferredSpeechVoice) {
+    utterance.voice = preferredSpeechVoice;
+    utterance.lang = preferredSpeechVoice.lang;
+  } else {
+    utterance.lang = "en-MY";
+  }
+  utterance.rate = 0.86;
+  utterance.pitch = 1.02;
+  window.speechSynthesis.speak(utterance);
+});
+
 resetButton.addEventListener("click", async () => {
   resetButton.disabled = true;
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
   try {
     const data = await sendJson("/api/reset");
     messages.replaceChildren();
@@ -169,10 +270,27 @@ resetButton.addEventListener("click", async () => {
   }
 });
 
+function applySavedDisplaySettings() {
+  const largeText = localStorage.getItem("largeText") === "true";
+  const highContrast = localStorage.getItem("highContrast") === "true";
+  document.body.classList.toggle("large-text", largeText);
+  document.body.classList.toggle("high-contrast", highContrast);
+  textSizeButton.setAttribute("aria-pressed", String(largeText));
+  contrastButton.setAttribute("aria-pressed", String(highContrast));
+  textSizeButton.querySelector(".control-label").textContent = largeText ? "Normal text" : "Larger text";
+  contrastButton.querySelector(".control-label").textContent = highContrast ? "Standard colours" : "High contrast";
+}
+
 textSizeButton.addEventListener("click", () => {
-  const enabled = document.body.classList.toggle("large-text");
-  textSizeButton.setAttribute("aria-pressed", String(enabled));
-  textSizeButton.innerHTML = enabled
-    ? '<span aria-hidden="true">A</span> Normal text'
-    : '<span aria-hidden="true">A+</span> Larger text';
+  const enabled = !document.body.classList.contains("large-text");
+  localStorage.setItem("largeText", String(enabled));
+  applySavedDisplaySettings();
 });
+
+contrastButton.addEventListener("click", () => {
+  const enabled = !document.body.classList.contains("high-contrast");
+  localStorage.setItem("highContrast", String(enabled));
+  applySavedDisplaySettings();
+});
+
+applySavedDisplaySettings();

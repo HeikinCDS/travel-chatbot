@@ -74,7 +74,12 @@ def recommend_attractions(
             recommended_duration_hours,
             family_friendly,
             elderly_friendly,
-            wheelchair_accessible
+            wheelchair_accessible,
+            accessibility_notes,
+            official_url,
+            source_url,
+            date_verified,
+            verification_status
         FROM attractions
         {where_clause}
         ORDER BY completeness DESC, attraction_name ASC

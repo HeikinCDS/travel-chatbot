@@ -3,94 +3,105 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="An elderly-friendly chatbot for discovering Malaysian attractions.">
-  <title>Malaysia Travel Companion</title>
+  <meta name="description" content="JomVoyage is an elderly-friendly AI travel companion for discovering Malaysian attractions.">
+  <title>JomVoyage | Meet Maya</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
   <a class="skip-link" href="#message-input">Skip to the message box</a>
 
-  <main class="page-frame">
-    <section class="chat-window" aria-labelledby="app-title">
-      <header class="chat-header">
-        <div class="assistant-identity">
-          <div class="assistant-avatar" aria-hidden="true">🤖</div>
-          <div>
-            <h1 id="app-title">Malaysia Travel Companion</h1>
-            <p><span class="online-dot" aria-hidden="true"></span> Ready to help</p>
-          </div>
-        </div>
-        <div class="header-actions">
-          <button id="text-size-button" class="header-button" type="button" aria-pressed="false">
-            <span aria-hidden="true">A+</span> Larger text
-          </button>
-          <button id="reset-button" class="header-button" type="button">
-            Start over
-          </button>
-        </div>
-      </header>
+  <header class="top-bar">
+    <a class="brand" href="/" aria-label="JomVoyage home">
+      <span class="brand-mark" aria-hidden="true">MY</span>
+      <span>
+        <strong>JomVoyage</strong>
+        <small>Plan Malaysia with Maya</small>
+      </span>
+    </a>
 
-      <div class="information-strip">
-        <details class="help-details">
-          <summary>How to use this chatbot</summary>
-          <p>Choose a state, attraction type, budget, or accessibility requirement. You can type or use the large choice buttons.</p>
-        </details>
-        <details class="preference-details">
-          <summary>My saved preferences</summary>
-          <dl id="preference-list" class="preference-list">
-            <div><dt>Status</dt><dd>Not provided yet</dd></div>
-          </dl>
-        </details>
+    <nav class="accessibility-controls" aria-label="Accessibility and conversation controls">
+      <button id="text-size-button" class="control-button" type="button" aria-pressed="false">
+        <span aria-hidden="true">A+</span>
+        <span class="control-label">Larger text</span>
+      </button>
+      <button id="contrast-button" class="control-button" type="button" aria-pressed="false">
+        <span aria-hidden="true">HC</span>
+        <span class="control-label">High contrast</span>
+      </button>
+      <button id="reset-button" class="control-button" type="button">
+        <span aria-hidden="true">+</span>
+        <span class="control-label">New chat</span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="conversation-shell">
+    <section class="intro-card" aria-labelledby="intro-title">
+      <div>
+        <p class="eyebrow">Plan a trip in Malaysia</p>
+        <h1 id="intro-title">Where would you like to explore?</h1>
+        <p>Tell me a state and what you enjoy. I will remember your choices while we chat.</p>
       </div>
+      <details class="help-details">
+        <summary>How to use</summary>
+        <p>You may type a message or tap one of the large choices. You can also mention your budget, mobility needs, or a preference for elderly-friendly places.</p>
+      </details>
+    </section>
 
-      <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions">
-        <article class="message-row bot-row">
-          <div class="message-avatar" aria-hidden="true">🤖</div>
-          <div>
-            <p class="speaker-name">Travel Companion</p>
-            <div class="message bot-message">
-              <p>Hello! Which Malaysian state would you like to visit?</p>
-            </div>
+    <details class="preference-panel">
+      <summary>View my saved trip preferences</summary>
+      <dl id="preference-list" class="preference-list">
+        <div><dt>Status</dt><dd>Not provided yet</dd></div>
+      </dl>
+    </details>
+
+    <section id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation">
+      <article class="message-row assistant-row">
+        <div class="assistant-mark" aria-hidden="true">MY</div>
+        <div class="message-content">
+          <p class="speaker-name">Maya</p>
+          <div class="assistant-message">
+            <p>Hello, I am Maya, your JomVoyage travel companion. Which Malaysian state would you like to visit?</p>
           </div>
-        </article>
+          <button class="speak-button" type="button" data-speak="Hello, I am Maya, your JomVoyage travel companion. Which Malaysian state would you like to visit?">
+            Read aloud
+          </button>
+        </div>
+      </article>
+    </section>
+
+    <section id="recommendations" class="recommendations" aria-live="polite" aria-label="Recommended attractions"></section>
+
+    <section class="choice-area" aria-labelledby="choice-heading">
+      <h2 id="choice-heading">Suggested answers</h2>
+      <div id="quick-replies" class="quick-replies">
+        <button type="button" data-message="Johor">Johor</button>
+        <button type="button" data-message="Penang">Penang</button>
+        <button type="button" data-message="Perak">Perak</button>
+        <button type="button" data-message="Pahang">Pahang</button>
+        <button type="button" data-message="Sabah">Sabah</button>
+        <button type="button" data-message="Sarawak">Sarawak</button>
       </div>
-
-      <div id="recommendations" class="recommendations" aria-live="polite"></div>
-
-      <section class="choice-area" aria-labelledby="choice-heading">
-        <h2 id="choice-heading">Tap a choice or type your own answer</h2>
-        <div id="quick-replies" class="quick-replies">
-          <button type="button" data-message="Johor">Johor</button>
-          <button type="button" data-message="Penang">Penang</button>
-          <button type="button" data-message="Perak">Perak</button>
-          <button type="button" data-message="Pahang">Pahang</button>
-          <button type="button" data-message="Sabah">Sabah</button>
-          <button type="button" data-message="Sarawak">Sarawak</button>
-        </div>
-      </section>
-
-      <form id="chat-form" class="chat-form">
-        <label for="message-input">Your message</label>
-        <div class="input-row">
-          <input
-            id="message-input"
-            name="message"
-            type="text"
-            maxlength="500"
-            autocomplete="off"
-            placeholder="Type your answer here"
-            required
-          >
-          <button id="send-button" class="send-button" type="submit">Send</button>
-        </div>
-        <p id="form-status" class="form-status" role="status"></p>
-      </form>
-
-      <footer class="app-note">
-        Attraction details should be confirmed with official sources before travelling.
-      </footer>
     </section>
   </main>
+
+  <div class="composer-area">
+    <form id="chat-form" class="chat-form">
+      <label class="visually-hidden" for="message-input">Type your travel request</label>
+      <textarea
+        id="message-input"
+        name="message"
+        rows="1"
+        maxlength="500"
+        autocomplete="off"
+        placeholder="Message Maya"
+        required
+      ></textarea>
+      <button id="send-button" class="send-button" type="submit">Send</button>
+    </form>
+    <p id="form-status" class="form-status" role="status"></p>
+    <p class="safety-note">Confirm prices, opening hours and accessibility with official sources before travelling.</p>
+  </div>
 
   <noscript>This chatbot requires JavaScript to send messages.</noscript>
   <script src="{{ url_for('static', filename='chat.js') }}" defer></script>

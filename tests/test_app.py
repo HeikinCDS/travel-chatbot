@@ -40,9 +40,12 @@ class FlaskApplicationTests(unittest.TestCase):
     def test_home_page_contains_accessible_chat_controls(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Malaysia Travel Companion", response.data)
+        self.assertIn(b"JomVoyage", response.data)
+        self.assertIn(b"Maya", response.data)
         self.assertIn(b'id="message-input"', response.data)
         self.assertIn(b'id="text-size-button"', response.data)
+        self.assertIn(b'id="contrast-button"', response.data)
+        self.assertIn(b'class="composer-area"', response.data)
 
     def test_health_endpoint(self):
         response = self.client.get("/health")
