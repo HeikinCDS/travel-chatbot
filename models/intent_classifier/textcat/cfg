@@ -7,7 +7,8 @@
     "request_alternative",
     "reset_conversation",
     "help",
-    "goodbye"
+    "goodbye",
+    "out_of_scope"
   ],
   "threshold":0.0,
   "positive_label":null

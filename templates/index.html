@@ -35,8 +35,26 @@
     </nav>
   </header>
 
-  <main class="conversation-shell">
-    <section class="intro-card" aria-labelledby="intro-title">
+  <div class="app-layout">
+    <aside class="trip-sidebar" aria-label="Trip preferences and chat history">
+      <details class="sidebar-card preference-panel" open>
+        <summary>Saved trip preferences</summary>
+        <p class="sidebar-help">Maya updates these details while you chat.</p>
+        <dl id="preference-list" class="preference-list">
+          <div><dt>Status</dt><dd>Not provided yet</dd></div>
+        </dl>
+      </details>
+
+      <details class="sidebar-card history-panel" open>
+        <summary>Chat history</summary>
+        <p class="sidebar-help">Current conversation. Select a message to return to it.</p>
+        <p id="history-empty" class="history-empty">Your messages will appear here.</p>
+        <ol id="chat-history" class="chat-history" aria-label="Messages in this conversation"></ol>
+      </details>
+    </aside>
+
+    <main class="conversation-shell">
+      <section class="intro-card" aria-labelledby="intro-title">
       <div>
         <p class="eyebrow">Plan a trip in Malaysia</p>
         <h1 id="intro-title">Where would you like to explore?</h1>
@@ -46,16 +64,9 @@
         <summary>How to use</summary>
         <p>You may type a message or tap one of the large choices. You can also mention your budget, mobility needs, or a preference for elderly-friendly places.</p>
       </details>
-    </section>
+      </section>
 
-    <details class="preference-panel">
-      <summary>View my saved trip preferences</summary>
-      <dl id="preference-list" class="preference-list">
-        <div><dt>Status</dt><dd>Not provided yet</dd></div>
-      </dl>
-    </details>
-
-    <section id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation">
+      <section id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation">
       <article class="message-row assistant-row">
         <div class="assistant-mark" aria-hidden="true">MY</div>
         <div class="message-content">
@@ -68,11 +79,11 @@
           </button>
         </div>
       </article>
-    </section>
+      </section>
 
-    <section id="recommendations" class="recommendations" aria-live="polite" aria-label="Recommended attractions"></section>
+      <section id="recommendations" class="recommendations" aria-live="polite" aria-label="Recommended attractions"></section>
 
-    <section class="choice-area" aria-labelledby="choice-heading">
+      <section class="choice-area" aria-labelledby="choice-heading">
       <h2 id="choice-heading">Suggested answers</h2>
       <div id="quick-replies" class="quick-replies">
         <button type="button" data-message="Johor">Johor</button>
@@ -82,8 +93,9 @@
         <button type="button" data-message="Sabah">Sabah</button>
         <button type="button" data-message="Sarawak">Sarawak</button>
       </div>
-    </section>
-  </main>
+      </section>
+    </main>
+  </div>
 
   <div class="composer-area">
     <form id="chat-form" class="chat-form">

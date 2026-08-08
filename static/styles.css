@@ -110,9 +110,43 @@ button, summary { cursor: pointer; }
 }
 .control-button:hover, .control-button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
 
-.conversation-shell {
-  width: min(860px, calc(100% - 2rem));
+.app-layout {
+  display: grid;
+  grid-template-columns: minmax(270px, 320px) minmax(0, 860px);
+  gap: 1.4rem;
+  width: min(1240px, calc(100% - 2rem));
   margin: 1.5rem auto 0;
+}
+
+.conversation-shell { min-width: 0; }
+
+.trip-sidebar {
+  position: sticky;
+  top: 98px;
+  align-self: start;
+  max-height: calc(100vh - 285px);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.sidebar-card {
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.sidebar-card summary {
+  min-height: 48px;
+  color: var(--accent-dark);
+  font-weight: 800;
+}
+
+.sidebar-help {
+  margin: 0 0 0.7rem;
+  color: var(--muted);
+  font-size: 0.78rem;
 }
 
 .intro-card {
@@ -131,20 +165,38 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
 .intro-card p { margin-bottom: 0; }
 
 .help-details { min-width: 170px; }
-.help-details summary, .preference-panel summary { min-height: 48px; color: var(--accent-dark); font-weight: 800; }
+.help-details summary { min-height: 48px; color: var(--accent-dark); font-weight: 800; }
 .help-details p { max-width: 420px; }
 
-.preference-panel {
-  margin-bottom: 1.2rem;
-  padding: 0.65rem 1rem;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--surface);
-}
-.preference-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.45rem; margin: 0.6rem 0 0; }
+.preference-list { display: grid; gap: 0.45rem; margin: 0; }
 .preference-list div { padding: 0.55rem 0.65rem; border-radius: 10px; background: var(--surface-soft); }
 .preference-list dt { font-weight: 800; }
 .preference-list dd { margin: 0; overflow-wrap: anywhere; }
+
+.history-empty { margin: 0; color: var(--muted); font-size: 0.82rem; }
+.chat-history { display: grid; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
+.chat-history button {
+  display: block;
+  width: 100%;
+  min-height: 58px;
+  padding: 0.55rem 0.65rem;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--surface-soft);
+  color: var(--text);
+  text-align: left;
+}
+.chat-history button:hover { border-color: var(--accent); background: var(--accent-soft); }
+.history-speaker { display: block; color: var(--accent-dark); font-size: 0.75rem; font-weight: 800; }
+.history-preview {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
 
 .messages { min-height: 260px; padding: 0.75rem 0; }
 .message-row { display: flex; gap: 0.8rem; margin-bottom: 1.6rem; }
@@ -163,10 +215,23 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
 .recommendation-card h3 { margin: 0 0 0.35rem; font-size: 1.05rem; }
 .recommendation-card p { margin: 0 0 0.45rem; }
 .recommendation-card a { color: var(--accent-dark); font-weight: 800; }
+.recommendation-image { margin: -1rem -1rem 0.9rem; }
+.recommendation-image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 14px 14px 0 0;
+  background: var(--surface-soft);
+}
+.recommendation-image figcaption { padding: 0.45rem 1rem 0; font-size: 0.75rem; }
+.recommendation-image figcaption a { font-weight: 600; }
 .recommendation-description { margin-top: 0.7rem !important; }
 .recommendation-facts { margin: 0.75rem 0; padding-left: 1.25rem; }
 .recommendation-facts li { margin-bottom: 0.35rem; }
 .verification-note { padding: 0.6rem; border-left: 4px solid var(--focus); background: var(--surface-soft); color: var(--muted); font-size: 0.82rem; }
+.source-links { display: grid; gap: 0.3rem; margin-top: 0.75rem; }
+.source-links strong { font-size: 0.85rem; }
 
 .choice-area { margin: 0 0 1rem 3.25rem; }
 .choice-area h2 { margin: 0 0 0.4rem; color: var(--muted); font-size: 0.85rem; }
@@ -188,7 +253,7 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
   bottom: 0;
   left: 0;
   z-index: 30;
-  padding: 0.75rem 1rem 0.6rem;
+  padding: 0.75rem 1rem 0.6rem 340px;
   background: linear-gradient(transparent, var(--page) 22%);
 }
 .chat-form { display: flex; align-items: flex-end; gap: 0.55rem; width: min(820px, 100%); margin: 0 auto; padding: 0.55rem; border: 2px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: 0 5px 22px rgba(0,0,0,0.1); }
@@ -204,13 +269,34 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
 button:focus-visible, textarea:focus-visible, summary:focus-visible, a:focus-visible { outline: 4px solid var(--focus); outline-offset: 3px; }
 button:disabled { cursor: wait; opacity: 0.6; }
 
+@media (max-width: 1050px) {
+  .app-layout { grid-template-columns: minmax(245px, 290px) minmax(0, 1fr); }
+  .composer-area { padding-left: 310px; }
+}
+
+@media (max-width: 880px) {
+  .app-layout { display: block; }
+  .trip-sidebar {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+    max-height: none;
+    overflow: visible;
+  }
+  .sidebar-card { margin-bottom: 0.8rem; }
+  .conversation-shell { width: 100%; }
+  .composer-area { padding-left: 1rem; }
+}
+
 @media (max-width: 760px) {
   body { padding-bottom: 215px; }
   .top-bar { align-items: stretch; flex-direction: column; }
   .accessibility-controls { display: grid; grid-template-columns: repeat(3, 1fr); }
   .control-button { padding: 0.4rem; }
   .control-label { display: block; font-size: 0.72rem; }
-  .conversation-shell { width: min(100% - 1.2rem, 860px); margin-top: 0.7rem; }
+  .app-layout { width: min(100% - 1.2rem, 860px); margin-top: 0.7rem; }
+  .trip-sidebar { display: block; }
   .intro-card { flex-direction: column; }
   .help-details { width: 100%; }
   .recommendations, .choice-area { margin-left: 0; }

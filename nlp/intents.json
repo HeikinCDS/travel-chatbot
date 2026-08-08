@@ -359,6 +359,51 @@
                                          "Okay bye, talk to you later",
                                          "I am signing off now"
                                      ]
+                    },
+                    {
+                        "label":  "out_of_scope",
+                        "examples":  [
+                                         "Can you help me write Python code?",
+                                         "Solve this mathematics equation for me",
+                                         "What is two plus two?",
+                                         "Write my homework assignment",
+                                         "Can you create an essay about science?",
+                                         "How do I cook fried rice?",
+                                         "Give me a chocolate cake recipe",
+                                         "Who won the football match yesterday?",
+                                         "Tell me the latest basketball score",
+                                         "What is the current stock price?",
+                                         "Should I buy cryptocurrency?",
+                                         "Give me financial investment advice",
+                                         "Tell me a funny joke",
+                                         "Write a poem for my friend",
+                                         "Can you compose a song?",
+                                         "What movie should I watch tonight?",
+                                         "Recommend a television series",
+                                         "Help me fix my computer",
+                                         "Why is my phone not working?",
+                                         "How do I install this software?",
+                                         "Explain quantum physics to me",
+                                         "What is the meaning of this English word?",
+                                         "Translate this sentence into Chinese",
+                                         "Who is the president of this country?",
+                                         "Tell me the latest political news",
+                                         "Can you diagnose my illness?",
+                                         "What medicine should I take?",
+                                         "Give me relationship advice",
+                                         "How can I pass my examination?",
+                                         "Help me prepare for a job interview",
+                                         "Write a business proposal for me",
+                                         "Create a logo for my company",
+                                         "Can you edit my photograph?",
+                                         "What is the capital of France?",
+                                         "Explain how electricity works",
+                                         "How do I repair a leaking pipe?",
+                                         "What should I wear to a wedding?",
+                                         "Can you order food for me?",
+                                         "Play some music",
+                                         "Set an alarm for tomorrow morning"
+                                     ]
                     }
                 ]
 }

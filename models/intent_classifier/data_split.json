@@ -3,459 +3,139 @@
   "test_ratio": 0.2,
   "training_examples": [
     {
-      "text": "I am leaving now, goodbye",
+      "text": "I have finished using the chatbot",
       "label": "goodbye"
     },
     {
-      "text": "Hello there",
+      "text": "What is the meaning of this English word?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Good evening, chatbot",
       "label": "greeting"
     },
     {
-      "text": "I want something related to history instead",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Forget my previous choices",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Which beach would you recommend in Malaysia?",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "Can I search using a price limit?",
-      "label": "help"
-    },
-    {
-      "text": "Thank you, I will stop now",
-      "label": "goodbye"
-    },
-    {
-      "text": "Are there any other matching places?",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Can you show me the description?",
-      "label": "request_information"
-    },
-    {
-      "text": "Give me instructions for using the chatbot",
-      "label": "help"
-    },
-    {
-      "text": "Restart without keeping any filters",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Recommend another attraction instead",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Change the state to Perak",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Bye",
-      "label": "goodbye"
-    },
-    {
-      "text": "Reset the conversation",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Start a completely new travel plan",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Actually I will be travelling alone",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Cheers, bye",
-      "label": "goodbye"
-    },
-    {
-      "text": "How do I change a travel preference?",
-      "label": "help"
-    },
-    {
-      "text": "Does this recommended place have parking?",
-      "label": "request_information"
-    },
-    {
-      "text": "Hi assistant, how are you today?",
+      "text": "A very good morning to you",
       "label": "greeting"
-    },
-    {
-      "text": "I need a place that is suitable for elderly visitors",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "Reset everything and begin again",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "What other attractions are available?",
-      "label": "request_alternative"
-    },
-    {
-      "text": "I want a different option from this one",
-      "label": "request_alternative"
-    },
-    {
-      "text": "What is the next recommendation?",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Good evening",
-      "label": "greeting"
-    },
-    {
-      "text": "Good evening, I need travel advice",
-      "label": "greeting"
-    },
-    {
-      "text": "Which attraction should I choose in Johor?",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "I am done planning",
-      "label": "goodbye"
-    },
-    {
-      "text": "How does this travel assistant work?",
-      "label": "help"
-    },
-    {
-      "text": "Hello",
-      "label": "greeting"
-    },
-    {
-      "text": "Reset the entire recommendation session",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Show me free attractions in Kuala Lumpur",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "Change my current search to Johor",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Can you replace this suggestion?",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Hi there",
-      "label": "greeting"
-    },
-    {
-      "text": "Show a different result",
-      "label": "request_alternative"
-    },
-    {
-      "text": "What are some good places to visit in Malaysia?",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "What activities can visitors do here?",
-      "label": "request_information"
-    },
-    {
-      "text": "When does this attraction open?",
-      "label": "request_information"
-    },
-    {
-      "text": "What facilities are available?",
-      "label": "request_information"
-    },
-    {
-      "text": "Good morning",
-      "label": "greeting"
-    },
-    {
-      "text": "Forget all preferences and start fresh",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "I only want wheelchair accessible places",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "I do not like this recommendation",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Show me the available commands",
-      "label": "help"
-    },
-    {
-      "text": "I want to see another result",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Bye for now",
-      "label": "goodbye"
-    },
-    {
-      "text": "Give me a different recommendation",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Can you limit it to indoor attractions?",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "What should I tell you?",
-      "label": "help"
-    },
-    {
-      "text": "What can I do at this attraction?",
-      "label": "request_information"
-    },
-    {
-      "text": "Forget every preference I entered",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Find me a place for a short holiday",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "Tell me how the chatbot works",
-      "label": "help"
-    },
-    {
-      "text": "Erase my previous requirements",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Help me find somewhere interesting to visit",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "Find an attraction for a solo traveller",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "I would like another option",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Show me something else without changing my preferences",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Tell me the address of this attraction",
-      "label": "request_information"
-    },
-    {
-      "text": "No, show me a different one",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Skip this attraction",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Evening",
-      "label": "greeting"
-    },
-    {
-      "text": "Forget the current trip plan",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "How do I request another recommendation?",
-      "label": "help"
-    },
-    {
-      "text": "Give me an alternative to the current place",
-      "label": "request_alternative"
-    },
-    {
-      "text": "What travel details can I enter?",
-      "label": "help"
-    },
-    {
-      "text": "What else can you recommend?",
-      "label": "request_alternative"
-    },
-    {
-      "text": "New search please",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "How can I search for Malaysian attractions?",
-      "label": "help"
-    },
-    {
-      "text": "Hi, I need your assistance",
-      "label": "greeting"
-    },
-    {
-      "text": "Change the current recommendation criteria to beaches",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Where is this place located?",
-      "label": "request_information"
     },
     {
       "text": "What activities are offered there?",
       "label": "request_information"
     },
     {
-      "text": "Can elderly visitors go there?",
+      "text": "Can you show me the description?",
       "label": "request_information"
+    },
+    {
+      "text": "What is the ticket price for this recommended place?",
+      "label": "request_information"
+    },
+    {
+      "text": "Let me begin again",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Suggest an outdoor activity for this weekend",
+      "label": "request_recommendation"
     },
     {
       "text": "Recommend an attraction suitable for senior citizens",
       "label": "request_recommendation"
     },
     {
-      "text": "Goodbye and have a nice day",
-      "label": "goodbye"
-    },
-    {
-      "text": "Does this attraction provide disabled access?",
-      "label": "request_information"
-    },
-    {
-      "text": "Change my current preference to an indoor attraction",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Show an example of a question I can ask",
-      "label": "help"
-    },
-    {
-      "text": "What does this chatbot support?",
-      "label": "help"
-    },
-    {
-      "text": "Morning",
-      "label": "greeting"
-    },
-    {
-      "text": "End the conversation",
-      "label": "goodbye"
-    },
-    {
-      "text": "Is this recommended destination family friendly?",
-      "label": "request_information"
-    },
-    {
-      "text": "Add wheelchair accessibility to my preferences",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Where can I go with my children?",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "What type of attraction is this?",
-      "label": "request_information"
-    },
-    {
-      "text": "Clear the current search completely",
+      "text": "Erase my previous requirements",
       "label": "reset_conversation"
     },
     {
-      "text": "Can you explain how recommendations work?",
-      "label": "help"
+      "text": "No more help is needed, bye",
+      "label": "goodbye"
     },
     {
-      "text": "Reduce the maximum travel time to half a day",
+      "text": "Can you make the recommendations child friendly?",
       "label": "refine_preferences"
     },
     {
-      "text": "Next recommendation please",
-      "label": "request_alternative"
+      "text": "I will end the chat here",
+      "label": "goodbye"
     },
     {
-      "text": "Show me how to get a recommendation",
-      "label": "help"
+      "text": "Find an attraction for a solo traveller",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Return the chatbot to the beginning",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Hello there",
+      "label": "greeting"
+    },
+    {
+      "text": "Where should I visit in Putrajaya?",
+      "label": "request_recommendation"
     },
     {
       "text": "Is the attraction indoors or outdoors?",
       "label": "request_information"
     },
     {
-      "text": "Can you suggest a tourist attraction?",
+      "text": "How do I repair a leaking pipe?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Does this attraction provide disabled access?",
+      "label": "request_information"
+    },
+    {
+      "text": "What other attractions are available?",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Can you help me write Python code?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "What nature destinations do you recommend?",
       "label": "request_recommendation"
     },
     {
-      "text": "I need help using the system",
-      "label": "help"
+      "text": "Why is my phone not working?",
+      "label": "out_of_scope"
     },
     {
-      "text": "Clear my preferences",
+      "text": "Begin a new search",
       "label": "reset_conversation"
     },
     {
-      "text": "Good day",
+      "text": "Hiya",
       "label": "greeting"
     },
     {
-      "text": "Is this attraction wheelchair accessible?",
-      "label": "request_information"
+      "text": "Bye for now",
+      "label": "goodbye"
     },
     {
       "text": "Remove the budget limit from my preferences",
       "label": "refine_preferences"
     },
     {
-      "text": "Good afternoon, how are you?",
-      "label": "greeting"
+      "text": "Tell me about the facilities at this attraction",
+      "label": "request_information"
     },
     {
-      "text": "Start from zero",
-      "label": "reset_conversation"
+      "text": "Reduce the maximum travel time to half a day",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Show me the available commands",
+      "label": "help"
     },
     {
       "text": "Hi travel chatbot",
       "label": "greeting"
     },
     {
-      "text": "How long should I spend there?",
-      "label": "request_information"
-    },
-    {
-      "text": "Start a fresh recommendation",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "I will stop here",
-      "label": "goodbye"
-    },
-    {
-      "text": "Change my interest to nature",
-      "label": "refine_preferences"
-    },
-    {
       "text": "Which state is this attraction in?",
-      "label": "request_information"
-    },
-    {
-      "text": "Change my selected category from nature to history",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Update my group type from friends to family",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Show me attractions in Johor",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "How do I get more details about this destination?",
-      "label": "request_information"
-    },
-    {
-      "text": "How much time is needed at this place?",
       "label": "request_information"
     },
     {
@@ -463,19 +143,219 @@
       "label": "greeting"
     },
     {
-      "text": "Thanks for assisting me, goodbye",
+      "text": "I want to plan a new trip",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Suggest a nature destination in Sabah",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Good morning",
+      "label": "greeting"
+    },
+    {
+      "text": "What kind of questions can I ask?",
+      "label": "help"
+    },
+    {
+      "text": "Replace the current recommendation with another one",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Start from zero",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "What is the estimated cost for an adult?",
+      "label": "request_information"
+    },
+    {
+      "text": "Give me relationship advice",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Where would you recommend I travel next?",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Recommend a television series",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "What can I do at this attraction?",
+      "label": "request_information"
+    },
+    {
+      "text": "Suggest a place I can visit in Malaysia",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "See you later",
       "label": "goodbye"
     },
     {
-      "text": "Suggest an outdoor activity for this weekend",
+      "text": "Please find a family attraction in Penang",
       "label": "request_recommendation"
     },
     {
-      "text": "Suggest an affordable destination for two people",
+      "text": "Show me another place",
+      "label": "request_alternative"
+    },
+    {
+      "text": "How can I search for Malaysian attractions?",
+      "label": "help"
+    },
+    {
+      "text": "Only include attractions in Sabah",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "I need help using the system",
+      "label": "help"
+    },
+    {
+      "text": "Change the current recommendation criteria to beaches",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Add family friendly places to my current search",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Reset all the filters",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Evening",
+      "label": "greeting"
+    },
+    {
+      "text": "Let us try again from scratch",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Show me how to get a recommendation",
+      "label": "help"
+    },
+    {
+      "text": "Can you suggest a tourist attraction?",
       "label": "request_recommendation"
     },
     {
-      "text": "Give me the next matching destination",
+      "text": "What is two plus two?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "I will stop here",
+      "label": "goodbye"
+    },
+    {
+      "text": "Make it suitable for children",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "What does this chatbot support?",
+      "label": "help"
+    },
+    {
+      "text": "I am signing off now",
+      "label": "goodbye"
+    },
+    {
+      "text": "Increase my maximum budget to RM100",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Where is this place located?",
+      "label": "request_information"
+    },
+    {
+      "text": "What destinations can you search?",
+      "label": "help"
+    },
+    {
+      "text": "Forget all preferences and start fresh",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Show another result with the same preferences",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Give me a different recommendation",
+      "label": "request_alternative"
+    },
+    {
+      "text": "How do I request another recommendation?",
+      "label": "help"
+    },
+    {
+      "text": "Hi, I need your assistance",
+      "label": "greeting"
+    },
+    {
+      "text": "Show an example of a question I can ask",
+      "label": "help"
+    },
+    {
+      "text": "Play some music",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Explain the steps for getting recommendations",
+      "label": "help"
+    },
+    {
+      "text": "Explain quantum physics to me",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Can you help me?",
+      "label": "help"
+    },
+    {
+      "text": "Can you order food for me?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Restart without keeping any filters",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "What movie should I watch tonight?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Hello, is anyone there?",
+      "label": "greeting"
+    },
+    {
+      "text": "What should I wear to a wedding?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Give me an alternative to the current place",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Tell me the address of this attraction",
+      "label": "request_information"
+    },
+    {
+      "text": "I would like another option",
+      "label": "request_alternative"
+    },
+    {
+      "text": "What can you do?",
+      "label": "help"
+    },
+    {
+      "text": "How does this travel assistant work?",
+      "label": "help"
+    },
+    {
+      "text": "Skip this attraction",
       "label": "request_alternative"
     },
     {
@@ -483,44 +363,452 @@
       "label": "greeting"
     },
     {
-      "text": "I prefer somewhere outdoors",
-      "label": "refine_preferences"
+      "text": "Show a different result",
+      "label": "request_alternative"
+    },
+    {
+      "text": "No, show me a different one",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Are there any other matching places?",
+      "label": "request_alternative"
+    },
+    {
+      "text": "How do I change a travel preference?",
+      "label": "help"
+    },
+    {
+      "text": "Set an alarm for tomorrow morning",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Thank you, that is all",
+      "label": "goodbye"
+    },
+    {
+      "text": "When does this attraction open?",
+      "label": "request_information"
+    },
+    {
+      "text": "I want a different option from this one",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Morning",
+      "label": "greeting"
     },
     {
       "text": "Hello, nice to meet you",
       "label": "greeting"
     },
     {
-      "text": "Can you help me?",
+      "text": "Can you compose a song?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Good afternoon",
+      "label": "greeting"
+    },
+    {
+      "text": "Hello, I need some travel guidance",
+      "label": "greeting"
+    },
+    {
+      "text": "Goodbye and have a nice day",
+      "label": "goodbye"
+    },
+    {
+      "text": "What are the opening hours?",
+      "label": "request_information"
+    },
+    {
+      "text": "Hi there",
+      "label": "greeting"
+    },
+    {
+      "text": "Does this recommended place have parking?",
+      "label": "request_information"
+    },
+    {
+      "text": "Show me something else without changing my preferences",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Forget the current trip plan",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Suggest an affordable destination for two people",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "New search please",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Can you limit it to indoor attractions?",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "How do I get more details about this destination?",
+      "label": "request_information"
+    },
+    {
+      "text": "What facilities are available?",
+      "label": "request_information"
+    },
+    {
+      "text": "Find me a place for a short holiday",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Bye",
+      "label": "goodbye"
+    },
+    {
+      "text": "Reset the entire recommendation session",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Hello",
+      "label": "greeting"
+    },
+    {
+      "text": "Remove the wheelchair requirement",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "How long should I spend there?",
+      "label": "request_information"
+    },
+    {
+      "text": "Can elderly visitors go there?",
+      "label": "request_information"
+    },
+    {
+      "text": "What is special about this attraction?",
+      "label": "request_information"
+    },
+    {
+      "text": "My planning is complete, thank you",
+      "label": "goodbye"
+    },
+    {
+      "text": "Clear all the information I provided",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Thank you for the recommendations",
+      "label": "goodbye"
+    },
+    {
+      "text": "Change my interest to nature",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "I am finished, see you later",
+      "label": "goodbye"
+    },
+    {
+      "text": "Tell me more about this place",
+      "label": "request_information"
+    },
+    {
+      "text": "Is this recommended destination family friendly?",
+      "label": "request_information"
+    },
+    {
+      "text": "Who won the football match yesterday?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Find one more attraction that matches",
+      "label": "request_alternative"
+    },
+    {
+      "text": "End the conversation",
+      "label": "goodbye"
+    },
+    {
+      "text": "Add wheelchair accessibility to my preferences",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Next recommendation please",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Give me another destination with the same preferences",
+      "label": "request_alternative"
+    },
+    {
+      "text": "How do I install this software?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Make it a half-day activity",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Show me attractions in Johor",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Help me get started",
       "label": "help"
     },
     {
-      "text": "How do I use this chatbot?",
+      "text": "Help me prepare for a job interview",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Give me instructions for using the chatbot",
       "label": "help"
+    },
+    {
+      "text": "Thank you, I will stop now",
+      "label": "goodbye"
+    },
+    {
+      "text": "Give me a chocolate cake recipe",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Tell me a funny joke",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "What type of attraction is this?",
+      "label": "request_information"
+    },
+    {
+      "text": "Change my current search to Johor",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "I do not need anything else",
+      "label": "goodbye"
+    },
+    {
+      "text": "Can you diagnose my illness?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Do you have another suggestion?",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Translate this sentence into Chinese",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Good evening",
+      "label": "greeting"
+    },
+    {
+      "text": "Thanks for your help",
+      "label": "goodbye"
+    },
+    {
+      "text": "Reset the conversation",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Can we begin from the beginning?",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Is this recommended place free to enter?",
+      "label": "request_information"
+    },
+    {
+      "text": "No more questions, goodbye",
+      "label": "goodbye"
+    },
+    {
+      "text": "I need a place that is suitable for elderly visitors",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Start again",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "What is the next recommendation?",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Hello travel assistant",
+      "label": "greeting"
+    },
+    {
+      "text": "Remove all my travel preferences",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Hey, how is it going?",
+      "label": "greeting"
+    },
+    {
+      "text": "Change my selected category from nature to history",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Show me free attractions in Kuala Lumpur",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "What else can you recommend?",
+      "label": "request_alternative"
+    },
+    {
+      "text": "How much time is needed at this place?",
+      "label": "request_information"
+    },
+    {
+      "text": "I changed my mind, start over",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Clear my preferences",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Can you replace this suggestion?",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Clear the current search completely",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "I would rather visit a beach",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Actually I will be travelling alone",
+      "label": "refine_preferences"
     },
     {
       "text": "Why did you recommend this attraction?",
       "label": "request_information"
     },
     {
+      "text": "Find a different attraction",
+      "label": "request_alternative"
+    },
+    {
+      "text": "I am not sure what to type",
+      "label": "help"
+    },
+    {
+      "text": "Help me fix my computer",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Only show family-friendly places",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Recommend another attraction instead",
+      "label": "request_alternative"
+    },
+    {
+      "text": "I am leaving now, goodbye",
+      "label": "goodbye"
+    },
+    {
+      "text": "Give me financial investment advice",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Hi, can we chat?",
+      "label": "greeting"
+    },
+    {
+      "text": "Good evening, I need travel advice",
+      "label": "greeting"
+    },
+    {
+      "text": "How should I ask for an attraction?",
+      "label": "help"
+    },
+    {
+      "text": "Can you suggest something else?",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Cancel this search and restart",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "What travel details can I enter?",
+      "label": "help"
+    },
+    {
+      "text": "Give me the next matching destination",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Start a completely new travel plan",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "What is the current stock price?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "That completes my travel planning",
+      "label": "goodbye"
+    },
+    {
+      "text": "Hey travel bot",
+      "label": "greeting"
+    },
+    {
+      "text": "I only want wheelchair accessible places",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "I prefer somewhere outdoors",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Is this attraction wheelchair accessible?",
+      "label": "request_information"
+    },
+    {
+      "text": "Where can I go with my children?",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Forget every preference I entered",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "What should I tell you?",
+      "label": "help"
+    },
+    {
+      "text": "Tell me the latest political news",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Which beach would you recommend in Malaysia?",
+      "label": "request_recommendation"
+    },
+    {
       "text": "That is enough for now",
       "label": "goodbye"
     },
     {
-      "text": "Let me begin again",
-      "label": "reset_conversation"
+      "text": "I am travelling with friends, not family",
+      "label": "refine_preferences"
     },
     {
-      "text": "Replace the current recommendation with another one",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Okay, I am leaving",
-      "label": "goodbye"
-    },
-    {
-      "text": "Thanks for your help",
-      "label": "goodbye"
+      "text": "Is it good for a family trip?",
+      "label": "request_information"
     },
     {
       "text": "Recommend somewhere for a half-day trip",
@@ -535,39 +823,71 @@
       "label": "request_information"
     },
     {
-      "text": "See you later",
-      "label": "goodbye"
+      "text": "Good afternoon, travel bot",
+      "label": "greeting"
     },
     {
       "text": "What age group is this place suitable for?",
       "label": "request_information"
     },
     {
-      "text": "What filters are available?",
-      "label": "help"
-    },
-    {
-      "text": "What information do you need from me?",
-      "label": "help"
-    },
-    {
-      "text": "Update the trip so it is suitable for children",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Find a different attraction",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Return the chatbot to the beginning",
-      "label": "reset_conversation"
+      "text": "Hi, I am planning a holiday",
+      "label": "greeting"
     },
     {
       "text": "I want a fresh conversation",
       "label": "reset_conversation"
     },
     {
-      "text": "Thank you, goodbye",
+      "text": "Where do I begin?",
+      "label": "help"
+    },
+    {
+      "text": "Recommend somewhere for a weekend outing",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Update the trip so it is suitable for children",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Bye, I have finished planning",
+      "label": "goodbye"
+    },
+    {
+      "text": "Goodbye",
+      "label": "goodbye"
+    },
+    {
+      "text": "Catch you later",
+      "label": "goodbye"
+    },
+    {
+      "text": "Clear everything",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "I need instructions before I start",
+      "label": "help"
+    },
+    {
+      "text": "Cheers, bye",
+      "label": "goodbye"
+    },
+    {
+      "text": "What features are available in this system?",
+      "label": "help"
+    },
+    {
+      "text": "Update my budget to RM50",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Forget my previous choices",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "That is all from me",
       "label": "goodbye"
     },
     {
@@ -583,48 +903,108 @@
       "label": "request_recommendation"
     },
     {
-      "text": "I am signing off now",
-      "label": "goodbye"
+      "text": "Teach me how to use the travel assistant",
+      "label": "help"
+    },
+    {
+      "text": "How do I use this chatbot?",
+      "label": "help"
+    },
+    {
+      "text": "What is a good wildlife attraction?",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Show instructions for this chatbot",
+      "label": "help"
     },
     {
       "text": "I want somewhere suitable for my family",
       "label": "request_recommendation"
     },
     {
-      "text": "What features are available in this system?",
+      "text": "Recommend a nature attraction below RM20",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Can we restart?",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "I would like to see the next result",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Can you create an essay about science?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "What information do you need from me?",
       "label": "help"
     },
     {
-      "text": "Show me the official website for this place",
-      "label": "request_information"
+      "text": "How can I pass my examination?",
+      "label": "out_of_scope"
     },
     {
-      "text": "See you next time",
-      "label": "goodbye"
+      "text": "Anything else?",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Tell me how the chatbot works",
+      "label": "help"
     },
     {
       "text": "I prefer somewhere less adventurous",
       "label": "refine_preferences"
     },
     {
-      "text": "Teach me how to use the travel assistant",
-      "label": "help"
+      "text": "Write my homework assignment",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Create a logo for my company",
+      "label": "out_of_scope"
     },
     {
       "text": "Find me an indoor place to visit",
       "label": "request_recommendation"
     },
     {
-      "text": "Explain the steps for getting recommendations",
-      "label": "help"
+      "text": "Reset everything and begin again",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Find me a cheap attraction in Perak",
+      "label": "request_recommendation"
     },
     {
       "text": "Keep the same preferences but lower the budget",
       "label": "refine_preferences"
     },
     {
-      "text": "I would like to see the next result",
-      "label": "request_alternative"
+      "text": "Explain how electricity works",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Have a nice day",
+      "label": "goodbye"
+    },
+    {
+      "text": "Thanks for assisting me, goodbye",
+      "label": "goodbye"
+    },
+    {
+      "text": "What filters are available?",
+      "label": "help"
+    },
+    {
+      "text": "Thank you, goodbye",
+      "label": "goodbye"
+    },
+    {
+      "text": "Okay, I am leaving",
+      "label": "goodbye"
     },
     {
       "text": "I want somewhere in Johor instead",
@@ -643,191 +1023,79 @@
       "label": "request_recommendation"
     },
     {
-      "text": "Is this recommended place free to enter?",
-      "label": "request_information"
+      "text": "Can you search by budget and state?",
+      "label": "help"
     },
     {
-      "text": "Where should I visit in Putrajaya?",
-      "label": "request_recommendation"
+      "text": "I want something related to history instead",
+      "label": "refine_preferences"
     },
     {
-      "text": "Cancel this search and restart",
+      "text": "Start a fresh recommendation",
       "label": "reset_conversation"
     },
     {
-      "text": "Show another result with the same preferences",
-      "label": "request_alternative"
-    },
-    {
-      "text": "No more help is needed, bye",
-      "label": "goodbye"
-    },
-    {
-      "text": "Good afternoon, travel bot",
+      "text": "Hello and good day",
       "label": "greeting"
     },
     {
-      "text": "Can you search by budget and state?",
-      "label": "help"
+      "text": "Keep everything else but change the state to Sabah",
+      "label": "refine_preferences"
     },
     {
       "text": "I want an attraction that costs less than RM50",
       "label": "request_recommendation"
     },
     {
-      "text": "A very good morning to you",
+      "text": "What are some good places to visit in Malaysia?",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Good day",
       "label": "greeting"
     },
     {
-      "text": "Hello, I need some travel guidance",
-      "label": "greeting"
-    },
-    {
-      "text": "Show instructions for this chatbot",
+      "text": "Can you explain how recommendations work?",
       "label": "help"
     },
     {
-      "text": "Anything else?",
+      "text": "I am done planning",
+      "label": "goodbye"
+    },
+    {
+      "text": "Update my group type from friends to family",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "I want to see another result",
       "label": "request_alternative"
     },
     {
-      "text": "Tell me about the facilities at this attraction",
-      "label": "request_information"
-    },
-    {
-      "text": "Where do I begin?",
-      "label": "help"
-    },
-    {
-      "text": "Tell me more about this place",
-      "label": "request_information"
-    },
-    {
-      "text": "What is a good wildlife attraction?",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "What can you do?",
-      "label": "help"
-    },
-    {
-      "text": "Reset all the filters",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "That completes my travel planning",
-      "label": "goodbye"
-    },
-    {
-      "text": "Update my budget to RM50",
+      "text": "Change my current preference to an indoor attraction",
       "label": "refine_preferences"
     },
     {
-      "text": "Hello travel assistant",
-      "label": "greeting"
-    },
-    {
-      "text": "Hey, how is it going?",
-      "label": "greeting"
-    },
-    {
-      "text": "Only include attractions in Sabah",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "What is the ticket price for this recommended place?",
-      "label": "request_information"
-    },
-    {
-      "text": "Can we restart?",
+      "text": "Clear my session and begin again",
       "label": "reset_conversation"
     },
     {
-      "text": "Good evening, chatbot",
+      "text": "Hi assistant, how are you today?",
       "label": "greeting"
     },
     {
-      "text": "Hello, is anyone there?",
+      "text": "Good afternoon, how are you?",
       "label": "greeting"
     },
     {
-      "text": "Increase my maximum budget to RM100",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "What are the opening hours?",
-      "label": "request_information"
-    },
-    {
-      "text": "I do not need anything else",
-      "label": "goodbye"
-    },
-    {
-      "text": "I need instructions before I start",
-      "label": "help"
-    },
-    {
-      "text": "Clear all the information I provided",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Reset my selections",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Suggest a place I can visit in Malaysia",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "Make it suitable for children",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Start again",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Find me a cheap attraction in Perak",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "Find one more attraction that matches",
+      "text": "Suggest an alternative attraction",
       "label": "request_alternative"
     },
     {
-      "text": "That is all from me",
-      "label": "goodbye"
-    },
-    {
-      "text": "Can you make the recommendations child friendly?",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Recommend a nature attraction below RM20",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "What destinations can you search?",
+      "text": "Can I search using a price limit?",
       "label": "help"
     },
     {
-      "text": "Can we begin from the beginning?",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Hi, I am planning a holiday",
-      "label": "greeting"
-    },
-    {
-      "text": "Hi, can we chat?",
-      "label": "greeting"
-    },
-    {
-      "text": "I will end the chat here",
-      "label": "goodbye"
-    },
-    {
-      "text": "Suggest a nature destination in Sabah",
+      "text": "Help me find somewhere interesting to visit",
       "label": "request_recommendation"
     },
     {
@@ -835,199 +1103,199 @@
       "label": "greeting"
     },
     {
-      "text": "Remove all my travel preferences",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "I am finished, see you later",
-      "label": "goodbye"
-    },
-    {
-      "text": "Suggest an alternative attraction",
+      "text": "I do not like this recommendation",
       "label": "request_alternative"
     },
     {
-      "text": "What kind of questions can I ask?",
-      "label": "help"
-    },
-    {
-      "text": "Clear my session and begin again",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Bye, I have finished planning",
+      "text": "See you next time",
       "label": "goodbye"
+    },
+    {
+      "text": "Can you edit my photograph?",
+      "label": "out_of_scope"
     },
     {
       "text": "Do you have a different matching attraction?",
       "label": "request_alternative"
     },
     {
-      "text": "Let us try again from scratch",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Help me get started",
-      "label": "help"
-    },
-    {
-      "text": "Show me another place",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Make it a half-day activity",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "I changed my mind, start over",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "I have already visited this place",
-      "label": "request_alternative"
-    },
-    {
-      "text": "I am not sure what to type",
-      "label": "help"
-    },
-    {
-      "text": "What is the estimated cost for an adult?",
+      "text": "Show me the official website for this place",
       "label": "request_information"
     },
     {
-      "text": "Recommend somewhere for a weekend outing",
-      "label": "request_recommendation"
+      "text": "Reset my selections",
+      "label": "reset_conversation"
     },
     {
-      "text": "Add family friendly places to my current search",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Remove the wheelchair requirement",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Where would you recommend I travel next?",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "My planning is complete, thank you",
-      "label": "goodbye"
-    },
-    {
-      "text": "Hey travel bot",
-      "label": "greeting"
-    },
-    {
-      "text": "Goodbye",
-      "label": "goodbye"
-    },
-    {
-      "text": "I am travelling with friends, not family",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "No more questions, goodbye",
-      "label": "goodbye"
-    },
-    {
-      "text": "Have a nice day",
-      "label": "goodbye"
-    },
-    {
-      "text": "Do you have another suggestion?",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Suggest somewhere for a couple",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "Can you suggest something else?",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Thank you for the recommendations",
-      "label": "goodbye"
-    },
-    {
-      "text": "Good afternoon",
-      "label": "greeting"
+      "text": "What activities can visitors do here?",
+      "label": "request_information"
     },
     {
       "text": "Please skip this result and show another",
       "label": "request_alternative"
     },
     {
-      "text": "Give me another destination with the same preferences",
+      "text": "I have already visited this place",
       "label": "request_alternative"
     },
     {
-      "text": "Catch you later",
-      "label": "goodbye"
-    },
-    {
-      "text": "Hiya",
-      "label": "greeting"
-    },
-    {
-      "text": "Hello and good day",
-      "label": "greeting"
-    },
-    {
-      "text": "I have finished using the chatbot",
-      "label": "goodbye"
-    },
-    {
-      "text": "How should I ask for an attraction?",
-      "label": "help"
-    },
-    {
-      "text": "Thank you, that is all",
-      "label": "goodbye"
-    },
-    {
-      "text": "I would rather visit a beach",
+      "text": "Change the state to Perak",
       "label": "refine_preferences"
     },
     {
-      "text": "Is it good for a family trip?",
-      "label": "request_information"
+      "text": "Tell me the latest basketball score",
+      "label": "out_of_scope"
     },
     {
-      "text": "Keep everything else but change the state to Sabah",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "I want to plan a new trip",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Clear everything",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Please find a family attraction in Penang",
+      "text": "Suggest somewhere for a couple",
       "label": "request_recommendation"
     },
     {
-      "text": "What is special about this attraction?",
-      "label": "request_information"
-    },
-    {
-      "text": "Only show family-friendly places",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "What nature destinations do you recommend?",
+      "text": "Which attraction should I choose in Johor?",
       "label": "request_recommendation"
-    },
-    {
-      "text": "Begin a new search",
-      "label": "reset_conversation"
     }
   ],
   "testing_examples": [
+    {
+      "text": "Find a destination that matches my preferences",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Write a poem for my friend",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Solve this mathematics equation for me",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Can you explain your features?",
+      "label": "help"
+    },
+    {
+      "text": "Remove outdoor attractions from my search",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Thanks, bye",
+      "label": "goodbye"
+    },
+    {
+      "text": "Recommend a free place to visit",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "How do I cook fried rice?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "That will be all",
+      "label": "goodbye"
+    },
+    {
+      "text": "Keep my preferences and suggest another place",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Thanks, I am finished",
+      "label": "goodbye"
+    },
+    {
+      "text": "How much is the entrance fee?",
+      "label": "request_information"
+    },
+    {
+      "text": "I want to visit a historical place",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Change it to an outdoor destination",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Can u recomend somewhere in Penang?",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "I need a holiday destination",
+      "label": "request_recommendation"
+    },
+    {
+      "text": "Make it cheaper",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "I have everything I need",
+      "label": "goodbye"
+    },
+    {
+      "text": "Good morning, travel assistant",
+      "label": "greeting"
+    },
+    {
+      "text": "Make the trip suitable for elderly people",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "Hey, can you help me plan?",
+      "label": "greeting"
+    },
+    {
+      "text": "When does this attraction close?",
+      "label": "request_information"
+    },
+    {
+      "text": "Hello, how are you?",
+      "label": "greeting"
+    },
+    {
+      "text": "This result is not for me, show another",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Do you only recommend places in Malaysia?",
+      "label": "help"
+    },
+    {
+      "text": "Show me the next option",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Hi chatbot",
+      "label": "greeting"
+    },
+    {
+      "text": "Clear the conversation history",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Hello bot",
+      "label": "greeting"
+    },
+    {
+      "text": "Forget what I said earlier",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "This one is not suitable for me",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Delete all filters and restart",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "What preferences can I provide?",
+      "label": "help"
+    },
+    {
+      "text": "Is it suitable for children?",
+      "label": "request_information"
+    },
+    {
+      "text": "Which details can the chatbot understand?",
+      "label": "help"
+    },
     {
       "text": "Restart the chatbot",
       "label": "reset_conversation"
@@ -1037,27 +1305,31 @@
       "label": "request_information"
     },
     {
-      "text": "What should I enter to begin a search?",
+      "text": "Actually, my budget is RM30",
+      "label": "refine_preferences"
+    },
+    {
+      "text": "I want to start over",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "Who is the president of this country?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "What medicine should I take?",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Which search filters does the system accept?",
       "label": "help"
-    },
-    {
-      "text": "Cancel my current plan and start over",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Clear the conversation history",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Hello, how are you?",
-      "label": "greeting"
     },
     {
       "text": "I am looking for a beach in Terengganu",
       "label": "request_recommendation"
     },
     {
-      "text": "Modify the current search to include free entry only",
+      "text": "Change the duration to two hours",
       "label": "refine_preferences"
     },
     {
@@ -1065,172 +1337,68 @@
       "label": "request_information"
     },
     {
-      "text": "Hello, I am new here",
-      "label": "greeting"
+      "text": "Keep the state but make the attraction cheaper",
+      "label": "refine_preferences"
     },
     {
-      "text": "Do you only recommend places in Malaysia?",
-      "label": "help"
-    },
-    {
-      "text": "Hey, can you help me plan?",
-      "label": "greeting"
-    },
-    {
-      "text": "Hey",
-      "label": "greeting"
-    },
-    {
-      "text": "Thanks, bye",
-      "label": "goodbye"
+      "text": "What is the capital of France?",
+      "label": "out_of_scope"
     },
     {
       "text": "Recommend a place for me",
       "label": "request_recommendation"
     },
     {
-      "text": "Make it cheaper",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Recommend a free place to visit",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "Does it have an official website?",
+      "text": "Give me more details about the current recommendation",
       "label": "request_information"
     },
     {
-      "text": "Remove outdoor attractions from my search",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Good morning, travel assistant",
-      "label": "greeting"
-    },
-    {
-      "text": "Give me one more recommendation",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Which search filters does the system accept?",
-      "label": "help"
-    },
-    {
-      "text": "Change it to an outdoor destination",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Delete all filters and restart",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Please recommend somewhere else",
-      "label": "request_alternative"
-    },
-    {
-      "text": "What preferences can I provide?",
-      "label": "help"
-    },
-    {
-      "text": "I want to visit a historical place",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "That will be all",
+      "text": "I am finished",
       "label": "goodbye"
-    },
-    {
-      "text": "Hi chatbot",
-      "label": "greeting"
-    },
-    {
-      "text": "Find a destination that matches my preferences",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "Okay bye, talk to you later",
-      "label": "goodbye"
-    },
-    {
-      "text": "What is another place I could visit?",
-      "label": "request_alternative"
-    },
-    {
-      "text": "How much is the entrance fee?",
-      "label": "request_information"
-    },
-    {
-      "text": "Actually, my budget is RM30",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "How can you assist with my trip?",
-      "label": "help"
-    },
-    {
-      "text": "Keep the state but make the attraction cheaper",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Discard this trip and create a new one",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "Is it suitable for children?",
-      "label": "request_information"
-    },
-    {
-      "text": "Can u recomend somewhere in Penang?",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "I have everything I need",
-      "label": "goodbye"
-    },
-    {
-      "text": "Forget what I said earlier",
-      "label": "reset_conversation"
     },
     {
       "text": "What accessibility facilities does it have?",
       "label": "request_information"
     },
     {
-      "text": "This result is not for me, show another",
-      "label": "request_alternative"
+      "text": "Cancel my current plan and start over",
+      "label": "reset_conversation"
     },
     {
-      "text": "Can I have a different choice?",
-      "label": "request_alternative"
+      "text": "Hello, I am new here",
+      "label": "greeting"
     },
     {
-      "text": "When does this attraction close?",
-      "label": "request_information"
-    },
-    {
-      "text": "Change the duration to two hours",
-      "label": "refine_preferences"
-    },
-    {
-      "text": "Show me the next option",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Thanks, I am finished",
-      "label": "goodbye"
-    },
-    {
-      "text": "Thanks, I do not need more recommendations",
-      "label": "goodbye"
+      "text": "Should I buy cryptocurrency?",
+      "label": "out_of_scope"
     },
     {
       "text": "Delete my current preferences",
       "label": "reset_conversation"
     },
     {
-      "text": "Which details can the chatbot understand?",
-      "label": "help"
+      "text": "Give me one more recommendation",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Please recommend somewhere else",
+      "label": "request_alternative"
+    },
+    {
+      "text": "Does it have an official website?",
+      "label": "request_information"
+    },
+    {
+      "text": "Hey",
+      "label": "greeting"
+    },
+    {
+      "text": "Write a business proposal for me",
+      "label": "out_of_scope"
+    },
+    {
+      "text": "Can I have a different choice?",
+      "label": "request_alternative"
     },
     {
       "text": "Find a wheelchair accessible attraction",
@@ -1241,48 +1409,40 @@
       "label": "goodbye"
     },
     {
-      "text": "Hello bot",
-      "label": "greeting"
-    },
-    {
-      "text": "Can you explain your features?",
-      "label": "help"
-    },
-    {
-      "text": "I need a holiday destination",
-      "label": "request_recommendation"
-    },
-    {
-      "text": "Keep my preferences and suggest another place",
-      "label": "request_alternative"
-    },
-    {
-      "text": "Hey assistant",
-      "label": "greeting"
-    },
-    {
-      "text": "Give me more details about the current recommendation",
-      "label": "request_information"
-    },
-    {
-      "text": "This one is not suitable for me",
-      "label": "request_alternative"
-    },
-    {
-      "text": "I want to start over",
-      "label": "reset_conversation"
-    },
-    {
-      "text": "I am finished",
+      "text": "Thanks, I do not need more recommendations",
       "label": "goodbye"
+    },
+    {
+      "text": "Modify the current search to include free entry only",
+      "label": "refine_preferences"
     },
     {
       "text": "Can the chatbot filter destinations by state?",
       "label": "help"
     },
     {
-      "text": "Make the trip suitable for elderly people",
-      "label": "refine_preferences"
+      "text": "Discard this trip and create a new one",
+      "label": "reset_conversation"
+    },
+    {
+      "text": "What should I enter to begin a search?",
+      "label": "help"
+    },
+    {
+      "text": "Hey assistant",
+      "label": "greeting"
+    },
+    {
+      "text": "Okay bye, talk to you later",
+      "label": "goodbye"
+    },
+    {
+      "text": "How can you assist with my trip?",
+      "label": "help"
+    },
+    {
+      "text": "What is another place I could visit?",
+      "label": "request_alternative"
     }
   ]
 }

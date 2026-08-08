@@ -13,11 +13,25 @@ from recommendation_engine.recommendation_engine import (
     get_attraction_by_id,
     recommend_attractions,
 )
+from web_discovery import OpenDataDiscovery
 
 
 class IntentPredictor(Protocol):
     def predict(self, text: str) -> IntentPrediction:
         """Return an intent prediction for one message."""
+
+
+class AttractionDiscovery(Protocol):
+    def discover(
+        self,
+        preferences: Mapping[str, Any],
+        *,
+        limit: int,
+    ) -> list[dict[str, Any]]:
+        """Return current, source-backed attraction candidates."""
+
+    def get_by_id(self, attraction_id: str) -> dict[str, Any] | None:
+        """Retrieve one attraction that was returned earlier."""
 
 
 EXPLICIT_RESET_PATTERN = re.compile(
@@ -178,12 +192,19 @@ def _present_attraction(attraction: Mapping[str, Any]) -> dict[str, Any]:
     result["duration_summary"] = _duration_summary(attraction)
     result["accessibility_summary"] = _access_summary(attraction)
     verification = str(attraction.get("verification_status") or "").casefold()
-    result["verification_note"] = (
-        "Some visitor details are AI-assisted and still require confirmation "
-        "from an official source."
-        if verification not in {"verified", "source verified"}
-        else "Visitor details have a recorded source-verification status."
-    )
+    if attraction.get("information_origin") == "open_data":
+        checked = attraction.get("date_verified") or "recently"
+        result["verification_note"] = (
+            f"Maya found this in public open-data sources and checked it on "
+            f"{checked}. Prices, opening hours and accessibility can change."
+        )
+    else:
+        result["verification_note"] = (
+            "Some visitor details are AI-assisted and still require confirmation "
+            "from an official source."
+            if verification not in {"verified", "source verified"}
+            else "Visitor details have a recorded source-verification status."
+        )
     return result
 
 
@@ -265,6 +286,7 @@ class ChatbotService:
         *,
         confidence_threshold: float = 0.45,
         recommendation_limit: int = 3,
+        web_discovery: AttractionDiscovery | None = None,
     ):
         if not 0.0 <= confidence_threshold <= 1.0:
             raise ValueError("confidence_threshold must be between 0 and 1")
@@ -273,6 +295,7 @@ class ChatbotService:
         self.classifier = classifier or IntentClassifier()
         self.confidence_threshold = confidence_threshold
         self.recommendation_limit = recommendation_limit
+        self.web_discovery = web_discovery or OpenDataDiscovery()
 
     def process_message(
         self,
@@ -378,10 +401,23 @@ class ChatbotService:
                 return self._clarification_response(prediction, session)
             return self._information_response(prediction, session)
 
+        if intent == "out_of_scope":
+            return self._response(
+                "I am designed to help with travel planning and attractions "
+                "in Malaysia. Please enter a travel-related message, such as "
+                "a state you want to visit, an attraction type, budget or "
+                "accessibility need.",
+                "out_of_scope",
+                prediction,
+                session,
+                suggestions=STATE_SUGGESTIONS,
+            )
+
         if prediction.confidence < self.confidence_threshold:
             return self._response(
-                "I am not certain what you mean. Please tell me the Malaysian "
-                "state and the type of attraction you prefer.",
+                "I could not understand that as a travel request. Please ask "
+                "about travel in Malaysia, such as a state and the type of "
+                "attraction you prefer.",
                 "low_confidence",
                 prediction,
                 session,
@@ -471,10 +507,15 @@ class ChatbotService:
         alternative: bool = False,
         sort_by: str | None = None,
     ) -> ChatbotResponse:
-        candidates = recommend_attractions(
+        local_candidates = recommend_attractions(
             **session.context.recommendation_filters(),
             limit=50,
         )
+        web_candidates = self.web_discovery.discover(
+            session.context.to_dict(),
+            limit=max(self.recommendation_limit * 2, 6),
+        )
+        candidates = self._merge_candidates(local_candidates, web_candidates)
         candidates = self._sort_candidates(candidates, sort_by)
 
         if not candidates:
@@ -483,9 +524,9 @@ class ChatbotService:
             interest = ", ".join(session.context.interests) or "selected"
             return self._response(
                 f"I could not find an exact match for {interest} attractions "
-                f"in {state} in the current verified collection. Your "
-                "preferences are still saved. Please choose another attraction "
-                "type, or tell me a different state.",
+                f"in {state} in the saved collection or from live web sources. "
+                "Your preferences are still saved. Please choose another "
+                "attraction type, or tell me a different state.",
                 "no_results",
                 prediction,
                 session,
@@ -499,8 +540,8 @@ class ChatbotService:
         ]
         if alternative and not unseen:
             return self._response(
-                "There are no more matching alternatives in the current "
-                "dataset. Try changing one of your preferences.",
+                "There are no more matching alternatives in the saved or live "
+                "results. Try changing one of your preferences.",
                 "no_alternatives",
                 prediction,
                 session,
@@ -531,6 +572,25 @@ class ChatbotService:
             presented,
             suggestions,
         )
+
+    @staticmethod
+    def _merge_candidates(
+        local: list[Mapping[str, Any]],
+        web: list[Mapping[str, Any]],
+    ) -> list[Mapping[str, Any]]:
+        """Combine both sources without repeating the same named place."""
+        merged: list[Mapping[str, Any]] = []
+        seen: set[tuple[str, str]] = set()
+        for item in [*web, *local]:
+            key = (
+                _normalise_name(str(item.get("attraction_name") or "")),
+                _normalise_name(str(item.get("state_territory") or "")),
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            merged.append(item)
+        return merged
 
     @staticmethod
     def _sort_candidates(
@@ -611,7 +671,7 @@ class ChatbotService:
 
         if attraction_id is None and len(session.latest_recommendation_ids) > 1:
             attractions = [
-                get_attraction_by_id(item_id)
+                self._get_attraction(item_id)
                 for item_id in session.latest_recommendation_ids
             ]
             presented = [
@@ -630,7 +690,7 @@ class ChatbotService:
             )
 
         attraction_id = attraction_id or session.latest_recommendation_ids[0]
-        attraction = get_attraction_by_id(attraction_id)
+        attraction = self._get_attraction(attraction_id)
         if attraction is None:
             return self._response(
                 "I could not retrieve that attraction's details.",
@@ -680,12 +740,16 @@ class ChatbotService:
             ))
         return tuple(suggestions)
 
-    @staticmethod
-    def _latest_attractions(session: ChatSession) -> list[dict[str, Any]]:
+    def _get_attraction(self, attraction_id: str) -> dict[str, Any] | None:
+        return get_attraction_by_id(attraction_id) or self.web_discovery.get_by_id(
+            attraction_id
+        )
+
+    def _latest_attractions(self, session: ChatSession) -> list[dict[str, Any]]:
         return [
             attraction
             for attraction_id in session.latest_recommendation_ids
-            if (attraction := get_attraction_by_id(attraction_id)) is not None
+            if (attraction := self._get_attraction(attraction_id)) is not None
         ]
 
     def _match_latest_selection(

@@ -25,7 +25,8 @@
       "request_alternative",
       "reset_conversation",
       "help",
-      "goodbye"
+      "goodbye",
+      "out_of_scope"
     ]
   },
   "pipeline":[

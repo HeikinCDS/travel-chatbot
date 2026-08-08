@@ -18,12 +18,82 @@ class FixedClassifier:
         )
 
 
+class OfflineDiscovery:
+    """Keep unit tests deterministic; live services have dedicated tests."""
+
+    def discover(self, preferences, *, limit):
+        return []
+
+    def get_by_id(self, attraction_id):
+        return None
+
+
 class ChatbotServiceTests(unittest.TestCase):
 
-    def make_service(self, label, confidence=0.95, limit=3):
+    def make_service(self, label, confidence=0.95, limit=3, web_discovery=None):
         return ChatbotService(
             classifier=FixedClassifier(label, confidence),
             recommendation_limit=limit,
+            web_discovery=(
+                web_discovery if web_discovery is not None else OfflineDiscovery()
+            ),
+        )
+
+    def test_open_data_candidate_is_combined_with_local_results(self):
+        web_item = {
+            "attraction_id": "WEB-TEST",
+            "attraction_name": "Test Botanical Walk",
+            "state_territory": "Penang",
+            "city_district": "George Town",
+            "primary_category": "Nature",
+            "interests_tags": "nature, garden",
+            "short_description": "A source-backed test attraction.",
+            "entrance_fee_status": "Unknown",
+            "min_fee_myr": None,
+            "max_fee_myr": None,
+            "recommended_duration_hours": 1.5,
+            "family_friendly": "Yes",
+            "elderly_friendly": "Partial",
+            "wheelchair_accessible": "Unknown",
+            "accessibility_notes": "Confirm the current route before visiting.",
+            "official_url": "https://example.org/attraction",
+            "source_url": "https://example.org/attraction",
+            "source_links": [
+                {"title": "Official source", "url": "https://example.org/attraction"}
+            ],
+            "date_verified": "2026-08-08",
+            "verification_status": "web_discovered",
+            "information_origin": "open_data",
+        }
+
+        class FakeDiscovery:
+            def discover(self, preferences, *, limit):
+                return [web_item]
+
+            def get_by_id(self, attraction_id):
+                return web_item if attraction_id == "WEB-TEST" else None
+
+        session = ChatSession(
+            context=ConversationContext(state="Penang", interests=["nature"])
+        )
+        service = self.make_service(
+            "request_recommendation",
+            limit=1,
+            web_discovery=FakeDiscovery(),
+        )
+        response = service.process_message("Recommend a nature place", session)
+        self.assertEqual(response.action, "recommend")
+        self.assertEqual(response.recommendations[0]["attraction_id"], "WEB-TEST")
+        self.assertIn(
+            "checked it on 2026-08-08",
+            response.recommendations[0]["verification_note"],
+        )
+
+        details = service.process_message("Tell me about the first option", session)
+        self.assertEqual(details.action, "information")
+        self.assertEqual(
+            details.recommendations[0]["attraction_name"],
+            "Test Botanical Walk",
         )
 
     def test_greeting(self):
@@ -170,6 +240,35 @@ class ChatbotServiceTests(unittest.TestCase):
             confidence=0.20,
         ).process_message("Something suitable")
         self.assertEqual(response.action, "low_confidence")
+        self.assertIn("travel", response.reply)
+
+    def test_unrelated_message_is_redirected_to_travel(self):
+        session = ChatSession(
+            context=ConversationContext(
+                state="Johor",
+                interests=["nature"],
+            )
+        )
+        before = session.to_dict()
+        response = self.make_service("out_of_scope").process_message(
+            "Can you help me write Python code?",
+            session,
+        )
+        self.assertEqual(response.action, "out_of_scope")
+        self.assertIn("travel", response.reply)
+        self.assertIn("Malaysia", response.reply)
+        self.assertEqual(session.to_dict(), before)
+        self.assertGreater(len(response.suggestions), 0)
+
+    def test_travel_entity_overrides_out_of_scope_prediction(self):
+        session = ChatSession()
+        response = self.make_service("out_of_scope").process_message(
+            "What about nature places in Kedah?",
+            session,
+        )
+        self.assertEqual(response.action, "recommend")
+        self.assertEqual(session.context.state, "Kedah")
+        self.assertEqual(session.context.interests, ["nature"])
 
     def test_structured_slot_is_used_even_with_low_confidence(self):
         session = ChatSession()

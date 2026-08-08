@@ -46,6 +46,9 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertIn(b'id="text-size-button"', response.data)
         self.assertIn(b'id="contrast-button"', response.data)
         self.assertIn(b'class="composer-area"', response.data)
+        self.assertIn(b'class="trip-sidebar"', response.data)
+        self.assertIn(b'id="preference-list"', response.data)
+        self.assertIn(b'id="chat-history"', response.data)
 
     def test_health_endpoint(self):
         response = self.client.get("/health")

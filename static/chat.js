@@ -9,6 +9,9 @@ const recommendations = document.querySelector("#recommendations");
 const quickReplies = document.querySelector("#quick-replies");
 const preferences = document.querySelector("#preference-list");
 const formStatus = document.querySelector("#form-status");
+const historyList = document.querySelector("#chat-history");
+const historyEmpty = document.querySelector("#history-empty");
+let messageCounter = 0;
 let preferredSpeechVoice = null;
 
 function chooseGentleVoice() {
@@ -41,6 +44,29 @@ function refreshPreferredVoice() {
 if ("speechSynthesis" in window) {
   refreshPreferredVoice();
   window.speechSynthesis.addEventListener("voiceschanged", refreshPreferredVoice);
+}
+
+function registerHistoryItem(row, text, sender) {
+  const messageId = `conversation-message-${messageCounter}`;
+  messageCounter += 1;
+  row.id = messageId;
+  row.tabIndex = -1;
+
+  const listItem = document.createElement("li");
+  const button = document.createElement("button");
+  const speaker = document.createElement("span");
+  const preview = document.createElement("span");
+  button.type = "button";
+  button.dataset.messageTarget = messageId;
+  button.setAttribute("aria-label", `Return to ${sender === "user" ? "your" : "Maya's"} message: ${text}`);
+  speaker.className = "history-speaker";
+  speaker.textContent = sender === "user" ? "You" : "Maya";
+  preview.className = "history-preview";
+  preview.textContent = text;
+  button.append(speaker, preview);
+  listItem.appendChild(button);
+  historyList.appendChild(listItem);
+  historyEmpty.hidden = true;
 }
 
 function addMessage(text, sender) {
@@ -82,7 +108,14 @@ function addMessage(text, sender) {
 
   row.appendChild(content);
   messages.appendChild(row);
+  registerHistoryItem(row, text, sender);
   row.scrollIntoView({ block: "nearest" });
+}
+
+const initialMessageRow = messages.querySelector(".message-row");
+const initialMessageText = initialMessageRow?.querySelector(".assistant-message p")?.textContent;
+if (initialMessageRow && initialMessageText) {
+  registerHistoryItem(initialMessageRow, initialMessageText, "bot");
 }
 
 function labelFor(key) {
@@ -120,6 +153,36 @@ function showRecommendations(items) {
   for (const item of items || []) {
     const card = document.createElement("article");
     card.className = "recommendation-card";
+
+    if (item.image_url) {
+      const figure = document.createElement("figure");
+      figure.className = "recommendation-image";
+      const image = document.createElement("img");
+      image.src = item.image_url;
+      image.alt = `Source photograph of ${item.attraction_name || "the attraction"}`;
+      image.loading = "lazy";
+      image.referrerPolicy = "no-referrer";
+      figure.appendChild(image);
+      if (item.image_attribution || item.image_license) {
+        const caption = document.createElement("figcaption");
+        const attribution = [item.image_attribution, item.image_license]
+          .filter(Boolean)
+          .join(" — ");
+        if (item.image_page_url) {
+          const creditLink = document.createElement("a");
+          creditLink.href = item.image_page_url;
+          creditLink.target = "_blank";
+          creditLink.rel = "noopener noreferrer";
+          creditLink.textContent = `Photo: ${attribution}`;
+          caption.appendChild(creditLink);
+        } else {
+          caption.textContent = `Photo: ${attribution}`;
+        }
+        figure.appendChild(caption);
+      }
+      card.appendChild(figure);
+    }
+
     const title = document.createElement("h3");
     title.textContent = item.attraction_name || "Attraction";
     const location = document.createElement("p");
@@ -154,14 +217,25 @@ function showRecommendations(items) {
       card.appendChild(note);
     }
 
-    const source = item.official_url || item.source_url;
-    if (source) {
-      const link = document.createElement("a");
-      link.href = source;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.textContent = "Check visitor information";
-      card.appendChild(link);
+    const sourceLinks = Array.isArray(item.source_links) && item.source_links.length
+      ? item.source_links
+      : [{ title: "Visitor information", url: item.official_url || item.source_url }];
+    const validSources = sourceLinks.filter(source => source && source.url);
+    if (validSources.length) {
+      const sourceBlock = document.createElement("div");
+      sourceBlock.className = "source-links";
+      const sourceHeading = document.createElement("strong");
+      sourceHeading.textContent = "Information source";
+      sourceBlock.appendChild(sourceHeading);
+      for (const source of validSources) {
+        const link = document.createElement("a");
+        link.href = source.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = source.title || "Check visitor information";
+        sourceBlock.appendChild(link);
+      }
+      card.appendChild(sourceBlock);
     }
     recommendations.appendChild(card);
   }
@@ -235,6 +309,15 @@ quickReplies.addEventListener("click", event => {
   if (button) submitMessage(button.dataset.message);
 });
 
+historyList.addEventListener("click", event => {
+  const button = event.target.closest("button[data-message-target]");
+  if (!button) return;
+  const target = document.getElementById(button.dataset.messageTarget);
+  if (!target) return;
+  target.scrollIntoView({ behavior: "smooth", block: "center" });
+  target.focus({ preventScroll: true });
+});
+
 messages.addEventListener("click", event => {
   const button = event.target.closest("button[data-speak]");
   if (!button || !("speechSynthesis" in window)) return;
@@ -257,6 +340,9 @@ resetButton.addEventListener("click", async () => {
   try {
     const data = await sendJson("/api/reset");
     messages.replaceChildren();
+    historyList.replaceChildren();
+    historyEmpty.hidden = false;
+    messageCounter = 0;
     addMessage(data.reply, "bot");
     showPreferences({});
     showRecommendations([]);

@@ -21,7 +21,8 @@ class IntentClassifierRuntimeTests(unittest.TestCase):
         self.assertIn(prediction.label, prediction.scores)
         self.assertGreaterEqual(prediction.confidence, 0.0)
         self.assertLessEqual(prediction.confidence, 1.0)
-        self.assertEqual(len(prediction.scores), 8)
+        self.assertEqual(len(prediction.scores), 9)
+        self.assertIn("out_of_scope", prediction.scores)
 
     def test_empty_message_is_rejected(self):
         with self.assertRaises(ValueError):

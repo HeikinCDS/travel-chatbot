@@ -1,3 +1,4 @@
+from contextlib import closing
 from pathlib import Path
 import sqlite3
 
@@ -88,7 +89,7 @@ def recommend_attractions(
 
     parameters.append(limit)
 
-    with sqlite3.connect(DATABASE_PATH) as connection:
+    with closing(sqlite3.connect(DATABASE_PATH)) as connection:
         connection.row_factory = sqlite3.Row
 
         results = connection.execute(
@@ -140,7 +141,7 @@ def get_attraction_by_id(attraction_id):
         WHERE attraction_id = ?
     """
 
-    with sqlite3.connect(DATABASE_PATH) as connection:
+    with closing(sqlite3.connect(DATABASE_PATH)) as connection:
         connection.row_factory = sqlite3.Row
         result = connection.execute(query, (attraction_id,)).fetchone()
 

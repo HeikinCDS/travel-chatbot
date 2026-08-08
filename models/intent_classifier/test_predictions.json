@@ -1,81 +1,33 @@
 [
   {
-    "text": "Restart the chatbot",
-    "actual": "reset_conversation",
-    "predicted": "reset_conversation",
-    "confidence": 1.0
+    "text": "Find a destination that matches my preferences",
+    "actual": "request_recommendation",
+    "predicted": "request_recommendation",
+    "confidence": 0.996442
   },
   {
-    "text": "Does this place charge an admission fee?",
-    "actual": "request_information",
-    "predicted": "request_information",
-    "confidence": 0.999995
+    "text": "Write a poem for my friend",
+    "actual": "out_of_scope",
+    "predicted": "out_of_scope",
+    "confidence": 0.949763
   },
   {
-    "text": "What should I enter to begin a search?",
+    "text": "Solve this mathematics equation for me",
+    "actual": "out_of_scope",
+    "predicted": "out_of_scope",
+    "confidence": 0.976592
+  },
+  {
+    "text": "Can you explain your features?",
     "actual": "help",
     "predicted": "help",
-    "confidence": 0.999995
+    "confidence": 0.59216
   },
   {
-    "text": "Cancel my current plan and start over",
-    "actual": "reset_conversation",
-    "predicted": "reset_conversation",
-    "confidence": 0.999999
-  },
-  {
-    "text": "Clear the conversation history",
-    "actual": "reset_conversation",
-    "predicted": "reset_conversation",
-    "confidence": 0.999994
-  },
-  {
-    "text": "Hello, how are you?",
-    "actual": "greeting",
-    "predicted": "greeting",
-    "confidence": 1.0
-  },
-  {
-    "text": "I am looking for a beach in Terengganu",
-    "actual": "request_recommendation",
-    "predicted": "refine_preferences",
-    "confidence": 0.7357
-  },
-  {
-    "text": "Modify the current search to include free entry only",
+    "text": "Remove outdoor attractions from my search",
     "actual": "refine_preferences",
     "predicted": "refine_preferences",
-    "confidence": 0.999927
-  },
-  {
-    "text": "Is this place appropriate for a short visit?",
-    "actual": "request_information",
-    "predicted": "request_information",
-    "confidence": 1.0
-  },
-  {
-    "text": "Hello, I am new here",
-    "actual": "greeting",
-    "predicted": "greeting",
-    "confidence": 1.0
-  },
-  {
-    "text": "Do you only recommend places in Malaysia?",
-    "actual": "help",
-    "predicted": "request_recommendation",
-    "confidence": 0.999928
-  },
-  {
-    "text": "Hey, can you help me plan?",
-    "actual": "greeting",
-    "predicted": "greeting",
-    "confidence": 0.999998
-  },
-  {
-    "text": "Hey",
-    "actual": "greeting",
-    "predicted": "greeting",
-    "confidence": 1.0
+    "confidence": 0.883056
   },
   {
     "text": "Thanks, bye",
@@ -84,202 +36,28 @@
     "confidence": 1.0
   },
   {
-    "text": "Recommend a place for me",
-    "actual": "request_recommendation",
-    "predicted": "request_recommendation",
-    "confidence": 0.999997
-  },
-  {
-    "text": "Make it cheaper",
-    "actual": "refine_preferences",
-    "predicted": "refine_preferences",
-    "confidence": 0.999999
-  },
-  {
     "text": "Recommend a free place to visit",
     "actual": "request_recommendation",
     "predicted": "request_recommendation",
-    "confidence": 0.997003
+    "confidence": 0.950577
   },
   {
-    "text": "Does it have an official website?",
-    "actual": "request_information",
-    "predicted": "request_information",
-    "confidence": 0.999983
-  },
-  {
-    "text": "Remove outdoor attractions from my search",
-    "actual": "refine_preferences",
-    "predicted": "refine_preferences",
-    "confidence": 0.856346
-  },
-  {
-    "text": "Good morning, travel assistant",
-    "actual": "greeting",
-    "predicted": "greeting",
-    "confidence": 0.999999
-  },
-  {
-    "text": "Give me one more recommendation",
-    "actual": "request_alternative",
-    "predicted": "request_alternative",
+    "text": "How do I cook fried rice?",
+    "actual": "out_of_scope",
+    "predicted": "help",
     "confidence": 0.999994
-  },
-  {
-    "text": "Which search filters does the system accept?",
-    "actual": "help",
-    "predicted": "help",
-    "confidence": 0.999876
-  },
-  {
-    "text": "Change it to an outdoor destination",
-    "actual": "refine_preferences",
-    "predicted": "refine_preferences",
-    "confidence": 0.999999
-  },
-  {
-    "text": "Delete all filters and restart",
-    "actual": "reset_conversation",
-    "predicted": "reset_conversation",
-    "confidence": 0.999997
-  },
-  {
-    "text": "Please recommend somewhere else",
-    "actual": "request_alternative",
-    "predicted": "request_alternative",
-    "confidence": 0.934529
-  },
-  {
-    "text": "What preferences can I provide?",
-    "actual": "help",
-    "predicted": "help",
-    "confidence": 0.717845
-  },
-  {
-    "text": "I want to visit a historical place",
-    "actual": "request_recommendation",
-    "predicted": "request_information",
-    "confidence": 0.70324
   },
   {
     "text": "That will be all",
     "actual": "goodbye",
     "predicted": "goodbye",
-    "confidence": 0.999989
-  },
-  {
-    "text": "Hi chatbot",
-    "actual": "greeting",
-    "predicted": "greeting",
     "confidence": 1.0
   },
   {
-    "text": "Find a destination that matches my preferences",
-    "actual": "request_recommendation",
-    "predicted": "request_alternative",
-    "confidence": 0.957328
-  },
-  {
-    "text": "Okay bye, talk to you later",
-    "actual": "goodbye",
-    "predicted": "goodbye",
-    "confidence": 0.999993
-  },
-  {
-    "text": "What is another place I could visit?",
-    "actual": "request_alternative",
-    "predicted": "request_information",
-    "confidence": 0.634133
-  },
-  {
-    "text": "How much is the entrance fee?",
-    "actual": "request_information",
-    "predicted": "help",
-    "confidence": 0.99935
-  },
-  {
-    "text": "Actually, my budget is RM30",
-    "actual": "refine_preferences",
-    "predicted": "refine_preferences",
-    "confidence": 0.911321
-  },
-  {
-    "text": "How can you assist with my trip?",
-    "actual": "help",
-    "predicted": "help",
-    "confidence": 0.999968
-  },
-  {
-    "text": "Keep the state but make the attraction cheaper",
-    "actual": "refine_preferences",
-    "predicted": "refine_preferences",
-    "confidence": 0.999992
-  },
-  {
-    "text": "Discard this trip and create a new one",
-    "actual": "reset_conversation",
-    "predicted": "request_information",
-    "confidence": 0.843826
-  },
-  {
-    "text": "Is it suitable for children?",
-    "actual": "request_information",
-    "predicted": "request_information",
-    "confidence": 1.0
-  },
-  {
-    "text": "Can u recomend somewhere in Penang?",
-    "actual": "request_recommendation",
-    "predicted": "request_recommendation",
-    "confidence": 0.999966
-  },
-  {
-    "text": "I have everything I need",
-    "actual": "goodbye",
-    "predicted": "goodbye",
-    "confidence": 0.992555
-  },
-  {
-    "text": "Forget what I said earlier",
-    "actual": "reset_conversation",
-    "predicted": "reset_conversation",
-    "confidence": 0.999985
-  },
-  {
-    "text": "What accessibility facilities does it have?",
-    "actual": "request_information",
-    "predicted": "request_information",
-    "confidence": 0.99641
-  },
-  {
-    "text": "This result is not for me, show another",
+    "text": "Keep my preferences and suggest another place",
     "actual": "request_alternative",
     "predicted": "request_alternative",
-    "confidence": 0.999524
-  },
-  {
-    "text": "Can I have a different choice?",
-    "actual": "request_alternative",
-    "predicted": "request_information",
-    "confidence": 0.848696
-  },
-  {
-    "text": "When does this attraction close?",
-    "actual": "request_information",
-    "predicted": "request_information",
-    "confidence": 0.999967
-  },
-  {
-    "text": "Change the duration to two hours",
-    "actual": "refine_preferences",
-    "predicted": "refine_preferences",
-    "confidence": 1.0
-  },
-  {
-    "text": "Show me the next option",
-    "actual": "request_alternative",
-    "predicted": "request_alternative",
-    "confidence": 0.999998
+    "confidence": 0.999999
   },
   {
     "text": "Thanks, I am finished",
@@ -288,99 +66,369 @@
     "confidence": 0.999999
   },
   {
-    "text": "Thanks, I do not need more recommendations",
-    "actual": "goodbye",
-    "predicted": "goodbye",
-    "confidence": 0.999999
-  },
-  {
-    "text": "Delete my current preferences",
-    "actual": "reset_conversation",
-    "predicted": "refine_preferences",
-    "confidence": 0.98372
-  },
-  {
-    "text": "Which details can the chatbot understand?",
-    "actual": "help",
+    "text": "How much is the entrance fee?",
+    "actual": "request_information",
     "predicted": "help",
-    "confidence": 0.831937
+    "confidence": 0.949998
   },
   {
-    "text": "Find a wheelchair accessible attraction",
+    "text": "I want to visit a historical place",
+    "actual": "request_recommendation",
+    "predicted": "request_information",
+    "confidence": 0.943308
+  },
+  {
+    "text": "Change it to an outdoor destination",
+    "actual": "refine_preferences",
+    "predicted": "refine_preferences",
+    "confidence": 0.999944
+  },
+  {
+    "text": "Can u recomend somewhere in Penang?",
     "actual": "request_recommendation",
     "predicted": "request_recommendation",
-    "confidence": 0.99988
-  },
-  {
-    "text": "Talk to you later",
-    "actual": "goodbye",
-    "predicted": "goodbye",
-    "confidence": 0.988232
-  },
-  {
-    "text": "Hello bot",
-    "actual": "greeting",
-    "predicted": "greeting",
-    "confidence": 0.999996
-  },
-  {
-    "text": "Can you explain your features?",
-    "actual": "help",
-    "predicted": "help",
-    "confidence": 0.995198
+    "confidence": 0.999863
   },
   {
     "text": "I need a holiday destination",
     "actual": "request_recommendation",
     "predicted": "request_recommendation",
-    "confidence": 0.992961
+    "confidence": 0.946165
   },
   {
-    "text": "Keep my preferences and suggest another place",
-    "actual": "request_alternative",
+    "text": "Make it cheaper",
+    "actual": "refine_preferences",
     "predicted": "refine_preferences",
-    "confidence": 0.598177
+    "confidence": 0.99998
   },
   {
-    "text": "Hey assistant",
+    "text": "I have everything I need",
+    "actual": "goodbye",
+    "predicted": "goodbye",
+    "confidence": 0.984816
+  },
+  {
+    "text": "Good morning, travel assistant",
+    "actual": "greeting",
+    "predicted": "greeting",
+    "confidence": 1.0
+  },
+  {
+    "text": "Make the trip suitable for elderly people",
+    "actual": "refine_preferences",
+    "predicted": "request_recommendation",
+    "confidence": 0.999986
+  },
+  {
+    "text": "Hey, can you help me plan?",
+    "actual": "greeting",
+    "predicted": "greeting",
+    "confidence": 0.999994
+  },
+  {
+    "text": "When does this attraction close?",
+    "actual": "request_information",
+    "predicted": "request_information",
+    "confidence": 1.0
+  },
+  {
+    "text": "Hello, how are you?",
+    "actual": "greeting",
+    "predicted": "greeting",
+    "confidence": 1.0
+  },
+  {
+    "text": "This result is not for me, show another",
+    "actual": "request_alternative",
+    "predicted": "request_alternative",
+    "confidence": 0.999727
+  },
+  {
+    "text": "Do you only recommend places in Malaysia?",
+    "actual": "help",
+    "predicted": "request_recommendation",
+    "confidence": 0.999948
+  },
+  {
+    "text": "Show me the next option",
+    "actual": "request_alternative",
+    "predicted": "request_alternative",
+    "confidence": 1.0
+  },
+  {
+    "text": "Hi chatbot",
     "actual": "greeting",
     "predicted": "greeting",
     "confidence": 0.999999
   },
   {
-    "text": "Give me more details about the current recommendation",
-    "actual": "request_information",
-    "predicted": "request_information",
-    "confidence": 0.999966
+    "text": "Clear the conversation history",
+    "actual": "reset_conversation",
+    "predicted": "reset_conversation",
+    "confidence": 0.999965
+  },
+  {
+    "text": "Hello bot",
+    "actual": "greeting",
+    "predicted": "greeting",
+    "confidence": 0.999999
+  },
+  {
+    "text": "Forget what I said earlier",
+    "actual": "reset_conversation",
+    "predicted": "reset_conversation",
+    "confidence": 0.99824
   },
   {
     "text": "This one is not suitable for me",
     "actual": "request_alternative",
     "predicted": "request_alternative",
-    "confidence": 0.998724
+    "confidence": 0.999983
+  },
+  {
+    "text": "Delete all filters and restart",
+    "actual": "reset_conversation",
+    "predicted": "reset_conversation",
+    "confidence": 0.999999
+  },
+  {
+    "text": "What preferences can I provide?",
+    "actual": "help",
+    "predicted": "help",
+    "confidence": 0.999932
+  },
+  {
+    "text": "Is it suitable for children?",
+    "actual": "request_information",
+    "predicted": "request_information",
+    "confidence": 0.999966
+  },
+  {
+    "text": "Which details can the chatbot understand?",
+    "actual": "help",
+    "predicted": "request_recommendation",
+    "confidence": 0.974555
+  },
+  {
+    "text": "Restart the chatbot",
+    "actual": "reset_conversation",
+    "predicted": "reset_conversation",
+    "confidence": 0.999994
+  },
+  {
+    "text": "Does this place charge an admission fee?",
+    "actual": "request_information",
+    "predicted": "request_information",
+    "confidence": 1.0
+  },
+  {
+    "text": "Actually, my budget is RM30",
+    "actual": "refine_preferences",
+    "predicted": "refine_preferences",
+    "confidence": 0.552311
   },
   {
     "text": "I want to start over",
     "actual": "reset_conversation",
     "predicted": "reset_conversation",
-    "confidence": 0.999998
+    "confidence": 0.999995
+  },
+  {
+    "text": "Who is the president of this country?",
+    "actual": "out_of_scope",
+    "predicted": "out_of_scope",
+    "confidence": 0.916339
+  },
+  {
+    "text": "What medicine should I take?",
+    "actual": "out_of_scope",
+    "predicted": "help",
+    "confidence": 0.857083
+  },
+  {
+    "text": "Which search filters does the system accept?",
+    "actual": "help",
+    "predicted": "help",
+    "confidence": 0.997642
+  },
+  {
+    "text": "I am looking for a beach in Terengganu",
+    "actual": "request_recommendation",
+    "predicted": "request_recommendation",
+    "confidence": 0.931219
+  },
+  {
+    "text": "Change the duration to two hours",
+    "actual": "refine_preferences",
+    "predicted": "request_information",
+    "confidence": 0.985576
+  },
+  {
+    "text": "Is this place appropriate for a short visit?",
+    "actual": "request_information",
+    "predicted": "request_information",
+    "confidence": 1.0
+  },
+  {
+    "text": "Keep the state but make the attraction cheaper",
+    "actual": "refine_preferences",
+    "predicted": "refine_preferences",
+    "confidence": 0.999982
+  },
+  {
+    "text": "What is the capital of France?",
+    "actual": "out_of_scope",
+    "predicted": "out_of_scope",
+    "confidence": 0.607791
+  },
+  {
+    "text": "Recommend a place for me",
+    "actual": "request_recommendation",
+    "predicted": "request_recommendation",
+    "confidence": 0.999868
+  },
+  {
+    "text": "Give me more details about the current recommendation",
+    "actual": "request_information",
+    "predicted": "out_of_scope",
+    "confidence": 0.970207
   },
   {
     "text": "I am finished",
     "actual": "goodbye",
     "predicted": "goodbye",
-    "confidence": 0.99477
+    "confidence": 1.0
+  },
+  {
+    "text": "What accessibility facilities does it have?",
+    "actual": "request_information",
+    "predicted": "request_information",
+    "confidence": 0.999905
+  },
+  {
+    "text": "Cancel my current plan and start over",
+    "actual": "reset_conversation",
+    "predicted": "reset_conversation",
+    "confidence": 0.999994
+  },
+  {
+    "text": "Hello, I am new here",
+    "actual": "greeting",
+    "predicted": "greeting",
+    "confidence": 1.0
+  },
+  {
+    "text": "Should I buy cryptocurrency?",
+    "actual": "out_of_scope",
+    "predicted": "help",
+    "confidence": 0.540708
+  },
+  {
+    "text": "Delete my current preferences",
+    "actual": "reset_conversation",
+    "predicted": "out_of_scope",
+    "confidence": 0.734874
+  },
+  {
+    "text": "Give me one more recommendation",
+    "actual": "request_alternative",
+    "predicted": "request_alternative",
+    "confidence": 0.999984
+  },
+  {
+    "text": "Please recommend somewhere else",
+    "actual": "request_alternative",
+    "predicted": "request_alternative",
+    "confidence": 0.998566
+  },
+  {
+    "text": "Does it have an official website?",
+    "actual": "request_information",
+    "predicted": "request_information",
+    "confidence": 0.999263
+  },
+  {
+    "text": "Hey",
+    "actual": "greeting",
+    "predicted": "greeting",
+    "confidence": 1.0
+  },
+  {
+    "text": "Write a business proposal for me",
+    "actual": "out_of_scope",
+    "predicted": "out_of_scope",
+    "confidence": 0.988005
+  },
+  {
+    "text": "Can I have a different choice?",
+    "actual": "request_alternative",
+    "predicted": "request_alternative",
+    "confidence": 0.991946
+  },
+  {
+    "text": "Find a wheelchair accessible attraction",
+    "actual": "request_recommendation",
+    "predicted": "request_recommendation",
+    "confidence": 0.999628
+  },
+  {
+    "text": "Talk to you later",
+    "actual": "goodbye",
+    "predicted": "goodbye",
+    "confidence": 0.970824
+  },
+  {
+    "text": "Thanks, I do not need more recommendations",
+    "actual": "goodbye",
+    "predicted": "goodbye",
+    "confidence": 1.0
+  },
+  {
+    "text": "Modify the current search to include free entry only",
+    "actual": "refine_preferences",
+    "predicted": "refine_preferences",
+    "confidence": 0.999974
   },
   {
     "text": "Can the chatbot filter destinations by state?",
     "actual": "help",
     "predicted": "help",
-    "confidence": 0.99993
+    "confidence": 0.999999
   },
   {
-    "text": "Make the trip suitable for elderly people",
-    "actual": "refine_preferences",
-    "predicted": "refine_preferences",
-    "confidence": 0.999104
+    "text": "Discard this trip and create a new one",
+    "actual": "reset_conversation",
+    "predicted": "request_alternative",
+    "confidence": 0.997315
+  },
+  {
+    "text": "What should I enter to begin a search?",
+    "actual": "help",
+    "predicted": "help",
+    "confidence": 0.998835
+  },
+  {
+    "text": "Hey assistant",
+    "actual": "greeting",
+    "predicted": "greeting",
+    "confidence": 1.0
+  },
+  {
+    "text": "Okay bye, talk to you later",
+    "actual": "goodbye",
+    "predicted": "goodbye",
+    "confidence": 1.0
+  },
+  {
+    "text": "How can you assist with my trip?",
+    "actual": "help",
+    "predicted": "request_recommendation",
+    "confidence": 0.619063
+  },
+  {
+    "text": "What is another place I could visit?",
+    "actual": "request_alternative",
+    "predicted": "request_alternative",
+    "confidence": 0.999478
   }
 ]
