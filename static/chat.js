@@ -225,7 +225,7 @@ function showRecommendations(items) {
       const sourceBlock = document.createElement("div");
       sourceBlock.className = "source-links";
       const sourceHeading = document.createElement("strong");
-      sourceHeading.textContent = "Information source";
+      sourceHeading.textContent = "Sources";
       sourceBlock.appendChild(sourceHeading);
       for (const source of validSources) {
         const link = document.createElement("a");

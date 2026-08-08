@@ -84,9 +84,11 @@ class ChatbotServiceTests(unittest.TestCase):
         response = service.process_message("Recommend a nature place", session)
         self.assertEqual(response.action, "recommend")
         self.assertEqual(response.recommendations[0]["attraction_id"], "WEB-TEST")
-        self.assertIn(
-            "checked it on 2026-08-08",
-            response.recommendations[0]["verification_note"],
+        self.assertIsNone(response.recommendations[0]["verification_note"])
+        self.assertIsNone(response.recommendations[0]["cost_summary"])
+        self.assertEqual(
+            response.recommendations[0]["accessibility_summary"],
+            "Elderly-friendly: Partial",
         )
 
         details = service.process_message("Tell me about the first option", session)

@@ -132,7 +132,7 @@ def _yes_partial_score(value: Any) -> int:
     return {"yes": 2, "partial": 1}.get(str(value).casefold(), 0)
 
 
-def _fee_summary(attraction: Mapping[str, Any]) -> str:
+def _fee_summary(attraction: Mapping[str, Any]) -> str | None:
     minimum = attraction.get("min_fee_myr")
     maximum = attraction.get("max_fee_myr")
     status = str(attraction.get("entrance_fee_status") or "").casefold()
@@ -144,20 +144,27 @@ def _fee_summary(attraction: Mapping[str, Any]) -> str:
         return f"Recorded entrance-fee range: RM{float(minimum):g}-RM{float(maximum):g}"
     if minimum is not None:
         return f"Recorded entrance fee starts from RM{float(minimum):g}"
-    return "Entrance fee has not been verified"
+    return None
 
 
-def _duration_summary(attraction: Mapping[str, Any]) -> str:
+def _duration_summary(attraction: Mapping[str, Any]) -> str | None:
     hours = attraction.get("recommended_duration_hours")
     if hours is None:
-        return "Recommended visit duration has not been verified"
+        return None
     return f"Suggested visit duration: about {float(hours):g} hour(s)"
 
 
-def _access_summary(attraction: Mapping[str, Any]) -> str:
-    elderly = str(attraction.get("elderly_friendly") or "Unknown").title()
-    wheelchair = str(attraction.get("wheelchair_accessible") or "Unknown").title()
-    return f"Elderly-friendly: {elderly}; wheelchair access: {wheelchair}"
+def _access_summary(attraction: Mapping[str, Any]) -> str | None:
+    elderly = str(attraction.get("elderly_friendly") or "").strip().casefold()
+    wheelchair = str(
+        attraction.get("wheelchair_accessible") or ""
+    ).strip().casefold()
+    details = []
+    if elderly in {"yes", "partial", "no"}:
+        details.append(f"Elderly-friendly: {elderly.title()}")
+    if wheelchair in {"yes", "partial", "no"}:
+        details.append(f"wheelchair access: {wheelchair.title()}")
+    return "; ".join(details) or None
 
 
 def _display_description(attraction: Mapping[str, Any]) -> str:
@@ -191,20 +198,9 @@ def _present_attraction(attraction: Mapping[str, Any]) -> dict[str, Any]:
     result["cost_summary"] = _fee_summary(attraction)
     result["duration_summary"] = _duration_summary(attraction)
     result["accessibility_summary"] = _access_summary(attraction)
-    verification = str(attraction.get("verification_status") or "").casefold()
-    if attraction.get("information_origin") == "open_data":
-        checked = attraction.get("date_verified") or "recently"
-        result["verification_note"] = (
-            f"Maya found this in public open-data sources and checked it on "
-            f"{checked}. Prices, opening hours and accessibility can change."
-        )
-    else:
-        result["verification_note"] = (
-            "Some visitor details are AI-assisted and still require confirmation "
-            "from an official source."
-            if verification not in {"verified", "source verified"}
-            else "Visitor details have a recorded source-verification status."
-        )
+    # Source links remain visible on the card. Missing facts are omitted instead
+    # of repeatedly warning travellers that each individual field is unverified.
+    result["verification_note"] = None
     return result
 
 
@@ -813,10 +809,9 @@ class ChatbotService:
         presented = [_present_attraction(item) for item in candidates]
         if best is None:
             return self._response(
-                f"I cannot choose reliably by {criterion} because that "
-                "information has not been verified for these places. Choose "
-                "a place by name, or use its visitor-information link to "
-                "confirm the details.",
+                f"I do not have enough information to compare these places "
+                f"by {criterion}. Choose a place by name or ask for another "
+                "type of comparison.",
                 "comparison_unavailable",
                 prediction,
                 session,
