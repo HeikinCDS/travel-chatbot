@@ -2,7 +2,9 @@ import unittest
 
 from chatbot.service import ChatbotService, ChatSession
 from dialogue.context_manager import ConversationContext
+from nlp.entity_extractor import TravelPreferences
 from nlp.intent_classifier import IntentPrediction
+from nlp.local_llm import LLMInterpretation
 
 
 class FixedClassifier:
@@ -28,16 +30,101 @@ class OfflineDiscovery:
         return None
 
 
+class OfflineLanguageInterpreter:
+    def interpret(self, text, context):
+        return None
+
+
+class FixedLanguageInterpreter:
+    def __init__(self, interpretation):
+        self.interpretation = interpretation
+        self.calls = 0
+
+    def interpret(self, text, context):
+        self.calls += 1
+        return self.interpretation
+
+
 class ChatbotServiceTests(unittest.TestCase):
 
-    def make_service(self, label, confidence=0.95, limit=3, web_discovery=None):
+    def make_service(
+        self,
+        label,
+        confidence=0.95,
+        limit=3,
+        web_discovery=None,
+        language_interpreter=None,
+    ):
         return ChatbotService(
             classifier=FixedClassifier(label, confidence),
             recommendation_limit=limit,
             web_discovery=(
                 web_discovery if web_discovery is not None else OfflineDiscovery()
             ),
+            language_interpreter=(
+                language_interpreter
+                if language_interpreter is not None
+                else OfflineLanguageInterpreter()
+            ),
         )
+
+    def test_local_model_recovers_a_flexible_travel_request(self):
+        class CandidateDiscovery:
+            def discover(self, preferences, *, limit):
+                return [{
+                    "attraction_id": "LM-TEST",
+                    "attraction_name": "Calm Garden",
+                    "state_territory": "Penang",
+                    "city_district": "George Town",
+                    "primary_category": "Nature",
+                    "short_description": "A calm public garden.",
+                    "elderly_friendly": "Yes",
+                }]
+
+            def get_by_id(self, attraction_id):
+                return None
+
+        interpretation = LLMInterpretation(
+            intent="request_recommendation",
+            confidence=0.91,
+            travel_related=True,
+            preferences=TravelPreferences(
+                state="Penang",
+                interests=("nature",),
+                elderly_friendly=True,
+            ),
+        )
+        response = self.make_service(
+            "out_of_scope",
+            web_discovery=CandidateDiscovery(),
+            language_interpreter=FixedLanguageInterpreter(interpretation),
+        ).process_message(
+            "My older mother would enjoy somewhere calm nearby"
+        )
+        self.assertEqual(response.action, "recommend")
+        self.assertEqual(response.intent, "request_recommendation")
+        self.assertEqual(response.context["state"], "Penang")
+        self.assertIn("nature", response.context["interests"])
+        self.assertTrue(response.context["elderly_friendly"])
+
+    def test_recognised_state_does_not_wait_for_local_model(self):
+        interpreter = FixedLanguageInterpreter(LLMInterpretation(
+            intent="refine_preferences",
+            confidence=0.99,
+            travel_related=True,
+            preferences=TravelPreferences(),
+        ))
+        session = ChatSession(
+            context=ConversationContext(interests=["relaxation"])
+        )
+        response = self.make_service(
+            "refine_preferences",
+            language_interpreter=interpreter,
+        ).process_message("Perak", session)
+
+        self.assertEqual(interpreter.calls, 0)
+        self.assertEqual(response.context["state"], "Perak")
+        self.assertEqual(response.action, "recommend")
 
     def test_open_data_candidate_is_combined_with_local_results(self):
         web_item = {

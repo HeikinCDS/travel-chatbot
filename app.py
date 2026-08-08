@@ -7,7 +7,7 @@ from typing import Any
 
 from flask import Flask, current_app, jsonify, render_template, request, session
 
-from chatbot.service import ChatSession, ChatbotService
+from chatbot.service import ChatSession, ChatbotService, STATE_SUGGESTIONS
 
 
 MAX_MESSAGE_LENGTH = 500
@@ -82,6 +82,24 @@ def create_app(
                     {"label": "Sabah", "message": "Sabah"},
                     {"label": "Sarawak", "message": "Sarawak"},
                 ],
+            }
+        )
+
+    @app.post("/api/reset-preferences")
+    def reset_preferences():
+        chat_session = ChatSession.from_dict(session.get("chatbot_session"))
+        chat_session.reset()
+        session["chatbot_session"] = chat_session.to_dict()
+        return jsonify(
+            {
+                "reply": (
+                    "Your saved trip preferences have been cleared. "
+                    "Which Malaysian state would you like to explore next?"
+                ),
+                "action": "reset_preferences",
+                "context": {},
+                "recommendations": [],
+                "suggestions": list(STATE_SUGGESTIONS),
             }
         )
 

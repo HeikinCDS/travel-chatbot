@@ -1,8 +1,7 @@
 """Free, source-backed attraction discovery for JomVoyage.
 
 Attractions come from Wikidata and OpenStreetMap. Photographs come from
-Wikimedia Commons with licence metadata. Ollama can optionally polish a short
-description locally, but it is never allowed to invent visitor facts.
+Wikimedia Commons with licence metadata.
 """
 
 from __future__ import annotations
@@ -21,6 +20,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, unquote, urlencode, urlparse
 from urllib.request import Request, urlopen
 
+from nlp.local_llm import LocalLLMInterpreter
+
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 DATABASE_PATH = PROJECT_DIR / "instance" / "travel_recommender.db"
@@ -28,7 +29,8 @@ CACHE_LIFETIME = timedelta(days=7)
 WIKIDATA_SPARQL = "https://query.wikidata.org/sparql"
 OVERPASS_API = "https://overpass-api.de/api/interpreter"
 COMMONS_API = "https://commons.wikimedia.org/w/api.php"
-OLLAMA_API = "http://127.0.0.1:11434/api/generate"
+OPENVERSE_API = "https://api.openverse.org/v1/images/"
+CACHE_SCHEMA_VERSION = 2
 
 STATE_ISO_CODES = {
     "johor": "MY-01",
@@ -106,19 +108,16 @@ class OpenDataDiscovery:
         database_path: Path | str = DATABASE_PATH,
         urlopen_function: Any | None = None,
         now: Any | None = None,
-        ollama_model: str | None = None,
-        ollama_url: str | None = None,
+        language_model: Any | None = None,
     ) -> None:
         self.database_path = Path(database_path)
         self._urlopen = urlopen_function or urlopen
         self._now = now or (lambda: datetime.now(UTC))
-        self.ollama_model = (
-            ollama_model if ollama_model is not None else os.getenv("OLLAMA_MODEL", "")
-        ).strip()
-        self.ollama_url = ollama_url or os.getenv("OLLAMA_URL", OLLAMA_API)
+        self.language_model = language_model or LocalLLMInterpreter()
         contact = os.getenv("JOMVOYAGE_CONTACT", "academic prototype")
         self.user_agent = f"JomVoyage-FYP/1.0 ({contact})"
         self._failed_until: dict[str, datetime] = {}
+        self._description_retry_after = datetime.min.replace(tzinfo=UTC)
 
     def discover(
         self,
@@ -137,6 +136,8 @@ class OpenDataDiscovery:
         query_key = self._query_key(preferences)
         cached = self._read_cache(query_key, limit)
         if cached:
+            if self._apply_generated_descriptions(cached):
+                self._write_cache(query_key, cached)
             return cached
         failed_until = self._failed_until.get(
             query_key, datetime.min.replace(tzinfo=UTC)
@@ -178,9 +179,9 @@ class OpenDataDiscovery:
         selected = candidates[:limit]
         for item in selected:
             item.update(self._find_commons_image(item))
-            item["short_description"] = self._polish_with_ollama(item)
             for key in [name for name in item if name.startswith("_")]:
                 item.pop(key, None)
+        self._apply_generated_descriptions(selected)
         if selected:
             self._write_cache(query_key, selected)
             self._failed_until.pop(query_key, None)
@@ -189,6 +190,30 @@ class OpenDataDiscovery:
             # rate limit or a query with no open-data matches.
             self._failed_until[query_key] = self._now() + timedelta(minutes=10)
         return selected
+
+    def _apply_generated_descriptions(
+        self,
+        items: list[dict[str, Any]],
+    ) -> bool:
+        pending = [
+            item for item in items
+            if item.get("description_origin") != "local_ai_from_source_facts"
+        ]
+        if not pending or self._description_retry_after > self._now():
+            return False
+        generated = self.language_model.generate_descriptions(pending)
+        if not generated:
+            self._description_retry_after = self._now() + timedelta(minutes=10)
+            return False
+        self._description_retry_after = datetime.min.replace(tzinfo=UTC)
+        changed = False
+        for item in pending:
+            description = generated.get(str(item["attraction_id"]))
+            if description:
+                item["short_description"] = description
+                item["description_origin"] = "local_ai_from_source_facts"
+                changed = True
+        return changed
 
     def get_by_id(self, attraction_id: str) -> dict[str, Any] | None:
         self._ensure_cache_table()
@@ -432,7 +457,7 @@ out center tags 80;
             payload = self._request_json(COMMONS_API, params=params, timeout=10)
             pages = payload.get("query", {}).get("pages", {}).values()
         except (HTTPError, URLError, TimeoutError, ValueError, KeyError):
-            return {}
+            return self._find_openverse_image(item)
         name_tokens = {
             token for token in _normalised_key(str(item["attraction_name"])).split()
             if len(token) >= 4
@@ -461,34 +486,60 @@ out center tags 80;
                     "image_attribution": artist or "Wikimedia Commons contributor",
                     "image_license": licence,
                 }
-        return {}
+        return self._find_openverse_image(item)
 
-    def _polish_with_ollama(self, item: Mapping[str, Any]) -> str:
-        original = _plain_text(item.get("short_description"), maximum=700)
-        if not self.ollama_model or not original:
-            return original
-        prompt = (
-            "Rewrite the following verified travel description in one or two clear, "
-            "friendly sentences for an elderly traveller. Use only the supplied "
-            "facts. Do not add prices, opening hours, accessibility claims or other "
-            f"facts. Place: {item['attraction_name']}. Facts: {original}"
-        )
+    def _find_openverse_image(self, item: Mapping[str, Any]) -> dict[str, Any]:
+        """Use openly licensed search as a fallback when Commons has no match."""
+        name = str(item.get("attraction_name") or "")
+        state = str(item.get("state_territory") or "")
         try:
             payload = self._request_json(
-                self.ollama_url,
-                data=json.dumps({
-                    "model": self.ollama_model,
-                    "prompt": prompt,
-                    "stream": False,
-                    "options": {"temperature": 0.2},
-                }).encode("utf-8"),
-                timeout=45,
-                content_type="application/json",
+                OPENVERSE_API,
+                params={
+                    "q": f'"{name}" {state} Malaysia',
+                    "page_size": 10,
+                    "mature": "false",
+                },
+                timeout=10,
             )
-            polished = _plain_text(payload.get("response"), maximum=700)
-            return polished if 20 <= len(polished) <= 700 else original
         except (HTTPError, URLError, TimeoutError, ValueError, KeyError):
-            return original
+            return {}
+
+        name_tokens = {
+            token for token in _normalised_key(name).split() if len(token) >= 4
+        }
+        required_matches = max(1, (len(name_tokens) + 1) // 2)
+        for result in payload.get("results", []):
+            if result.get("mature") is True:
+                continue
+            tags = " ".join(
+                str(tag.get("name") or "")
+                for tag in result.get("tags", [])
+                if isinstance(tag, Mapping)
+            )
+            searchable = _normalised_key(
+                f"{result.get('title', '')} {tags}"
+            )
+            matches = sum(token in searchable for token in name_tokens)
+            if name_tokens and matches < required_matches:
+                continue
+            image_url = _safe_http_url(
+                result.get("thumbnail") or result.get("url")
+            )
+            page_url = _safe_http_url(result.get("foreign_landing_url"))
+            licence = _plain_text(result.get("license"), maximum=40).upper()
+            version = _plain_text(result.get("license_version"), maximum=20)
+            creator = _plain_text(
+                result.get("creator") or result.get("attribution"), maximum=240
+            )
+            if image_url and page_url and licence:
+                return {
+                    "image_url": image_url,
+                    "image_page_url": page_url,
+                    "image_attribution": creator or "Openverse contributor",
+                    "image_license": f"{licence} {version}".strip(),
+                }
+        return {}
 
     def _request_json(
         self,
@@ -523,7 +574,11 @@ out center tags 80;
 
     @staticmethod
     def _query_key(preferences: Mapping[str, Any]) -> str:
-        canonical = json.dumps(dict(preferences), sort_keys=True, default=str)
+        canonical = json.dumps(
+            {"version": CACHE_SCHEMA_VERSION, "preferences": dict(preferences)},
+            sort_keys=True,
+            default=str,
+        )
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
     def _ensure_cache_table(self) -> None:

@@ -6,6 +6,7 @@ from .entity_extractor import (
     to_recommendation_filters,
 )
 from .intent_classifier import IntentClassifier, IntentPrediction
+from .local_llm import LLMInterpretation, LocalLLMInterpreter
 
 __all__ = [
     "TravelPreferences",
@@ -13,4 +14,6 @@ __all__ = [
     "to_recommendation_filters",
     "IntentClassifier",
     "IntentPrediction",
+    "LLMInterpretation",
+    "LocalLLMInterpreter",
 ]

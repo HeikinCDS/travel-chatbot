@@ -36,13 +36,22 @@
   </header>
 
   <div class="app-layout">
-    <aside class="trip-sidebar" aria-label="Trip preferences and chat history">
+    <div class="sidebar-region">
+      <button id="sidebar-toggle-button" class="sidebar-toggle-button" type="button"
+              aria-controls="trip-sidebar" aria-expanded="true">
+        <span aria-hidden="true">◀</span>
+        <span class="control-label">Hide trip panel</span>
+      </button>
+      <aside id="trip-sidebar" class="trip-sidebar" aria-label="Trip preferences and chat history">
       <details class="sidebar-card preference-panel" open>
         <summary>Saved trip preferences</summary>
         <p class="sidebar-help">Maya updates these details while you chat.</p>
         <dl id="preference-list" class="preference-list">
           <div><dt>Status</dt><dd>Not provided yet</dd></div>
         </dl>
+        <button id="preference-reset-button" class="sidebar-reset-button" type="button">
+          Reset trip preferences
+        </button>
       </details>
 
       <details class="sidebar-card history-panel" open>
@@ -51,7 +60,8 @@
         <p id="history-empty" class="history-empty">Your messages will appear here.</p>
         <ol id="chat-history" class="chat-history" aria-label="Messages in this conversation"></ol>
       </details>
-    </aside>
+      </aside>
+    </div>
 
     <main class="conversation-shell">
       <section class="intro-card" aria-labelledby="intro-title">

@@ -65,6 +65,40 @@ COMMONS_PAYLOAD = {
     }
 }
 
+OPENVERSE_PAYLOAD = {
+    "results": [{
+        "title": "Pantai Irama Kelantan",
+        "thumbnail": "https://api.openverse.org/example-thumb.jpg",
+        "url": "https://images.example.org/pantai-irama.jpg",
+        "foreign_landing_url": "https://example.org/pantai-irama-photo",
+        "creator": "Example photographer",
+        "license": "by-sa",
+        "license_version": "4.0",
+        "mature": False,
+        "tags": [{"name": "Pantai Irama"}, {"name": "Kelantan"}],
+    }]
+}
+
+
+class OfflineLanguageModel:
+    def generate_descriptions(self, attractions):
+        return {}
+
+
+class RecordingLanguageModel:
+    def __init__(self):
+        self.calls = 0
+
+    def generate_descriptions(self, attractions):
+        self.calls += 1
+        return {
+            str(item["attraction_id"]): (
+                f"{item['attraction_name']} offers a welcoming natural setting "
+                "for visitors interested in a relaxed Malaysian outing."
+            )
+            for item in attractions
+        }
+
 
 class FakeHttpResponse:
     def __init__(self, payload):
@@ -81,9 +115,11 @@ class FakeHttpResponse:
 
 
 class FakeUrlOpen:
-    def __init__(self, *, fail=False, ollama_response=None):
+    def __init__(self, *, fail=False, commons_payload=None):
         self.fail = fail
-        self.ollama_response = ollama_response
+        self.commons_payload = (
+            COMMONS_PAYLOAD if commons_payload is None else commons_payload
+        )
         self.calls = []
 
     def __call__(self, request, **kwargs):
@@ -96,9 +132,9 @@ class FakeUrlOpen:
         if "overpass-api.de" in url:
             return FakeHttpResponse(OVERPASS_PAYLOAD)
         if "commons.wikimedia.org" in url:
-            return FakeHttpResponse(COMMONS_PAYLOAD)
-        if "127.0.0.1:11434" in url:
-            return FakeHttpResponse({"response": self.ollama_response or ""})
+            return FakeHttpResponse(self.commons_payload)
+        if "api.openverse.org" in url:
+            return FakeHttpResponse(OPENVERSE_PAYLOAD)
         raise AssertionError(f"Unexpected URL: {url}")
 
 
@@ -115,7 +151,7 @@ class OpenDataDiscoveryTests(unittest.TestCase):
         discovery = OpenDataDiscovery(
             database_path=self.database_path,
             urlopen_function=fake_urlopen,
-            ollama_model="",
+            language_model=OfflineLanguageModel(),
         )
         preferences = {"state": "Penang", "interests": ["nature"]}
 
@@ -137,7 +173,7 @@ class OpenDataDiscoveryTests(unittest.TestCase):
         discovery = OpenDataDiscovery(
             database_path=self.database_path,
             urlopen_function=FakeUrlOpen(),
-            ollama_model="",
+            language_model=OfflineLanguageModel(),
         )
         items = discovery._search_openstreetmap("Penang", "MY-07")
         item = items[0]
@@ -146,29 +182,12 @@ class OpenDataDiscoveryTests(unittest.TestCase):
         self.assertEqual(item["entrance_fee_status"], "Free")
         self.assertIn("Seating is recorded", item["accessibility_notes"])
 
-    def test_optional_ollama_only_polishes_existing_description(self):
-        fake_urlopen = FakeUrlOpen(
-            ollama_response="A calm protected forest park suitable for a gentle visit."
-        )
-        discovery = OpenDataDiscovery(
-            database_path=self.database_path,
-            urlopen_function=fake_urlopen,
-            ollama_model="test-model",
-        )
-        item = {
-            "attraction_name": "Example Nature Park",
-            "short_description": "A protected forest park in Penang.",
-        }
-        polished = discovery._polish_with_ollama(item)
-        self.assertIn("protected forest", polished)
-        self.assertTrue(any("127.0.0.1:11434" in url for url in fake_urlopen.calls))
-
     def test_network_failure_returns_empty_result_for_sqlite_fallback(self):
         fake_urlopen = FakeUrlOpen(fail=True)
         discovery = OpenDataDiscovery(
             database_path=self.database_path,
             urlopen_function=fake_urlopen,
-            ollama_model="",
+            language_model=OfflineLanguageModel(),
         )
         preferences = {"state": "Penang", "interests": ["nature"]}
         self.assertEqual(discovery.discover(preferences, limit=3), [])
@@ -181,6 +200,7 @@ class OpenDataDiscoveryTests(unittest.TestCase):
         discovery = OpenDataDiscovery(
             database_path=self.database_path,
             urlopen_function=fake_urlopen,
+            language_model=OfflineLanguageModel(),
         )
         self.assertEqual(
             discovery.discover(
@@ -190,6 +210,45 @@ class OpenDataDiscoveryTests(unittest.TestCase):
             [],
         )
         self.assertEqual(fake_urlopen.calls, [])
+
+    def test_openverse_is_used_when_commons_has_no_matching_image(self):
+        fake_urlopen = FakeUrlOpen(commons_payload={"query": {"pages": {}}})
+        discovery = OpenDataDiscovery(
+            database_path=self.database_path,
+            urlopen_function=fake_urlopen,
+            language_model=OfflineLanguageModel(),
+        )
+        image = discovery._find_commons_image({
+            "attraction_name": "Pantai Irama",
+            "state_territory": "Kelantan",
+        })
+        self.assertEqual(image["image_license"], "BY-SA 4.0")
+        self.assertIn("openverse", image["image_url"])
+
+    def test_cached_source_text_is_enriched_when_local_model_becomes_available(self):
+        preferences = {"state": "Penang", "interests": ["nature"]}
+        language_model = RecordingLanguageModel()
+        discovery = OpenDataDiscovery(
+            database_path=self.database_path,
+            urlopen_function=FakeUrlOpen(),
+            language_model=language_model,
+        )
+        query_key = discovery._query_key(preferences)
+        discovery._write_cache(query_key, [{
+            "attraction_id": "OPEN-CACHED",
+            "attraction_name": "Example Nature Park",
+            "state_territory": "Penang",
+            "primary_category": "Nature",
+            "short_description": "Listed as a park in Penang.",
+        }])
+
+        result = discovery.discover(preferences, limit=1)
+        self.assertEqual(language_model.calls, 1)
+        self.assertEqual(
+            result[0]["description_origin"],
+            "local_ai_from_source_facts",
+        )
+        self.assertIn("welcoming natural setting", result[0]["short_description"])
 
 
 if __name__ == "__main__":

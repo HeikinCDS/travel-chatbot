@@ -2,8 +2,11 @@ const form = document.querySelector("#chat-form");
 const input = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-button");
 const resetButton = document.querySelector("#reset-button");
+const preferenceResetButton = document.querySelector("#preference-reset-button");
 const textSizeButton = document.querySelector("#text-size-button");
 const contrastButton = document.querySelector("#contrast-button");
+const sidebarToggleButton = document.querySelector("#sidebar-toggle-button");
+const tripSidebar = document.querySelector("#trip-sidebar");
 const messages = document.querySelector("#messages");
 const recommendations = document.querySelector("#recommendations");
 const quickReplies = document.querySelector("#quick-replies");
@@ -356,6 +359,24 @@ resetButton.addEventListener("click", async () => {
   }
 });
 
+preferenceResetButton.addEventListener("click", async () => {
+  preferenceResetButton.disabled = true;
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  try {
+    const data = await sendJson("/api/reset-preferences");
+    addMessage(data.reply, "bot");
+    showPreferences(data.context);
+    showRecommendations(data.recommendations);
+    showQuickReplies(data.suggestions);
+    formStatus.textContent = "Trip preferences cleared.";
+  } catch (error) {
+    formStatus.textContent = error.message;
+  } finally {
+    preferenceResetButton.disabled = false;
+    input.focus();
+  }
+});
+
 function applySavedDisplaySettings() {
   const largeText = localStorage.getItem("largeText") === "true";
   const highContrast = localStorage.getItem("highContrast") === "true";
@@ -366,6 +387,25 @@ function applySavedDisplaySettings() {
   textSizeButton.querySelector(".control-label").textContent = largeText ? "Normal text" : "Larger text";
   contrastButton.querySelector(".control-label").textContent = highContrast ? "Standard colours" : "High contrast";
 }
+
+function applySavedSidebarSetting() {
+  const visible = localStorage.getItem("tripPanelVisible") !== "false";
+  tripSidebar.hidden = !visible;
+  document.body.classList.toggle("sidebar-hidden", !visible);
+  sidebarToggleButton.setAttribute("aria-expanded", String(visible));
+  sidebarToggleButton.querySelector(".control-label").textContent = visible
+    ? "Hide trip panel"
+    : "Show trip panel";
+  sidebarToggleButton.querySelector("span[aria-hidden='true']").textContent = visible
+    ? "◀"
+    : "▶";
+}
+
+sidebarToggleButton.addEventListener("click", () => {
+  const visible = tripSidebar.hidden;
+  localStorage.setItem("tripPanelVisible", String(visible));
+  applySavedSidebarSetting();
+});
 
 textSizeButton.addEventListener("click", () => {
   const enabled = !document.body.classList.contains("large-text");
@@ -380,3 +420,4 @@ contrastButton.addEventListener("click", () => {
 });
 
 applySavedDisplaySettings();
+applySavedSidebarSetting();

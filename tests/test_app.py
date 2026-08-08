@@ -48,6 +48,9 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertIn(b'class="composer-area"', response.data)
         self.assertIn(b'class="trip-sidebar"', response.data)
         self.assertIn(b'id="preference-list"', response.data)
+        self.assertIn(b'id="preference-reset-button"', response.data)
+        self.assertIn(b'id="sidebar-toggle-button"', response.data)
+        self.assertIn(b'id="trip-sidebar"', response.data)
         self.assertIn(b'id="chat-history"', response.data)
 
     def test_health_endpoint(self):
@@ -82,6 +85,16 @@ class FlaskApplicationTests(unittest.TestCase):
         self.client.post("/api/chat", json={"message": "Nature"})
         self.assertEqual(reset_response.status_code, 200)
         self.assertGreater(len(reset_response.get_json()["suggestions"]), 0)
+        self.assertEqual(self.service.received_contexts[1]["context"], {})
+
+    def test_preference_reset_keeps_endpoint_separate_from_new_chat(self):
+        self.client.post("/api/chat", json={"message": "Johor"})
+        response = self.client.post("/api/reset-preferences", json={})
+        self.client.post("/api/chat", json={"message": "Nature"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["action"], "reset_preferences")
+        self.assertEqual(response.get_json()["context"], {})
         self.assertEqual(self.service.received_contexts[1]["context"], {})
 
 

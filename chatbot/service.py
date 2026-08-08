@@ -6,9 +6,14 @@ from dataclasses import dataclass, field
 import re
 from typing import Any, Mapping, Protocol
 
-from dialogue.context_manager import ConversationContext
+from dialogue.context_manager import ConversationContext, REPLACE_INTEREST_PATTERN
 from nlp.entity_extractor import extract_preferences
 from nlp.intent_classifier import IntentClassifier, IntentPrediction
+from nlp.local_llm import (
+    LLMInterpretation,
+    LocalLLMInterpreter,
+    merge_preferences,
+)
 from recommendation_engine.recommendation_engine import (
     get_attraction_by_id,
     recommend_attractions,
@@ -32,6 +37,21 @@ class AttractionDiscovery(Protocol):
 
     def get_by_id(self, attraction_id: str) -> dict[str, Any] | None:
         """Retrieve one attraction that was returned earlier."""
+
+
+class LanguageInterpreter(Protocol):
+    def interpret(
+        self,
+        text: str,
+        context: Mapping[str, Any],
+    ) -> LLMInterpretation | None:
+        """Return a validated local-model interpretation when available."""
+
+    def generate_descriptions(
+        self,
+        attractions: list[Mapping[str, Any]],
+    ) -> dict[str, str]:
+        """Return grounded display descriptions keyed by attraction ID."""
 
 
 EXPLICIT_RESET_PATTERN = re.compile(
@@ -283,6 +303,7 @@ class ChatbotService:
         confidence_threshold: float = 0.45,
         recommendation_limit: int = 3,
         web_discovery: AttractionDiscovery | None = None,
+        language_interpreter: LanguageInterpreter | None = None,
     ):
         if not 0.0 <= confidence_threshold <= 1.0:
             raise ValueError("confidence_threshold must be between 0 and 1")
@@ -291,7 +312,10 @@ class ChatbotService:
         self.classifier = classifier or IntentClassifier()
         self.confidence_threshold = confidence_threshold
         self.recommendation_limit = recommendation_limit
-        self.web_discovery = web_discovery or OpenDataDiscovery()
+        self.language_interpreter = language_interpreter or LocalLLMInterpreter()
+        self.web_discovery = web_discovery or OpenDataDiscovery(
+            language_model=self.language_interpreter
+        )
 
     def process_message(
         self,
@@ -306,15 +330,47 @@ class ChatbotService:
 
         session = session or ChatSession()
         prediction = self.classifier.predict(text)
+        rule_preferences = extract_preferences(text)
+        message_preferences = rule_preferences
+
+        explicit_reset = bool(EXPLICIT_RESET_PATTERN.fullmatch(text))
+        explicit_goodbye = bool(EXPLICIT_GOODBYE_PATTERN.fullmatch(text))
+        interpretation = None
+        use_local_model = (
+            not rule_preferences.to_dict()
+            and (
+                prediction.confidence < self.confidence_threshold
+                or prediction.label == "out_of_scope"
+            )
+        )
+        if not explicit_reset and not explicit_goodbye and use_local_model:
+            interpretation = self.language_interpreter.interpret(
+                text,
+                session.context.to_dict(),
+            )
+        if interpretation is not None:
+            message_preferences = merge_preferences(
+                rule_preferences,
+                interpretation.preferences,
+            )
+            minimum_confidence = (
+                0.85 if interpretation.intent == "out_of_scope" else 0.65
+            )
+            if interpretation.confidence >= minimum_confidence:
+                prediction = IntentPrediction(
+                    label=interpretation.intent,
+                    confidence=interpretation.confidence,
+                    scores={interpretation.intent: interpretation.confidence},
+                )
+
         intent = prediction.label
-        message_preferences = extract_preferences(text)
         state_changed = (
             message_preferences.state is not None
             and message_preferences.state != session.context.state
         )
         requested_ranking = _ranking_criterion(text)
 
-        if intent == "reset_conversation" and EXPLICIT_RESET_PATTERN.fullmatch(text):
+        if intent == "reset_conversation" and explicit_reset:
             session.reset()
             return self._response(
                 "Your travel preferences have been cleared. Where would you like to go?",
@@ -324,7 +380,7 @@ class ChatbotService:
                 suggestions=STATE_SUGGESTIONS,
             )
 
-        if intent == "goodbye" and EXPLICIT_GOODBYE_PATTERN.fullmatch(text):
+        if intent == "goodbye" and explicit_goodbye:
             return self._response(
                 "Goodbye. I hope you enjoy planning your trip in Malaysia.",
                 "goodbye",
@@ -361,7 +417,10 @@ class ChatbotService:
         # Extract recognised travel details before trusting the classifier.
         # A short answer such as "Relaxation" can otherwise be mistaken for
         # "reset conversation" and unexpectedly erase the user's choices.
-        changes = session.context.update_from_text(text)
+        changes = session.context.update(
+            message_preferences,
+            replace_interests=bool(REPLACE_INTEREST_PATTERN.search(text)),
+        )
         if changes:
             session.shown_attraction_ids.clear()
             session.latest_recommendation_ids.clear()
@@ -696,16 +755,17 @@ class ChatbotService:
             )
 
         attraction = _present_attraction(attraction)
-        access = attraction.get("accessibility_notes") or (
-            "Detailed terrain, seating, toilet and step information has not "
-            "been confirmed."
-        )
-        reply = (
-            f"{attraction['attraction_name']}: "
-            f"{attraction['display_description']} "
-            f"{attraction['cost_summary']}. {attraction['duration_summary']}. "
-            f"{attraction['accessibility_summary']}. "
-            f"Accessibility notes: {access}"
+        details = [
+            attraction.get("display_description"),
+            attraction.get("cost_summary"),
+            attraction.get("duration_summary"),
+            attraction.get("accessibility_summary"),
+        ]
+        access = attraction.get("accessibility_notes")
+        if access:
+            details.append(f"Accessibility notes: {access}")
+        reply = f"{attraction['attraction_name']}: " + " ".join(
+            f"{str(detail).rstrip('.')}." for detail in details if detail
         )
         return self._response(
             reply,
