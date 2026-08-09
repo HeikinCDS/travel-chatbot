@@ -1,5 +1,11 @@
+from contextlib import closing
+from pathlib import Path
+import sqlite3
+import tempfile
 import unittest
+from unittest.mock import patch
 
+from recommendation_engine import recommendation_engine as engine
 from recommendation_engine.recommendation_engine import (
     recommend_attractions,
     recommend_from_text,
@@ -7,6 +13,85 @@ from recommendation_engine.recommendation_engine import (
 
 
 class RecommendationEngineTests(unittest.TestCase):
+
+    def test_fts_ranks_matching_description_after_hard_filters(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            database_path = Path(temporary_directory) / "search.db"
+            with closing(sqlite3.connect(database_path)) as connection:
+                connection.execute("""
+                    CREATE TABLE attractions (
+                        attraction_id TEXT,
+                        attraction_name TEXT,
+                        state_territory TEXT,
+                        city_district TEXT,
+                        primary_category TEXT,
+                        interests_tags TEXT,
+                        short_description TEXT,
+                        entrance_fee_status TEXT,
+                        min_fee_myr REAL,
+                        max_fee_myr REAL,
+                        recommended_duration_hours REAL,
+                        family_friendly TEXT,
+                        elderly_friendly TEXT,
+                        wheelchair_accessible TEXT,
+                        accessibility_notes TEXT,
+                        official_url TEXT,
+                        source_url TEXT,
+                        date_verified TEXT,
+                        verification_status TEXT,
+                        completeness REAL
+                    )
+                """)
+                rows = [
+                    (
+                        "PEN-ACTIVE", "Active Forest", "Penang", "Balik Pulau",
+                        "Nature", "nature, hiking", "A challenging uphill trail.",
+                    ),
+                    (
+                        "PEN-CALM", "Calm Garden", "Penang", "George Town",
+                        "Nature", "nature, relaxation", "A quiet peaceful garden.",
+                    ),
+                    (
+                        "JOH-CALM", "Johor Quiet Park", "Johor", "Johor Bahru",
+                        "Nature", "nature, relaxation", "A quiet peaceful park.",
+                    ),
+                ]
+                for row in rows:
+                    connection.execute("""
+                        INSERT INTO attractions (
+                            attraction_id, attraction_name, state_territory,
+                            city_district, primary_category, interests_tags,
+                            short_description, entrance_fee_status,
+                            family_friendly, elderly_friendly,
+                            wheelchair_accessible, completeness
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'Unknown', 'Yes',
+                                  'Partial', 'Unknown', 90)
+                    """, row)
+                connection.commit()
+
+            with patch.object(engine, "DATABASE_PATH", database_path):
+                results = engine.recommend_attractions(
+                    state="Penang",
+                    interest="nature",
+                    query_text="somewhere quiet and peaceful!",
+                    limit=2,
+                )
+
+            with closing(sqlite3.connect(database_path)) as connection:
+                indexed = connection.execute(
+                    "SELECT COUNT(*) FROM attractions_fts"
+                ).fetchone()[0]
+                triggers = connection.execute("""
+                    SELECT COUNT(*) FROM sqlite_master
+                    WHERE type = 'trigger' AND name LIKE 'attractions_fts_%'
+                """).fetchone()[0]
+
+            self.assertEqual(
+                [item["attraction_id"] for item in results],
+                ["PEN-CALM", "PEN-ACTIVE"],
+            )
+            self.assertEqual(indexed, 3)
+            self.assertEqual(triggers, 3)
 
     def test_state_filter(self):
         results = recommend_attractions(

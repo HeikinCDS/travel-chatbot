@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import os
 import re
 from typing import Any, Mapping, Protocol
 
@@ -54,6 +55,23 @@ class LanguageInterpreter(Protocol):
         """Return grounded display descriptions keyed by attraction ID."""
 
 
+class DisabledLanguageInterpreter:
+    """No-op interpreter used when local language generation is switched off."""
+
+    def interpret(
+        self,
+        text: str,
+        context: Mapping[str, Any],
+    ) -> None:
+        return None
+
+    def generate_descriptions(
+        self,
+        attractions: list[Mapping[str, Any]],
+    ) -> dict[str, str]:
+        return {}
+
+
 EXPLICIT_RESET_PATTERN = re.compile(
     r"^\s*(?:reset|start\s+over|begin\s+again|new\s+search|"
     r"clear\s+(?:everything|all\s+preferences|my\s+preferences))"
@@ -82,6 +100,16 @@ STATE_SUGGESTIONS = (
     {"label": "Sabah", "message": "Sabah"},
     {"label": "Sarawak", "message": "Sarawak"},
 )
+
+
+def _environment_flag(name: str, *, default: bool = False) -> bool:
+    """Read a predictable true/false feature flag from the environment."""
+
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().casefold() in {"1", "true", "yes", "on"}
+
 
 INTEREST_SUGGESTIONS = (
     {"label": "Nature", "message": "Nature"},
@@ -232,6 +260,7 @@ class ChatSession:
     shown_attraction_ids: list[str] = field(default_factory=list)
     latest_recommendation_ids: list[str] = field(default_factory=list)
     ranking_preference: str | None = None
+    retrieval_query: str | None = None
 
     @classmethod
     def from_dict(cls, values: Mapping[str, Any] | None) -> "ChatSession":
@@ -246,6 +275,7 @@ class ChatSession:
                 values.get("latest_recommendation_ids", [])
             ),
             ranking_preference=values.get("ranking_preference"),
+            retrieval_query=values.get("retrieval_query"),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -254,6 +284,7 @@ class ChatSession:
             "shown_attraction_ids": list(self.shown_attraction_ids),
             "latest_recommendation_ids": list(self.latest_recommendation_ids),
             "ranking_preference": self.ranking_preference,
+            "retrieval_query": self.retrieval_query,
         }
 
     def reset(self) -> None:
@@ -261,6 +292,7 @@ class ChatSession:
         self.shown_attraction_ids.clear()
         self.latest_recommendation_ids.clear()
         self.ranking_preference = None
+        self.retrieval_query = None
 
 
 @dataclass(frozen=True)
@@ -304,6 +336,8 @@ class ChatbotService:
         recommendation_limit: int = 3,
         web_discovery: AttractionDiscovery | None = None,
         language_interpreter: LanguageInterpreter | None = None,
+        enable_local_llm: bool | None = None,
+        enable_live_discovery: bool | None = None,
     ):
         if not 0.0 <= confidence_threshold <= 1.0:
             raise ValueError("confidence_threshold must be between 0 and 1")
@@ -312,9 +346,28 @@ class ChatbotService:
         self.classifier = classifier or IntentClassifier()
         self.confidence_threshold = confidence_threshold
         self.recommendation_limit = recommendation_limit
-        self.language_interpreter = language_interpreter or LocalLLMInterpreter()
+        self.enable_local_llm = (
+            _environment_flag("ENABLE_LOCAL_LLM")
+            if enable_local_llm is None
+            else bool(enable_local_llm)
+        )
+        self.enable_live_discovery = (
+            _environment_flag("ENABLE_LIVE_DISCOVERY")
+            if enable_live_discovery is None
+            else bool(enable_live_discovery)
+        )
+        disabled_interpreter = DisabledLanguageInterpreter()
+        self.language_interpreter = language_interpreter or (
+            LocalLLMInterpreter()
+            if self.enable_local_llm
+            else disabled_interpreter
+        )
         self.web_discovery = web_discovery or OpenDataDiscovery(
-            language_model=self.language_interpreter
+            language_model=(
+                self.language_interpreter
+                if self.enable_local_llm
+                else disabled_interpreter
+            )
         )
 
     def process_message(
@@ -343,7 +396,12 @@ class ChatbotService:
                 or prediction.label == "out_of_scope"
             )
         )
-        if not explicit_reset and not explicit_goodbye and use_local_model:
+        if (
+            self.enable_local_llm
+            and not explicit_reset
+            and not explicit_goodbye
+            and use_local_model
+        ):
             interpretation = self.language_interpreter.interpret(
                 text,
                 session.context.to_dict(),
@@ -424,6 +482,14 @@ class ChatbotService:
         if changes:
             session.shown_attraction_ids.clear()
             session.latest_recommendation_ids.clear()
+            if state_changed or message_preferences.interests:
+                session.retrieval_query = text
+            else:
+                session.retrieval_query = " ".join(
+                    part
+                    for part in (session.retrieval_query, text)
+                    if part
+                )[-500:]
 
         # A short slot answer such as "Penang" may have a weak or unexpected
         # intent prediction. Recognised structured preferences take priority.
@@ -521,6 +587,11 @@ class ChatbotService:
             if not session.context.is_ready_for_recommendation():
                 return self._clarification_response(prediction, session)
             session.shown_attraction_ids.clear()
+            session.retrieval_query = " ".join(
+                part
+                for part in (session.retrieval_query, text)
+                if part
+            )[-500:]
             return self._recommendation_response(
                 prediction,
                 session,
@@ -564,11 +635,16 @@ class ChatbotService:
     ) -> ChatbotResponse:
         local_candidates = recommend_attractions(
             **session.context.recommendation_filters(),
+            query_text=session.retrieval_query,
             limit=50,
         )
-        web_candidates = self.web_discovery.discover(
-            session.context.to_dict(),
-            limit=max(self.recommendation_limit * 2, 6),
+        web_candidates = (
+            self.web_discovery.discover(
+                session.context.to_dict(),
+                limit=max(self.recommendation_limit * 2, 6),
+            )
+            if self.enable_live_discovery
+            else []
         )
         candidates = self._merge_candidates(local_candidates, web_candidates)
         candidates = self._sort_candidates(candidates, sort_by)
@@ -577,9 +653,14 @@ class ChatbotService:
             session.latest_recommendation_ids.clear()
             state = session.context.state or "that location"
             interest = ", ".join(session.context.interests) or "selected"
+            search_scope = (
+                "the saved collection or live open-data sources"
+                if self.enable_live_discovery
+                else "the saved collection"
+            )
             return self._response(
                 f"I could not find an exact match for {interest} attractions "
-                f"in {state} in the saved collection or from live web sources. "
+                f"in {state} in {search_scope}. "
                 "Your preferences are still saved. Please choose another "
                 "attraction type, or tell me a different state.",
                 "no_results",
@@ -594,8 +675,11 @@ class ChatbotService:
             if item["attraction_id"] not in session.shown_attraction_ids
         ]
         if alternative and not unseen:
+            result_scope = (
+                "saved or live" if self.enable_live_discovery else "saved"
+            )
             return self._response(
-                "There are no more matching alternatives in the saved or live "
+                f"There are no more matching alternatives in the {result_scope} "
                 "results. Try changing one of your preferences.",
                 "no_alternatives",
                 prediction,
@@ -797,9 +881,10 @@ class ChatbotService:
         return tuple(suggestions)
 
     def _get_attraction(self, attraction_id: str) -> dict[str, Any] | None:
-        return get_attraction_by_id(attraction_id) or self.web_discovery.get_by_id(
-            attraction_id
-        )
+        attraction = get_attraction_by_id(attraction_id)
+        if attraction is not None or not self.enable_live_discovery:
+            return attraction
+        return self.web_discovery.get_by_id(attraction_id)
 
     def _latest_attractions(self, session: ChatSession) -> list[dict[str, Any]]:
         return [

@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from chatbot.service import ChatbotService, ChatSession
 from dialogue.context_manager import ConversationContext
@@ -66,6 +67,56 @@ class ChatbotServiceTests(unittest.TestCase):
                 if language_interpreter is not None
                 else OfflineLanguageInterpreter()
             ),
+            enable_live_discovery=web_discovery is not None,
+            enable_local_llm=language_interpreter is not None,
+        )
+
+    def test_environment_flags_disable_external_services(self):
+        class ForbiddenDiscovery:
+            def discover(self, preferences, *, limit):
+                raise AssertionError("Live discovery must remain disabled")
+
+            def get_by_id(self, attraction_id):
+                raise AssertionError("Live discovery must remain disabled")
+
+        class ForbiddenInterpreter:
+            def interpret(self, text, context):
+                raise AssertionError("The local LLM must remain disabled")
+
+        disabled = {
+            "ENABLE_LOCAL_LLM": "false",
+            "ENABLE_LIVE_DISCOVERY": "false",
+        }
+        with patch.dict("os.environ", disabled):
+            uncertain_service = ChatbotService(
+                classifier=FixedClassifier("out_of_scope", 0.20),
+                web_discovery=ForbiddenDiscovery(),
+                language_interpreter=ForbiddenInterpreter(),
+            )
+            uncertain = uncertain_service.process_message(
+                "Something calm for my mother"
+            )
+
+            recommendation_service = ChatbotService(
+                classifier=FixedClassifier("request_recommendation"),
+                web_discovery=ForbiddenDiscovery(),
+                language_interpreter=ForbiddenInterpreter(),
+            )
+            session = ChatSession(
+                context=ConversationContext(
+                    state="Penang",
+                    interests=["nature"],
+                )
+            )
+            recommendation = recommendation_service.process_message(
+                "Recommend a place",
+                session,
+            )
+
+        self.assertEqual(uncertain.action, "out_of_scope")
+        self.assertIn(
+            recommendation.action,
+            {"recommend", "no_results"},
         )
 
     def test_local_model_recovers_a_flexible_travel_request(self):
@@ -218,6 +269,7 @@ class ChatbotServiceTests(unittest.TestCase):
             shown_attraction_ids=["A001"],
             latest_recommendation_ids=["A001"],
             ranking_preference="accessibility",
+            retrieval_query="quiet nature in Johor",
         )
         response = self.make_service("reset_conversation").process_message(
             "Start over",
@@ -227,6 +279,7 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertEqual(session.context.to_dict(), {})
         self.assertEqual(session.shown_attraction_ids, [])
         self.assertIsNone(session.ranking_preference)
+        self.assertIsNone(session.retrieval_query)
 
     def test_recognised_interest_is_not_mistaken_for_reset(self):
         session = ChatSession(
@@ -239,6 +292,7 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertEqual(response.action, "recommend")
         self.assertEqual(session.context.state, "Penang")
         self.assertEqual(session.context.interests, ["relaxation"])
+        self.assertEqual(session.retrieval_query, "Relaxation")
         self.assertGreater(len(response.recommendations), 0)
         self.assertTrue(all(
             item["state_territory"] == "Penang"
@@ -584,6 +638,7 @@ class ChatbotServiceTests(unittest.TestCase):
             shown_attraction_ids=["A001"],
             latest_recommendation_ids=["A001"],
             ranking_preference="duration",
+            retrieval_query="quiet nature in Johor",
         )
         restored = ChatSession.from_dict(original.to_dict())
         self.assertEqual(restored.to_dict(), original.to_dict())

@@ -11,7 +11,7 @@ Maya can discover attractions without a paid API key. The live provider uses:
 The existing SQLite collection remains the fallback if the internet or a public
 service is unavailable.
 
-## Normal use: no key and no additional installation
+## Normal use: fast SQLite-only baseline
 
 Activate the virtual environment and run JomVoyage normally:
 
@@ -19,9 +19,30 @@ Activate the virtual environment and run JomVoyage normally:
 python app.py
 ```
 
-The first new preference combination may take longer because Maya contacts the
-public sources. Results are cached in `instance/travel_recommender.db` for seven
-days. Repeated requests use the cache and do not contact the public services.
+Both optional external features are disabled by default. Maya recommends from
+the curated SQLite collection without contacting LM Studio or live open-data
+services. This is the baseline mode for the hybrid RAG redesign.
+
+The settings can be made explicit in the current PowerShell window:
+
+```powershell
+$env:ENABLE_LOCAL_LLM="false"
+$env:ENABLE_LIVE_DISCOVERY="false"
+python app.py
+```
+
+To temporarily compare the earlier live-discovery prototype, enable only the
+required feature before starting the app:
+
+```powershell
+$env:ENABLE_LIVE_DISCOVERY="true"
+$env:ENABLE_LOCAL_LLM="true"
+python app.py
+```
+
+When live discovery is enabled, the first new preference combination may take
+longer because Maya contacts public services. Results are cached in
+`instance/travel_recommender.db` for seven days.
 
 ## Optional LM Studio language understanding
 
@@ -33,9 +54,11 @@ opening hours, accessibility claims, ratings or named facilities.
 
 1. Install LM Studio and download `Qwen3.5-4B-GGUF` (`Q4_K_M`).
 2. Start **Local Model API** at `http://127.0.0.1:1234/v1`.
-3. Run JomVoyage. It automatically looks for `qwen3.5-4b` at the local API:
+3. Enable the feature and run JomVoyage. It automatically looks for
+   `qwen3.5-4b` at the local API:
 
 ```powershell
+$env:ENABLE_LOCAL_LLM="true"
 python app.py
 ```
 
