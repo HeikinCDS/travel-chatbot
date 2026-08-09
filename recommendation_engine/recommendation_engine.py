@@ -1,7 +1,10 @@
 from contextlib import closing
+import os
 from pathlib import Path
 import re
 import sqlite3
+
+from recommendation_engine.semantic_search import SemanticRanker
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 DATABASE_PATH = PROJECT_DIR / "instance" / "travel_recommender.db"
@@ -11,7 +14,27 @@ SEARCH_STOPWORDS = {
     "me", "my", "of", "on", "place", "places", "recommend", "show",
     "something", "that", "the", "to", "travel", "want", "with",
     "yang", "dan", "di", "mahu", "saya", "tempat", "untuk",
+    "johor", "kedah", "kelantan", "melaka", "malacca", "sembilan",
+    "pahang", "penang", "perak", "perlis", "sabah", "sarawak",
+    "selangor", "terengganu", "kuala", "lumpur", "labuan", "putrajaya",
+    "malaysia", "malaysian",
 }
+
+_SEMANTIC_RANKER = None
+
+
+def _environment_flag(name, *, default=False):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().casefold() in {"1", "true", "yes", "on"}
+
+
+def _semantic_ranker():
+    global _SEMANTIC_RANKER
+    if _SEMANTIC_RANKER is None:
+        _SEMANTIC_RANKER = SemanticRanker()
+    return _SEMANTIC_RANKER
 
 
 def rebuild_search_index(connection):
@@ -108,54 +131,154 @@ def _ensure_search_index(connection):
     connection.commit()
 
 
-def _search_expression(text):
+def _search_expression(text, ignored_terms=()):
     """Convert unrestricted user text into a safe FTS5 OR expression."""
 
     if not isinstance(text, str):
         return None
+    ignored_tokens = {
+        token
+        for term in ignored_terms
+        if term
+        for token in re.findall(r"[a-z0-9]+", str(term).casefold())
+    }
     tokens = []
     for token in re.findall(r"[a-z0-9]+", text.casefold()):
-        if len(token) < 2 or token in SEARCH_STOPWORDS or token in tokens:
+        if (
+            len(token) < 2
+            or token in SEARCH_STOPWORDS
+            or token in ignored_tokens
+            or token in tokens
+        ):
             continue
         tokens.append(token)
     return " OR ".join(f'"{token}"' for token in tokens[:20]) or None
 
 
-def _rank_by_search(connection, attractions, query_text):
-    """Put FTS5 matches first while preserving the existing fallback order."""
+def _rank_by_search(
+    connection,
+    attractions,
+    query_text,
+    semantic_ranker=None,
+    semantic_mode=None,
+    ignored_terms=(),
+):
+    """Blend exact FTS5 relevance with optional semantic similarity."""
 
-    expression = _search_expression(query_text)
-    if not expression or not attractions:
+    expression = _search_expression(query_text, ignored_terms)
+    if not attractions:
         return attractions
+    rank_by_id = {}
     try:
-        _ensure_search_index(connection)
-        ranked_rows = connection.execute("""
-            SELECT attraction_id
-            FROM attractions_fts
-            WHERE attractions_fts MATCH ?
-            ORDER BY bm25(
-                attractions_fts,
-                0.0, 5.0, 2.0, 3.0, 4.0, 1.0, 1.0
-            )
-        """, (expression,)).fetchall()
+        if expression:
+            _ensure_search_index(connection)
+            ranked_rows = connection.execute("""
+                SELECT attraction_id
+                FROM attractions_fts
+                WHERE attractions_fts MATCH ?
+                ORDER BY bm25(
+                    attractions_fts,
+                    0.0, 5.0, 2.0, 3.0, 4.0, 1.0, 1.0
+                )
+            """, (expression,)).fetchall()
+            rank_by_id = {
+                str(row["attraction_id"]): rank
+                for rank, row in enumerate(ranked_rows)
+            }
     except sqlite3.OperationalError:
         # Existing databases continue working until the importer builds FTS5.
-        return attractions
+        rank_by_id = {}
 
-    rank_by_id = {
-        str(row["attraction_id"]): rank
-        for rank, row in enumerate(ranked_rows)
+    semantic_scores = {}
+    ranker = semantic_ranker
+    configured_mode = str(
+        semantic_mode
+        or os.getenv("SEMANTIC_SEARCH_MODE", "adaptive")
+    ).strip().casefold()
+    if configured_mode not in {"off", "adaptive", "always"}:
+        configured_mode = "adaptive"
+    if (
+        ranker is None
+        and not _environment_flag("ENABLE_SEMANTIC_SEARCH", default=True)
+    ):
+        configured_mode = "off"
+    if ranker is False:
+        configured_mode = "off"
+
+    candidate_ids = {
+        str(attraction["attraction_id"])
+        for attraction in attractions
     }
+    has_candidate_fts_match = any(
+        attraction_id in candidate_ids
+        for attraction_id in rank_by_id
+    )
+    should_use_semantic = configured_mode == "always" or (
+        configured_mode == "adaptive"
+        and expression is not None
+        and not has_candidate_fts_match
+    )
+    if should_use_semantic:
+        ranker = ranker or _semantic_ranker()
+        try:
+            semantic_scores = ranker.scores(
+                connection,
+                attractions,
+                query_text,
+            )
+        except (
+            OSError,
+            RuntimeError,
+            TypeError,
+            ValueError,
+            sqlite3.Error,
+        ):
+            semantic_scores = {}
+
+    if not rank_by_id and not semantic_scores:
+        return attractions
     indexed = list(enumerate(attractions))
+
+    def combined_score(attraction):
+        attraction_id = str(attraction["attraction_id"])
+        fts_rank = rank_by_id.get(attraction_id)
+        fts_score = 1.0 / (1.0 + fts_rank) if fts_rank is not None else 0.0
+        semantic_score = max(
+            0.0,
+            min(1.0, semantic_scores.get(attraction_id, 0.0)),
+        )
+        if semantic_scores and rank_by_id:
+            return 0.45 * fts_score + 0.55 * semantic_score
+        return semantic_score if semantic_scores else fts_score
+
     indexed.sort(
         key=lambda pair: (
-            0,
-            rank_by_id[str(pair[1]["attraction_id"])],
+            -combined_score(pair[1]),
+            pair[0],
         )
-        if str(pair[1]["attraction_id"]) in rank_by_id
-        else (1, pair[0])
     )
     return [attraction for _, attraction in indexed]
+
+
+def _accessibility_score(
+    attraction,
+    *,
+    elderly_friendly=False,
+    wheelchair_accessible=False,
+):
+    values = {"yes": 2, "partial": 1}
+    score = 0
+    if elderly_friendly:
+        score += values.get(
+            str(attraction.get("elderly_friendly") or "").casefold(),
+            0,
+        )
+    if wheelchair_accessible:
+        score += values.get(
+            str(attraction.get("wheelchair_accessible") or "").casefold(),
+            0,
+        )
+    return score
 
 
 def recommend_attractions(
@@ -166,6 +289,8 @@ def recommend_attractions(
     elderly_friendly=False,
     wheelchair_accessible=False,
     query_text=None,
+    semantic_ranker=None,
+    semantic_mode=None,
     limit=5
 ):
     if limit < 1:
@@ -200,14 +325,14 @@ def recommend_attractions(
 
     if elderly_friendly:
         conditions.append("""
-            LOWER(elderly_friendly)
-            IN ('yes', 'partial')
+            LOWER(COALESCE(NULLIF(TRIM(elderly_friendly), ''), 'unknown'))
+            != 'no'
         """)
 
     if wheelchair_accessible:
         conditions.append("""
-            LOWER(wheelchair_accessible)
-            IN ('yes', 'partial')
+            LOWER(COALESCE(NULLIF(TRIM(wheelchair_accessible), ''), 'unknown'))
+            != 'no'
         """)
 
     where_clause = ""
@@ -252,7 +377,24 @@ def recommend_attractions(
             parameters
         ).fetchall()
         results = [dict(result) for result in rows]
-        results = _rank_by_search(connection, results, query_text)
+        results = _rank_by_search(
+            connection,
+            results,
+            query_text,
+            semantic_ranker=semantic_ranker,
+            semantic_mode=semantic_mode,
+            ignored_terms=(state, interest),
+        )
+
+    if elderly_friendly or wheelchair_accessible:
+        results.sort(
+            key=lambda attraction: _accessibility_score(
+                attraction,
+                elderly_friendly=elderly_friendly,
+                wheelchair_accessible=wheelchair_accessible,
+            ),
+            reverse=True,
+        )
 
     return results[:limit]
 

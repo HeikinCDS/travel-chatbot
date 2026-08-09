@@ -475,9 +475,12 @@ class ChatbotService:
         # Extract recognised travel details before trusting the classifier.
         # A short answer such as "Relaxation" can otherwise be mistaken for
         # "reset conversation" and unexpectedly erase the user's choices.
+        replace_interests = bool(REPLACE_INTEREST_PATTERN.search(text)) or bool(
+            message_preferences.state and message_preferences.interests
+        )
         changes = session.context.update(
             message_preferences,
-            replace_interests=bool(REPLACE_INTEREST_PATTERN.search(text)),
+            replace_interests=replace_interests,
         )
         if changes:
             session.shown_attraction_ids.clear()
@@ -696,12 +699,35 @@ class ChatbotService:
         presented = [_present_attraction(item) for item in selected]
         names = ", ".join(item["attraction_name"] for item in presented)
         prefix = "Here is another match" if alternative else "I found"
+        accessibility_requested = bool(
+            session.context.elderly_friendly
+            or session.context.wheelchair_accessible
+        )
+        accessibility_unknown = accessibility_requested and any(
+            (
+                session.context.elderly_friendly
+                and str(item.get("elderly_friendly") or "").casefold()
+                not in {"yes", "partial"}
+            )
+            or (
+                session.context.wheelchair_accessible
+                and str(item.get("wheelchair_accessible") or "").casefold()
+                not in {"yes", "partial"}
+            )
+            for item in presented
+        )
         reply = (
             f"{prefix}: {names}. I have compared their recorded cost, visit "
             "duration and accessibility below. Which option suits you best? "
             "Choose a place by name, or ask for the easiest access, lowest "
             "cost or shortest visit."
         )
+        if accessibility_unknown:
+            reply += (
+                " Some accessibility details are not recorded in the saved "
+                "collection, so Maya has not labelled those details as "
+                "confirmed."
+            )
         suggestions = self._result_suggestions(presented)
         return self._response(
             reply,

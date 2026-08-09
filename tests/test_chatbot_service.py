@@ -299,6 +299,32 @@ class ChatbotServiceTests(unittest.TestCase):
             for item in response.recommendations
         ))
 
+    def test_state_and_interest_message_replaces_old_interests(self):
+        session = ChatSession(
+            context=ConversationContext(
+                state="Penang",
+                interests=["nature", "wildlife"],
+            )
+        )
+        response = self.make_service("request_recommendation").process_message(
+            "I want somewhere peaceful in Penang",
+            session,
+        )
+
+        self.assertEqual(response.action, "recommend")
+        self.assertEqual(session.context.interests, ["relaxation"])
+
+    def test_unknown_elderly_accessibility_does_not_remove_all_places(self):
+        session = ChatSession()
+        response = self.make_service("request_recommendation").process_message(
+            "I want somewhere peaceful for my elderly mother in Penang",
+            session,
+        )
+
+        self.assertEqual(response.action, "recommend")
+        self.assertGreater(len(response.recommendations), 0)
+        self.assertIn("not recorded", response.reply)
+
     def test_reset_prediction_without_reset_words_does_not_clear_context(self):
         session = ChatSession(
             context=ConversationContext(

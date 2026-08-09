@@ -77,6 +77,37 @@ class RecommendationEngineTests(unittest.TestCase):
                     limit=2,
                 )
 
+                class FakeSemanticRanker:
+                    def scores(self, connection, attractions, query_text):
+                        return {
+                            "PEN-CALM": 0.95,
+                            "PEN-ACTIVE": 0.10,
+                            "JOH-CALM": 0.99,
+                        }
+
+                semantic_results = engine.recommend_attractions(
+                    state="Penang",
+                    interest="nature",
+                    query_text="somewhere soothing",
+                    semantic_ranker=FakeSemanticRanker(),
+                    limit=2,
+                )
+
+                class ForbiddenSemanticRanker:
+                    def scores(self, connection, attractions, query_text):
+                        raise AssertionError(
+                            "Semantic search should be skipped for FTS matches"
+                        )
+
+                adaptive_results = engine.recommend_attractions(
+                    state="Penang",
+                    interest="nature",
+                    query_text="somewhere quiet and peaceful!",
+                    semantic_ranker=ForbiddenSemanticRanker(),
+                    semantic_mode="adaptive",
+                    limit=2,
+                )
+
             with closing(sqlite3.connect(database_path)) as connection:
                 indexed = connection.execute(
                     "SELECT COUNT(*) FROM attractions_fts"
@@ -88,6 +119,14 @@ class RecommendationEngineTests(unittest.TestCase):
 
             self.assertEqual(
                 [item["attraction_id"] for item in results],
+                ["PEN-CALM", "PEN-ACTIVE"],
+            )
+            self.assertEqual(
+                [item["attraction_id"] for item in semantic_results],
+                ["PEN-CALM", "PEN-ACTIVE"],
+            )
+            self.assertEqual(
+                [item["attraction_id"] for item in adaptive_results],
                 ["PEN-CALM", "PEN-ACTIVE"],
             )
             self.assertEqual(indexed, 3)
@@ -158,9 +197,9 @@ class RecommendationEngineTests(unittest.TestCase):
         self.assertGreater(len(results), 0)
 
         for attraction in results:
-            self.assertIn(
+            self.assertNotEqual(
                 attraction["wheelchair_accessible"].lower(),
-                ["yes", "partial"]
+                "no",
             )
 
     def test_elderly_friendly_filter(self):
@@ -172,9 +211,9 @@ class RecommendationEngineTests(unittest.TestCase):
         self.assertGreater(len(results), 0)
 
         for attraction in results:
-            self.assertIn(
+            self.assertNotEqual(
                 attraction["elderly_friendly"].lower(),
-                ["yes", "partial"]
+                "no",
             )
 
     def test_result_limit(self):
@@ -232,7 +271,7 @@ class RecommendationEngineTests(unittest.TestCase):
             )
             self.assertIn(
                 attraction["elderly_friendly"].lower(),
-                ["yes", "partial"]
+                ["yes", "partial", "unknown"]
             )
 
 

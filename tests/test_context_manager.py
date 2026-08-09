@@ -122,7 +122,7 @@ class ConversationContextTests(unittest.TestCase):
             self.assertEqual(attraction["state_territory"], "W.P. Putrajaya")
             self.assertIn(
                 attraction["elderly_friendly"].lower(),
-                ["yes", "partial"],
+                ["yes", "partial", "unknown"],
             )
 
     def test_summary_is_readable(self):
