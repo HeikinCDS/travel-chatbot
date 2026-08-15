@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 
-from chatbot.service import ChatbotService, ChatSession
+from chatbot.service import ChatbotService, ChatSession, _accessibility_detail
 from dialogue.context_manager import ConversationContext
 from nlp.entity_extractor import TravelPreferences
 from nlp.intent_classifier import IntentPrediction
@@ -47,6 +47,80 @@ class FixedLanguageInterpreter:
 
 
 class ChatbotServiceTests(unittest.TestCase):
+
+    def test_missing_accessibility_fields_are_named_without_verification_warning(self):
+        detail = _accessibility_detail({
+            "elderly_friendly": "Unknown",
+            "wheelchair_accessible": "Unknown",
+            "accessibility_notes": (
+                "Accessibility information has not been verified. Confirm "
+                "terrain, steps, seating and toilets with an official source."
+            ),
+        })
+
+        self.assertEqual(
+            detail,
+            "Accessibility details not recorded: elderly suitability and "
+            "wheelchair access",
+        )
+        self.assertNotIn("official source", detail)
+
+    def test_specific_accessibility_note_is_preserved(self):
+        detail = _accessibility_detail({
+            "elderly_friendly": "Partial",
+            "wheelchair_accessible": "Yes",
+            "accessibility_notes": "A lift serves the main visitor level.",
+        })
+
+        self.assertEqual(
+            detail,
+            "Accessibility notes: A lift serves the main visitor level.",
+        )
+
+    def test_specific_note_is_preserved_when_a_structured_field_is_missing(self):
+        detail = _accessibility_detail({
+            "elderly_friendly": "Partial",
+            "wheelchair_accessible": "Unknown",
+            "accessibility_notes": "Benches are available along the main path.",
+        })
+
+        self.assertEqual(
+            detail,
+            "Accessibility details not recorded: wheelchair access. "
+            "Accessibility notes: Benches are available along the main path.",
+        )
+
+    @patch("chatbot.service.find_attraction_by_name_in_text")
+    def test_named_attraction_question_overrides_broad_state_search(
+        self,
+        find_named_attraction,
+    ):
+        penang_hill = {
+            "attraction_id": "TEST-PENANG-HILL",
+            "attraction_name": "Penang Hill",
+            "state_territory": "Penang",
+            "city_district": "George Town",
+            "primary_category": "Nature",
+            "short_description": "A hill resort reached by funicular railway.",
+            "elderly_friendly": "Unknown",
+            "wheelchair_accessible": "Unknown",
+        }
+        find_named_attraction.return_value = penang_hill
+        service = self.make_service("request_information")
+        session = ChatSession(latest_recommendation_ids=["ESCAPE-PENANG"])
+
+        with patch.object(service, "_get_attraction", return_value=penang_hill):
+            response = service.process_message("Tell me about Penang Hill", session)
+
+        self.assertEqual(response.action, "information")
+        self.assertEqual(
+            response.recommendations[0]["attraction_name"],
+            "Penang Hill",
+        )
+        self.assertIn("Penang Hill:", response.reply)
+        self.assertNotIn("ESCAPE Penang", response.reply)
+        self.assertEqual(session.latest_recommendation_ids, ["TEST-PENANG-HILL"])
+        self.assertEqual(session.context.state, "Penang")
 
     def make_service(
         self,

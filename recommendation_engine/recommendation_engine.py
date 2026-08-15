@@ -451,6 +451,57 @@ def get_attraction_by_id(attraction_id):
     return dict(result) if result else None
 
 
+def find_attraction_by_name_in_text(text):
+    """Return the longest saved attraction name explicitly mentioned in text."""
+
+    if not isinstance(text, str) or not text.strip():
+        return None
+
+    normalised_text = " " + re.sub(
+        r"[^a-z0-9]+", " ", text.casefold()
+    ).strip() + " "
+    query = """
+        SELECT
+            attraction_id,
+            attraction_name,
+            state_territory,
+            city_district,
+            primary_category,
+            interests_tags,
+            short_description,
+            entrance_fee_status,
+            min_fee_myr,
+            max_fee_myr,
+            recommended_duration_hours,
+            family_friendly,
+            elderly_friendly,
+            wheelchair_accessible,
+            accessibility_notes,
+            official_url,
+            source_url
+        FROM attractions
+    """
+
+    with closing(sqlite3.connect(DATABASE_PATH)) as connection:
+        connection.row_factory = sqlite3.Row
+        rows = connection.execute(query).fetchall()
+
+    matches = []
+    for row in rows:
+        attraction = dict(row)
+        normalised_name = re.sub(
+            r"[^a-z0-9]+",
+            " ",
+            str(attraction["attraction_name"]).casefold(),
+        ).strip()
+        if normalised_name and f" {normalised_name} " in normalised_text:
+            matches.append((len(normalised_name), attraction))
+
+    if not matches:
+        return None
+    return max(matches, key=lambda item: item[0])[1]
+
+
 if __name__ == "__main__":
     recommendations = recommend_attractions(
         state="W.P. Putrajaya",

@@ -16,6 +16,7 @@ from nlp.local_llm import (
     merge_preferences,
 )
 from recommendation_engine.recommendation_engine import (
+    find_attraction_by_name_in_text,
     get_attraction_by_id,
     recommend_attractions,
 )
@@ -89,6 +90,12 @@ NO_CHANGE_PATTERN = re.compile(
     r"^\s*(?:no\s+changes?|nothing\s+to\s+change|keep\s+(?:it|them)\s+"
     r"(?:the\s+)?same|leave\s+(?:it|them)\s+(?:the\s+)?same|"
     r"never\s+mind|cancel)\s*[.!]?\s*$",
+    re.IGNORECASE,
+)
+
+DIRECT_INFORMATION_PATTERN = re.compile(
+    r"\b(?:tell\s+me\s+about|information\s+(?:about|on)|"
+    r"what\s+(?:is|are)|describe|details?\s+(?:about|on))\b",
     re.IGNORECASE,
 )
 
@@ -215,6 +222,44 @@ def _access_summary(attraction: Mapping[str, Any]) -> str | None:
     return "; ".join(details) or None
 
 
+def _accessibility_detail(attraction: Mapping[str, Any]) -> str | None:
+    """Describe missing structured facts without a generic verification warning."""
+
+    missing = []
+    elderly = str(
+        attraction.get("elderly_friendly") or ""
+    ).strip().casefold()
+    wheelchair = str(
+        attraction.get("wheelchair_accessible") or ""
+    ).strip().casefold()
+    known_values = {"yes", "partial", "no"}
+    if elderly not in known_values:
+        missing.append("elderly suitability")
+    if wheelchair not in known_values:
+        missing.append("wheelchair access")
+
+    note = str(attraction.get("accessibility_notes") or "").strip()
+    generic_markers = (
+        "not been verified",
+        "not been confirmed",
+        "information is not available",
+        "information has not been verified",
+        "information has not been confirmed",
+    )
+    note_is_specific = note and not any(
+        marker in note.casefold() for marker in generic_markers
+    )
+
+    details = []
+    if missing:
+        details.append(
+            "Accessibility details not recorded: " + " and ".join(missing)
+        )
+    if note_is_specific:
+        details.append(f"Accessibility notes: {note}")
+    return ". ".join(details) or None
+
+
 def _display_description(attraction: Mapping[str, Any]) -> str:
     description = str(attraction.get("short_description") or "").strip()
     if description and not description.casefold().startswith("ai-generated candidate"):
@@ -246,6 +291,7 @@ def _present_attraction(attraction: Mapping[str, Any]) -> dict[str, Any]:
     result["cost_summary"] = _fee_summary(attraction)
     result["duration_summary"] = _duration_summary(attraction)
     result["accessibility_summary"] = _access_summary(attraction)
+    result["accessibility_notes"] = _accessibility_detail(attraction)
     # Source links remain visible on the card. Missing facts are omitted instead
     # of repeatedly warning travellers that each individual field is unverified.
     result["verification_note"] = None
@@ -444,6 +490,28 @@ class ChatbotService:
                 "goodbye",
                 prediction,
                 session,
+            )
+
+        # A direct question about a saved attraction must be resolved before
+        # state extraction starts a broad search. For example, "Tell me about
+        # Penang Hill" contains the state name Penang, but names one specific
+        # attraction rather than requesting any attraction in that state.
+        named_attraction = None
+        if intent == "request_information" or DIRECT_INFORMATION_PATTERN.search(text):
+            named_attraction = find_attraction_by_name_in_text(text)
+        if named_attraction is not None:
+            attraction_id = str(named_attraction["attraction_id"])
+            state = str(named_attraction.get("state_territory") or "").strip()
+            if state:
+                session.context.state = state
+            if attraction_id not in session.latest_recommendation_ids:
+                session.latest_recommendation_ids = [attraction_id]
+            if attraction_id not in session.shown_attraction_ids:
+                session.shown_attraction_ids.append(attraction_id)
+            return self._information_response(
+                prediction,
+                session,
+                attraction_id=attraction_id,
             )
 
         # A newly named state starts a search in that state. It must take
@@ -873,7 +941,7 @@ class ChatbotService:
         ]
         access = attraction.get("accessibility_notes")
         if access:
-            details.append(f"Accessibility notes: {access}")
+            details.append(access)
         reply = f"{attraction['attraction_name']}: " + " ".join(
             f"{str(detail).rstrip('.')}." for detail in details if detail
         )
