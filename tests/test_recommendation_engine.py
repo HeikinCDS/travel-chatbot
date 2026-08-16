@@ -15,6 +15,59 @@ from recommendation_engine.recommendation_engine import (
 
 class RecommendationEngineTests(unittest.TestCase):
 
+    def test_penang_elderly_pilot_ranks_source_supported_places(self):
+        minimal_walking = recommend_attractions(
+            state="Penang",
+            interest="relaxation",
+            elderly_friendly=True,
+            accessibility_needs=("low_walking",),
+            limit=3,
+        )
+        accessible_toilet = recommend_attractions(
+            state="Penang",
+            interest="wildlife",
+            elderly_friendly=True,
+            accessibility_needs=("accessible_toilet",),
+            limit=3,
+        )
+        nearby_seats = recommend_attractions(
+            state="Penang",
+            interest="wildlife",
+            elderly_friendly=True,
+            accessibility_needs=("seating",),
+            limit=3,
+        )
+
+        self.assertEqual(minimal_walking[0]["attraction_name"], "Penang Hill")
+        self.assertEqual(
+            accessible_toilet[0]["attraction_name"],
+            "Entopia by Penang Butterfly Farm",
+        )
+        self.assertEqual(nearby_seats[0]["attraction_name"], "Penang Bird Park")
+
+    def test_elderly_requests_exclude_places_without_accessibility_evidence(self):
+        general_results = recommend_attractions(
+            state="Penang",
+            interest="nature",
+            limit=50,
+        )
+        elderly_results = recommend_attractions(
+            state="Penang",
+            interest="nature",
+            elderly_friendly=True,
+            limit=50,
+        )
+
+        general_names = {
+            attraction["attraction_name"] for attraction in general_results
+        }
+        elderly_names = {
+            attraction["attraction_name"] for attraction in elderly_results
+        }
+        self.assertIn("Penang National Park", general_names)
+        self.assertNotIn("Penang National Park", elderly_names)
+        self.assertIn("Bukit Panchor State Park", elderly_names)
+
     def test_specific_elderly_needs_improve_accessibility_ranking(self):
         easier = {
             "walking_difficulty": "Low",

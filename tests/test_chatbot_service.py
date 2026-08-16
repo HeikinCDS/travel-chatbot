@@ -792,6 +792,26 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertIn("still saved", response.reply)
         self.assertGreater(len(response.suggestions), 0)
 
+    def test_elderly_no_results_explains_evidence_filter(self):
+        session = ChatSession(
+            context=ConversationContext(
+                state="Perak",
+                interests=["nature"],
+                elderly_friendly=True,
+                accessibility_needs=["low_walking"],
+            ),
+            accessibility_clarified=True,
+        )
+        response = self.make_service("request_recommendation").process_message(
+            "Recommend a place",
+            session,
+        )
+
+        self.assertEqual(response.action, "no_results")
+        self.assertIn("source-backed elderly accessibility feature", response.reply)
+        self.assertIn("left out", response.reply)
+        self.assertIn("unknown", response.reply)
+
     def test_session_round_trip(self):
         original = ChatSession(
             context=ConversationContext(

@@ -94,6 +94,48 @@ class ImportAttractionsTests(unittest.TestCase):
 
         self.assertEqual(result.iloc[0]["state_territory"], "Kuala Lumpur")
 
+    def test_explicit_elderly_screening_retains_status_for_runtime_filtering(self):
+        master = pd.DataFrame([
+            {
+                "candidate_id": "MC0500",
+                "attraction_name": "Accessible Place",
+                "state_territory": "Perak",
+                "primary_category": "Park",
+                "review_status": "Complete",
+                "elderly_recommendation_eligibility": "Eligible",
+                "accessibility_evidence_source": "https://example.org/access",
+                "accessibility_screening_notes": "A step-free route is recorded.",
+                "accessibility_screening_date": "2026-08-16",
+            },
+            {
+                "candidate_id": "MC0501",
+                "attraction_name": "Unscreened Place",
+                "state_territory": "Perak",
+                "primary_category": "Nature",
+                "review_status": "Complete",
+                "elderly_recommendation_eligibility": "Excluded",
+                "accessibility_screening_notes": "No source-backed feature recorded.",
+            },
+        ])
+
+        result = build_attractions(master, pd.DataFrame())
+
+        self.assertEqual(result["attraction_id"].tolist(), ["MC0500", "MC0501"])
+        attraction = result.iloc[0]
+        self.assertEqual(
+            attraction["elderly_recommendation_eligibility"],
+            "Eligible",
+        )
+        self.assertEqual(
+            attraction["accessibility_evidence_source"],
+            "https://example.org/access",
+        )
+        self.assertEqual(attraction["accessibility_screening_date"], "2026-08-16")
+        self.assertEqual(
+            result.iloc[1]["elderly_recommendation_eligibility"],
+            "Excluded",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

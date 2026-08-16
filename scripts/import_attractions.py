@@ -35,6 +35,8 @@ DATABASE_COLUMNS = [
     "source_url", "date_verified", "verification_status", "completeness",
     "reviewer_notes", "candidate_id", "coverage_lens", "source_basis",
     "source_status", "state_tourism_guide_url", "origin_batch",
+    "elderly_recommendation_eligibility", "accessibility_evidence_source",
+    "accessibility_screening_notes", "accessibility_screening_date",
 ]
 
 CONFIRMED_STATUSES = {"approved", "complete", "completed", "confirmed"}
@@ -121,12 +123,14 @@ def build_attractions(
         if _text(row.get("attraction_id"))
     }
     records = []
-
     for _, candidate in master_candidates.iterrows():
         status = (_text(candidate.get("review_status")) or "").casefold()
         if status not in CONFIRMED_STATUSES:
             continue
 
+        eligibility = _text(
+            candidate.get("elderly_recommendation_eligibility")
+        )
         candidate_id = _text(candidate.get("candidate_id"))
         existing_id = _text(candidate.get("existing_record_id"))
         attraction_id = existing_id or candidate_id
@@ -166,6 +170,16 @@ def build_attractions(
             "source_status": _text(candidate.get("source_status")),
             "state_tourism_guide_url": _text(candidate.get("state_tourism_guide_url")),
             "origin_batch": _text(candidate.get("origin_batch")),
+            "elderly_recommendation_eligibility": eligibility or "Not screened",
+            "accessibility_evidence_source": _text(
+                candidate.get("accessibility_evidence_source")
+            ),
+            "accessibility_screening_notes": _text(
+                candidate.get("accessibility_screening_notes")
+            ),
+            "accessibility_screening_date": _date(
+                candidate.get("accessibility_screening_date")
+            ),
         })
 
         defaults = {
@@ -229,7 +243,8 @@ def main() -> None:
     count = import_attractions()
     print(f"Successfully imported {count} confirmed attractions.")
     print(f"Database created at: {DATABASE_PATH}")
-    print("Rejected and incomplete candidates were not imported.")
+    print("Elderly-ineligible attractions remain available for general travel searches.")
+    print("Elderly and accessibility requests use the workbook eligibility filter.")
     print("Run scripts/build_semantic_index.py before enabling semantic search.")
 
 

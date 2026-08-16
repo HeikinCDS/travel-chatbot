@@ -859,6 +859,23 @@ class ChatbotService:
             session.latest_recommendation_ids.clear()
             state = session.context.state or "that location"
             interest = ", ".join(session.context.interests) or "selected"
+            accessibility_request = bool(
+                session.context.elderly_friendly
+                or session.context.wheelchair_accessible
+                or session.context.accessibility_needs
+            )
+            if accessibility_request:
+                return self._response(
+                    f"I could not find a {interest} attraction in {state} "
+                    "with a source-backed elderly accessibility feature in "
+                    "the reviewed collection. I have left out places whose "
+                    "accessibility information is unknown. Please choose "
+                    "another attraction type, or tell me a different state.",
+                    "no_results",
+                    prediction,
+                    session,
+                    suggestions=CHANGE_INTEREST_SUGGESTIONS,
+                )
             search_scope = (
                 "the saved collection or live open-data sources"
                 if self.enable_live_discovery

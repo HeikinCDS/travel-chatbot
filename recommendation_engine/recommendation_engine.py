@@ -368,6 +368,14 @@ def recommend_attractions(
             != 'no'
         """)
 
+    if elderly_friendly or wheelchair_accessible or accessibility_needs:
+        conditions.append("""
+            LOWER(COALESCE(
+                NULLIF(TRIM(elderly_recommendation_eligibility), ''),
+                'excluded'
+            )) = 'eligible'
+        """)
+
     where_clause = ""
 
     if conditions:
