@@ -5,6 +5,25 @@ from nlp.entity_extractor import extract_preferences, to_recommendation_filters
 
 class EntityExtractorTests(unittest.TestCase):
 
+    def test_extracts_specific_elderly_accessibility_needs(self):
+        result = extract_preferences(
+            "My elderly mother cannot walk far or climb stairs. We need "
+            "benches, an accessible toilet, nearby parking and shade."
+        )
+
+        self.assertTrue(result.elderly_friendly)
+        self.assertEqual(
+            set(result.accessibility_needs),
+            {
+                "low_walking", "step_free", "seating",
+                "accessible_toilet", "nearby_parking", "shelter",
+            },
+        )
+        self.assertEqual(
+            set(to_recommendation_filters(result)["accessibility_needs"]),
+            set(result.accessibility_needs),
+        )
+
     def test_extracts_full_state_name(self):
         result = extract_preferences("I want to visit Negeri Sembilan")
         self.assertEqual(result.state, "Negeri Sembilan")

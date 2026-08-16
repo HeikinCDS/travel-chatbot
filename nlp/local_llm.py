@@ -74,6 +74,9 @@ def merge_preferences(
             if rules.wheelchair_accessible is not None
             else model.wheelchair_accessible
         ),
+        accessibility_needs=tuple(dict.fromkeys(
+            (*rules.accessibility_needs, *model.accessibility_needs)
+        )),
     )
 
 

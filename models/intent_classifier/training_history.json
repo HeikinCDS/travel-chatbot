@@ -1,122 +1,122 @@
 [
   {
     "epoch": 1,
-    "textcat_loss": 6.963444
+    "textcat_loss": 7.68707
   },
   {
     "epoch": 2,
-    "textcat_loss": 5.698596
+    "textcat_loss": 6.256708
   },
   {
     "epoch": 3,
-    "textcat_loss": 3.698225
+    "textcat_loss": 4.369464
   },
   {
     "epoch": 4,
-    "textcat_loss": 2.160726
+    "textcat_loss": 2.777758
   },
   {
     "epoch": 5,
-    "textcat_loss": 1.518018
+    "textcat_loss": 1.892625
   },
   {
     "epoch": 6,
-    "textcat_loss": 0.751419
+    "textcat_loss": 1.215027
   },
   {
     "epoch": 7,
-    "textcat_loss": 0.822476
+    "textcat_loss": 0.604242
   },
   {
     "epoch": 8,
-    "textcat_loss": 0.351145
+    "textcat_loss": 0.535083
   },
   {
     "epoch": 9,
-    "textcat_loss": 0.122278
+    "textcat_loss": 0.258328
   },
   {
     "epoch": 10,
-    "textcat_loss": 0.092545
+    "textcat_loss": 0.240216
   },
   {
     "epoch": 11,
-    "textcat_loss": 0.172059
+    "textcat_loss": 0.056732
   },
   {
     "epoch": 12,
-    "textcat_loss": 0.047072
+    "textcat_loss": 0.018901
   },
   {
     "epoch": 13,
-    "textcat_loss": 0.087717
+    "textcat_loss": 0.070053
   },
   {
     "epoch": 14,
-    "textcat_loss": 0.031194
+    "textcat_loss": 0.105284
   },
   {
     "epoch": 15,
-    "textcat_loss": 0.014898
+    "textcat_loss": 0.132821
   },
   {
     "epoch": 16,
-    "textcat_loss": 0.061494
+    "textcat_loss": 0.109075
   },
   {
     "epoch": 17,
-    "textcat_loss": 0.005589
+    "textcat_loss": 0.126593
   },
   {
     "epoch": 18,
-    "textcat_loss": 0.048612
+    "textcat_loss": 0.037193
   },
   {
     "epoch": 19,
-    "textcat_loss": 0.001785
+    "textcat_loss": 0.031023
   },
   {
     "epoch": 20,
-    "textcat_loss": 0.000209
+    "textcat_loss": 0.037496
   },
   {
     "epoch": 21,
-    "textcat_loss": 0.002356
+    "textcat_loss": 0.003611
   },
   {
     "epoch": 22,
-    "textcat_loss": 0.067145
+    "textcat_loss": 0.023652
   },
   {
     "epoch": 23,
-    "textcat_loss": 0.029979
+    "textcat_loss": 0.005671
   },
   {
     "epoch": 24,
-    "textcat_loss": 0.000205
+    "textcat_loss": 0.037878
   },
   {
     "epoch": 25,
-    "textcat_loss": 0.092521
+    "textcat_loss": 0.017841
   },
   {
     "epoch": 26,
-    "textcat_loss": 0.000522
+    "textcat_loss": 0.002085
   },
   {
     "epoch": 27,
-    "textcat_loss": 0.053994
+    "textcat_loss": 0.000753
   },
   {
     "epoch": 28,
-    "textcat_loss": 0.002424
+    "textcat_loss": 0.000173
   },
   {
     "epoch": 29,
-    "textcat_loss": 0.000525
+    "textcat_loss": 0.011392
   },
   {
     "epoch": 30,
-    "textcat_loss": 0.001029
+    "textcat_loss": 0.002562
   }
 ]

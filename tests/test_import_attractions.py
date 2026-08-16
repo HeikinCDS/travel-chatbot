@@ -70,6 +70,13 @@ class ImportAttractionsTests(unittest.TestCase):
         self.assertEqual(attraction["entrance_fee_status"], "Unknown")
         self.assertEqual(attraction["elderly_friendly"], "Unknown")
         self.assertEqual(attraction["wheelchair_accessible"], "Unknown")
+        self.assertEqual(attraction["walking_difficulty"], "Unknown")
+        self.assertEqual(attraction["step_free_access"], "Unknown")
+        self.assertEqual(attraction["resting_seats_available"], "Unknown")
+        self.assertEqual(attraction["accessible_toilet"], "Unknown")
+        self.assertEqual(attraction["parking_proximity"], "Unknown")
+        self.assertEqual(attraction["shelter_available"], "Unknown")
+        self.assertEqual(attraction["elderly_suitability"], "Unknown")
         self.assertIsNone(attraction["official_url"])
         self.assertIn("google.com/maps", attraction["source_url"])
 

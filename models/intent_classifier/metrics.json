@@ -1,8 +1,8 @@
 {
-  "accuracy": 0.8194,
-  "macro_f1_score": 0.8219,
-  "correct_predictions": 59,
-  "test_examples": 72,
+  "accuracy": 0.6667,
+  "macro_f1_score": 0.6536,
+  "correct_predictions": 52,
+  "test_examples": 78,
   "per_intent": {
     "greeting": {
       "precision": 1.0,
@@ -11,51 +11,51 @@
       "support": 8
     },
     "request_recommendation": {
-      "precision": 0.6364,
-      "recall": 0.875,
-      "f1_score": 0.7368,
-      "support": 8
+      "precision": 0.6667,
+      "recall": 0.8,
+      "f1_score": 0.7273,
+      "support": 10
     },
     "refine_preferences": {
-      "precision": 1.0,
-      "recall": 0.75,
-      "f1_score": 0.8571,
-      "support": 8
+      "precision": 0.625,
+      "recall": 0.5,
+      "f1_score": 0.5556,
+      "support": 10
     },
     "request_information": {
+      "precision": 0.6429,
+      "recall": 0.9,
+      "f1_score": 0.75,
+      "support": 10
+    },
+    "request_alternative": {
+      "precision": 0.625,
+      "recall": 0.625,
+      "f1_score": 0.625,
+      "support": 8
+    },
+    "reset_conversation": {
+      "precision": 0.7143,
+      "recall": 0.625,
+      "f1_score": 0.6667,
+      "support": 8
+    },
+    "help": {
+      "precision": 0.4,
+      "recall": 0.5,
+      "f1_score": 0.4444,
+      "support": 8
+    },
+    "goodbye": {
       "precision": 0.75,
       "recall": 0.75,
       "f1_score": 0.75,
       "support": 8
     },
-    "request_alternative": {
-      "precision": 0.8889,
-      "recall": 1.0,
-      "f1_score": 0.9412,
-      "support": 8
-    },
-    "reset_conversation": {
-      "precision": 1.0,
-      "recall": 0.75,
-      "f1_score": 0.8571,
-      "support": 8
-    },
-    "help": {
-      "precision": 0.5556,
-      "recall": 0.625,
-      "f1_score": 0.5882,
-      "support": 8
-    },
-    "goodbye": {
-      "precision": 1.0,
-      "recall": 1.0,
-      "f1_score": 1.0,
-      "support": 8
-    },
     "out_of_scope": {
-      "precision": 0.7143,
-      "recall": 0.625,
-      "f1_score": 0.6667,
+      "precision": 0.6667,
+      "recall": 0.25,
+      "f1_score": 0.3636,
       "support": 8
     }
   },
@@ -73,43 +73,43 @@
     },
     "request_recommendation": {
       "greeting": 0,
-      "request_recommendation": 7,
+      "request_recommendation": 8,
       "refine_preferences": 0,
       "request_information": 1,
       "request_alternative": 0,
       "reset_conversation": 0,
-      "help": 0,
+      "help": 1,
       "goodbye": 0,
       "out_of_scope": 0
     },
     "refine_preferences": {
       "greeting": 0,
-      "request_recommendation": 1,
-      "refine_preferences": 6,
+      "request_recommendation": 2,
+      "refine_preferences": 5,
       "request_information": 1,
       "request_alternative": 0,
-      "reset_conversation": 0,
+      "reset_conversation": 1,
       "help": 0,
-      "goodbye": 0,
+      "goodbye": 1,
       "out_of_scope": 0
     },
     "request_information": {
       "greeting": 0,
       "request_recommendation": 0,
       "refine_preferences": 0,
-      "request_information": 6,
+      "request_information": 9,
       "request_alternative": 0,
       "reset_conversation": 0,
       "help": 1,
       "goodbye": 0,
-      "out_of_scope": 1
+      "out_of_scope": 0
     },
     "request_alternative": {
       "greeting": 0,
-      "request_recommendation": 0,
-      "refine_preferences": 0,
+      "request_recommendation": 2,
+      "refine_preferences": 1,
       "request_information": 0,
-      "request_alternative": 8,
+      "request_alternative": 5,
       "reset_conversation": 0,
       "help": 0,
       "goodbye": 0,
@@ -118,24 +118,24 @@
     "reset_conversation": {
       "greeting": 0,
       "request_recommendation": 0,
-      "refine_preferences": 0,
+      "refine_preferences": 1,
       "request_information": 0,
       "request_alternative": 1,
-      "reset_conversation": 6,
+      "reset_conversation": 5,
       "help": 0,
-      "goodbye": 0,
-      "out_of_scope": 1
+      "goodbye": 1,
+      "out_of_scope": 0
     },
     "help": {
       "greeting": 0,
-      "request_recommendation": 3,
+      "request_recommendation": 0,
       "refine_preferences": 0,
-      "request_information": 0,
+      "request_information": 2,
       "request_alternative": 0,
-      "reset_conversation": 0,
-      "help": 5,
+      "reset_conversation": 1,
+      "help": 4,
       "goodbye": 0,
-      "out_of_scope": 0
+      "out_of_scope": 1
     },
     "goodbye": {
       "greeting": 0,
@@ -144,20 +144,20 @@
       "request_information": 0,
       "request_alternative": 0,
       "reset_conversation": 0,
-      "help": 0,
-      "goodbye": 8,
+      "help": 2,
+      "goodbye": 6,
       "out_of_scope": 0
     },
     "out_of_scope": {
       "greeting": 0,
       "request_recommendation": 0,
-      "refine_preferences": 0,
-      "request_information": 0,
-      "request_alternative": 0,
+      "refine_preferences": 1,
+      "request_information": 1,
+      "request_alternative": 2,
       "reset_conversation": 0,
-      "help": 3,
+      "help": 2,
       "goodbye": 0,
-      "out_of_scope": 5
+      "out_of_scope": 2
     }
   }
 }

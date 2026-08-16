@@ -7,6 +7,22 @@ from recommendation_engine.recommendation_engine import recommend_attractions
 
 class ConversationContextTests(unittest.TestCase):
 
+    def test_retains_specific_elderly_accessibility_needs(self):
+        context = ConversationContext()
+        context.update_from_text(
+            "My father cannot walk far and needs benches and nearby parking"
+        )
+
+        self.assertEqual(
+            set(context.accessibility_needs),
+            {"low_walking", "seating", "nearby_parking"},
+        )
+        self.assertIn("minimal walking", context.preference_summary())
+        self.assertEqual(
+            set(context.recommendation_filters()["accessibility_needs"]),
+            set(context.accessibility_needs),
+        )
+
     def test_new_context_is_empty(self):
         context = ConversationContext()
         self.assertEqual(context.to_dict(), {})

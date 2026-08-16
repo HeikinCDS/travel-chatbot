@@ -7,12 +7,42 @@ from unittest.mock import patch
 
 from recommendation_engine import recommendation_engine as engine
 from recommendation_engine.recommendation_engine import (
+    _accessibility_score,
     recommend_attractions,
     recommend_from_text,
 )
 
 
 class RecommendationEngineTests(unittest.TestCase):
+
+    def test_specific_elderly_needs_improve_accessibility_ranking(self):
+        easier = {
+            "walking_difficulty": "Low",
+            "step_free_access": "Yes",
+            "resting_seats_available": "Yes",
+            "accessible_toilet": "Yes",
+            "parking_proximity": "Near",
+            "shelter_available": "Partial",
+            "elderly_suitability": "Suitable",
+        }
+        difficult = {
+            "walking_difficulty": "High",
+            "step_free_access": "No",
+            "resting_seats_available": "No",
+            "accessible_toilet": "Unknown",
+            "parking_proximity": "Far",
+            "shelter_available": "No",
+            "elderly_suitability": "Not recommended",
+        }
+        needs = (
+            "low_walking", "step_free", "seating", "accessible_toilet",
+            "nearby_parking", "shelter",
+        )
+
+        self.assertGreater(
+            _accessibility_score(easier, accessibility_needs=needs),
+            _accessibility_score(difficult, accessibility_needs=needs),
+        )
 
     def test_fts_ranks_matching_description_after_hard_filters(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
@@ -35,6 +65,14 @@ class RecommendationEngineTests(unittest.TestCase):
                         elderly_friendly TEXT,
                         wheelchair_accessible TEXT,
                         accessibility_notes TEXT,
+                        walking_difficulty TEXT,
+                        step_free_access TEXT,
+                        resting_seats_available TEXT,
+                        accessible_toilet TEXT,
+                        parking_proximity TEXT,
+                        shelter_available TEXT,
+                        elderly_suitability TEXT,
+                        elderly_accessibility_notes TEXT,
                         official_url TEXT,
                         source_url TEXT,
                         date_verified TEXT,

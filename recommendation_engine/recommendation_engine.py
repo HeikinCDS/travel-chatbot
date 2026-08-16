@@ -265,6 +265,7 @@ def _accessibility_score(
     *,
     elderly_friendly=False,
     wheelchair_accessible=False,
+    accessibility_needs=(),
 ):
     values = {"yes": 2, "partial": 1}
     score = 0
@@ -278,6 +279,37 @@ def _accessibility_score(
             str(attraction.get("wheelchair_accessible") or "").casefold(),
             0,
         )
+    needs = set(accessibility_needs or ())
+    if "low_walking" in needs:
+        score += {
+            "low": 4, "moderate": 1, "high": -4,
+        }.get(str(attraction.get("walking_difficulty") or "").casefold(), 0)
+    if "step_free" in needs:
+        score += {
+            "yes": 4, "partial": 1, "no": -4,
+        }.get(str(attraction.get("step_free_access") or "").casefold(), 0)
+    if "seating" in needs:
+        score += {
+            "yes": 3, "partial": 1, "no": -3,
+        }.get(str(attraction.get("resting_seats_available") or "").casefold(), 0)
+    if "accessible_toilet" in needs:
+        score += {
+            "yes": 3, "partial": 1, "no": -3,
+        }.get(str(attraction.get("accessible_toilet") or "").casefold(), 0)
+    if "nearby_parking" in needs:
+        score += {
+            "near": 3, "moderate": 1, "far": -3,
+        }.get(str(attraction.get("parking_proximity") or "").casefold(), 0)
+    if "shelter" in needs:
+        score += {
+            "yes": 2, "partial": 1, "no": -2,
+        }.get(str(attraction.get("shelter_available") or "").casefold(), 0)
+    if needs:
+        score += {
+            "suitable": 3,
+            "suitable with assistance": 1,
+            "not recommended": -4,
+        }.get(str(attraction.get("elderly_suitability") or "").casefold(), 0)
     return score
 
 
@@ -288,6 +320,7 @@ def recommend_attractions(
     family_friendly=False,
     elderly_friendly=False,
     wheelchair_accessible=False,
+    accessibility_needs=(),
     query_text=None,
     semantic_ranker=None,
     semantic_mode=None,
@@ -357,6 +390,14 @@ def recommend_attractions(
             elderly_friendly,
             wheelchair_accessible,
             accessibility_notes,
+            walking_difficulty,
+            step_free_access,
+            resting_seats_available,
+            accessible_toilet,
+            parking_proximity,
+            shelter_available,
+            elderly_suitability,
+            elderly_accessibility_notes,
             official_url,
             source_url,
             date_verified,
@@ -386,12 +427,13 @@ def recommend_attractions(
             ignored_terms=(state, interest),
         )
 
-    if elderly_friendly or wheelchair_accessible:
+    if elderly_friendly or wheelchair_accessible or accessibility_needs:
         results.sort(
             key=lambda attraction: _accessibility_score(
                 attraction,
                 elderly_friendly=elderly_friendly,
                 wheelchair_accessible=wheelchair_accessible,
+                accessibility_needs=accessibility_needs,
             ),
             reverse=True,
         )
@@ -438,6 +480,14 @@ def get_attraction_by_id(attraction_id):
             elderly_friendly,
             wheelchair_accessible,
             accessibility_notes,
+            walking_difficulty,
+            step_free_access,
+            resting_seats_available,
+            accessible_toilet,
+            parking_proximity,
+            shelter_available,
+            elderly_suitability,
+            elderly_accessibility_notes,
             official_url,
             source_url
         FROM attractions
@@ -477,6 +527,14 @@ def find_attraction_by_name_in_text(text):
             elderly_friendly,
             wheelchair_accessible,
             accessibility_notes,
+            walking_difficulty,
+            step_free_access,
+            resting_seats_available,
+            accessible_toilet,
+            parking_proximity,
+            shelter_available,
+            elderly_suitability,
+            elderly_accessibility_notes,
             official_url,
             source_url
         FROM attractions

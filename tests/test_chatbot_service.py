@@ -1,7 +1,12 @@
 import unittest
 from unittest.mock import patch
 
-from chatbot.service import ChatbotService, ChatSession, _accessibility_detail
+from chatbot.service import (
+    ChatbotService,
+    ChatSession,
+    _accessibility_detail,
+    _accessibility_features,
+)
 from dialogue.context_manager import ConversationContext
 from nlp.entity_extractor import TravelPreferences
 from nlp.intent_classifier import IntentPrediction
@@ -48,6 +53,20 @@ class FixedLanguageInterpreter:
 
 class ChatbotServiceTests(unittest.TestCase):
 
+    def test_specific_accessibility_need_overrides_wrong_intent_prediction(self):
+        session = ChatSession()
+        response = self.make_service("goodbye").process_message(
+            "I need nearby parking and benches because I cannot walk far",
+            session,
+        )
+
+        self.assertEqual(response.action, "clarify_preferences")
+        self.assertEqual(
+            set(response.context["accessibility_needs"]),
+            {"nearby_parking", "seating", "low_walking"},
+        )
+        self.assertNotIn("Goodbye", response.reply)
+
     def test_missing_accessibility_fields_are_named_without_verification_warning(self):
         detail = _accessibility_detail({
             "elderly_friendly": "Unknown",
@@ -86,7 +105,6 @@ class ChatbotServiceTests(unittest.TestCase):
 
         self.assertEqual(
             detail,
-            "Accessibility details not recorded: wheelchair access. "
             "Accessibility notes: Benches are available along the main path.",
         )
 
@@ -219,18 +237,27 @@ class ChatbotServiceTests(unittest.TestCase):
                 elderly_friendly=True,
             ),
         )
-        response = self.make_service(
+        service = self.make_service(
             "out_of_scope",
             web_discovery=CandidateDiscovery(),
             language_interpreter=FixedLanguageInterpreter(interpretation),
-        ).process_message(
-            "My older mother would enjoy somewhere calm nearby"
         )
-        self.assertEqual(response.action, "recommend")
+        session = ChatSession()
+        response = service.process_message(
+            "My older mother would enjoy somewhere calm nearby",
+            session,
+        )
+        self.assertEqual(response.action, "clarify_accessibility")
         self.assertEqual(response.intent, "request_recommendation")
         self.assertEqual(response.context["state"], "Penang")
         self.assertIn("nature", response.context["interests"])
         self.assertTrue(response.context["elderly_friendly"])
+
+        recommendation = service.process_message(
+            "No special accessibility requirements",
+            session,
+        )
+        self.assertEqual(recommendation.action, "recommend")
 
     def test_recognised_state_does_not_wait_for_local_model(self):
         interpreter = FixedLanguageInterpreter(LLMInterpretation(
@@ -388,16 +415,52 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertEqual(response.action, "recommend")
         self.assertEqual(session.context.interests, ["relaxation"])
 
-    def test_unknown_elderly_accessibility_does_not_remove_all_places(self):
+    def test_general_elderly_request_asks_for_a_specific_access_need(self):
         session = ChatSession()
         response = self.make_service("request_recommendation").process_message(
             "I want somewhere peaceful for my elderly mother in Penang",
             session,
         )
 
-        self.assertEqual(response.action, "recommend")
-        self.assertGreater(len(response.recommendations), 0)
-        self.assertIn("not recorded", response.reply)
+        self.assertEqual(response.action, "clarify_accessibility")
+        self.assertIn("most important accessibility need", response.reply)
+        self.assertEqual(
+            [suggestion["label"] for suggestion in response.suggestions],
+            [
+                "Minimal walking",
+                "Wheelchair access",
+                "Nearby seats",
+                "Accessible toilet",
+                "No special requirements",
+            ],
+        )
+
+        recommendation = self.make_service("request_recommendation").process_message(
+            "No special accessibility requirements",
+            session,
+        )
+        self.assertEqual(recommendation.action, "recommend")
+        self.assertGreater(len(recommendation.recommendations), 0)
+
+    def test_accessibility_features_name_known_and_missing_fields(self):
+        features = _accessibility_features({
+            "walking_difficulty": "Low",
+            "step_free_access": "Yes",
+            "resting_seats_available": "Unknown",
+            "accessible_toilet": "Yes",
+            "parking_proximity": "Near",
+            "shelter_available": "Partial",
+            "elderly_suitability": "Suitable",
+        })
+
+        self.assertEqual(len(features), 7)
+        self.assertEqual(features[0], {
+            "label": "Walking difficulty",
+            "value": "Low",
+            "status": "positive",
+        })
+        self.assertEqual(features[2]["value"], "Not recorded")
+        self.assertEqual(features[5]["status"], "caution")
 
     def test_reset_prediction_without_reset_words_does_not_clear_context(self):
         session = ChatSession(
@@ -739,6 +802,7 @@ class ChatbotServiceTests(unittest.TestCase):
             latest_recommendation_ids=["A001"],
             ranking_preference="duration",
             retrieval_query="quiet nature in Johor",
+            accessibility_clarified=True,
         )
         restored = ChatSession.from_dict(original.to_dict())
         self.assertEqual(restored.to_dict(), original.to_dict())

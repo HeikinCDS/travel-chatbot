@@ -47,6 +47,7 @@ class ConversationContext:
     family_friendly: bool | None = None
     elderly_friendly: bool | None = None
     wheelchair_accessible: bool | None = None
+    accessibility_needs: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, values: Mapping[str, Any] | None) -> "ConversationContext":
@@ -65,6 +66,7 @@ class ConversationContext:
             "family_friendly",
             "elderly_friendly",
             "wheelchair_accessible",
+            "accessibility_needs",
         }
         unexpected = set(values) - allowed
         if unexpected:
@@ -74,6 +76,9 @@ class ConversationContext:
         interests = values.get("interests", [])
         if not isinstance(interests, (list, tuple)):
             raise TypeError("interests must be a list or tuple")
+        accessibility_needs = values.get("accessibility_needs", [])
+        if not isinstance(accessibility_needs, (list, tuple)):
+            raise TypeError("accessibility_needs must be a list or tuple")
 
         return cls(
             state=values.get("state"),
@@ -84,6 +89,7 @@ class ConversationContext:
             family_friendly=values.get("family_friendly"),
             elderly_friendly=values.get("elderly_friendly"),
             wheelchair_accessible=values.get("wheelchair_accessible"),
+            accessibility_needs=list(accessibility_needs),
         )
 
     def to_dict(self, omit_empty: bool = True) -> dict[str, Any]:
@@ -97,6 +103,7 @@ class ConversationContext:
             "family_friendly": self.family_friendly,
             "elderly_friendly": self.elderly_friendly,
             "wheelchair_accessible": self.wheelchair_accessible,
+            "accessibility_needs": list(self.accessibility_needs),
         }
         if omit_empty:
             return {
@@ -116,6 +123,7 @@ class ConversationContext:
         self.family_friendly = None
         self.elderly_friendly = None
         self.wheelchair_accessible = None
+        self.accessibility_needs.clear()
 
     def update(
         self,
@@ -152,6 +160,10 @@ class ConversationContext:
             if value is not None:
                 setattr(self, field_name, value)
 
+        for need in preferences.accessibility_needs:
+            if need not in self.accessibility_needs:
+                self.accessibility_needs.append(need)
+
         after = self.to_dict(omit_empty=False)
         return {
             key: value
@@ -172,8 +184,8 @@ class ConversationContext:
         """Clear one supported field without resetting the full conversation."""
         if field_name not in self.to_dict(omit_empty=False):
             raise ValueError(f"Unsupported context field: {field_name}")
-        if field_name == "interests":
-            self.interests.clear()
+        if field_name in {"interests", "accessibility_needs"}:
+            getattr(self, field_name).clear()
         else:
             setattr(self, field_name, None)
 
@@ -205,6 +217,7 @@ class ConversationContext:
             family_friendly=self.family_friendly,
             elderly_friendly=self.elderly_friendly,
             wheelchair_accessible=self.wheelchair_accessible,
+            accessibility_needs=tuple(self.accessibility_needs),
         )
         return to_recommendation_filters(preferences)
 
@@ -227,4 +240,17 @@ class ConversationContext:
             parts.append("elderly-friendly")
         if self.wheelchair_accessible:
             parts.append("wheelchair-accessible")
+        if self.accessibility_needs:
+            labels = {
+                "low_walking": "minimal walking",
+                "step_free": "step-free access",
+                "seating": "resting seats",
+                "accessible_toilet": "accessible toilets",
+                "nearby_parking": "nearby parking",
+                "shelter": "shelter or shade",
+            }
+            parts.append(
+                "access needs: "
+                + ", ".join(labels.get(need, need) for need in self.accessibility_needs)
+            )
         return "; ".join(parts) if parts else "No travel preferences recorded."

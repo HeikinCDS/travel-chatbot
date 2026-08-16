@@ -93,6 +93,13 @@ NO_CHANGE_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+NO_SPECIAL_ACCESS_PATTERN = re.compile(
+    r"^\s*(?:no\s+(?:special\s+)?(?:accessibility|mobility)\s+"
+    r"(?:needs?|requirements?)|no\s+special\s+requirements?|"
+    r"none\s+of\s+these)\s*[.!]?\s*$",
+    re.IGNORECASE,
+)
+
 DIRECT_INFORMATION_PATTERN = re.compile(
     r"\b(?:tell\s+me\s+about|information\s+(?:about|on)|"
     r"what\s+(?:is|are)|describe|details?\s+(?:about|on))\b",
@@ -124,6 +131,14 @@ INTEREST_SUGGESTIONS = (
     {"label": "History", "message": "History"},
     {"label": "Wildlife", "message": "Wildlife"},
     {"label": "Relaxation", "message": "Relaxation"},
+)
+
+ACCESSIBILITY_SUGGESTIONS = (
+    {"label": "Minimal walking", "message": "The traveller needs minimal walking"},
+    {"label": "Wheelchair access", "message": "The traveller needs wheelchair access"},
+    {"label": "Nearby seats", "message": "The traveller needs benches and places to rest"},
+    {"label": "Accessible toilet", "message": "The traveller needs an accessible toilet"},
+    {"label": "No special requirements", "message": "No special accessibility requirements"},
 )
 
 CHANGE_INTEREST_SUGGESTIONS = tuple(
@@ -219,6 +234,22 @@ def _access_summary(attraction: Mapping[str, Any]) -> str | None:
         details.append(f"Elderly-friendly: {elderly.title()}")
     if wheelchair in {"yes", "partial", "no"}:
         details.append(f"wheelchair access: {wheelchair.title()}")
+    walking = str(attraction.get("walking_difficulty") or "").strip().casefold()
+    if walking in {"low", "moderate", "high"}:
+        details.append(f"walking difficulty: {walking}")
+    feature_labels = {
+        "step_free_access": "step-free access",
+        "resting_seats_available": "resting seats",
+        "accessible_toilet": "accessible toilet",
+        "shelter_available": "shelter",
+    }
+    for field_name, label in feature_labels.items():
+        value = str(attraction.get(field_name) or "").strip().casefold()
+        if value in {"yes", "partial", "no"}:
+            details.append(f"{label}: {value.title()}")
+    parking = str(attraction.get("parking_proximity") or "").strip().casefold()
+    if parking in {"near", "moderate", "far"}:
+        details.append(f"parking: {parking}")
     return "; ".join(details) or None
 
 
@@ -238,7 +269,10 @@ def _accessibility_detail(attraction: Mapping[str, Any]) -> str | None:
     if wheelchair not in known_values:
         missing.append("wheelchair access")
 
-    note = str(attraction.get("accessibility_notes") or "").strip()
+    elderly_note = str(
+        attraction.get("elderly_accessibility_notes") or ""
+    ).strip()
+    note = elderly_note or str(attraction.get("accessibility_notes") or "").strip()
     generic_markers = (
         "not been verified",
         "not been confirmed",
@@ -250,14 +284,57 @@ def _accessibility_detail(attraction: Mapping[str, Any]) -> str | None:
         marker in note.casefold() for marker in generic_markers
     )
 
-    details = []
-    if missing:
-        details.append(
-            "Accessibility details not recorded: " + " and ".join(missing)
-        )
     if note_is_specific:
-        details.append(f"Accessibility notes: {note}")
-    return ". ".join(details) or None
+        return f"Accessibility notes: {note}"
+    if missing:
+        return "Accessibility details not recorded: " + " and ".join(missing)
+    return None
+
+
+def _accessibility_features(
+    attraction: Mapping[str, Any],
+) -> tuple[dict[str, str], ...]:
+    """Return consistent, readable accessibility rows for result cards."""
+
+    overall = str(attraction.get("elderly_suitability") or "").strip()
+    if overall.casefold() not in {
+        "suitable",
+        "suitable with assistance",
+        "not recommended",
+    }:
+        legacy = str(attraction.get("elderly_friendly") or "").strip().casefold()
+        overall = {
+            "yes": "Suitable",
+            "partial": "Suitable with assistance",
+            "no": "Not recommended",
+        }.get(legacy, "Not recorded")
+
+    fields = (
+        ("Walking difficulty", attraction.get("walking_difficulty")),
+        ("Step-free access", attraction.get("step_free_access")),
+        ("Resting seats", attraction.get("resting_seats_available")),
+        ("Accessible toilet", attraction.get("accessible_toilet")),
+        ("Parking proximity", attraction.get("parking_proximity")),
+        ("Shelter", attraction.get("shelter_available")),
+        ("Overall elderly suitability", overall),
+    )
+    positive = {"low", "yes", "near", "suitable"}
+    caution = {"moderate", "partial", "suitable with assistance"}
+    negative = {"high", "no", "far", "not recommended"}
+    features = []
+    for label, raw_value in fields:
+        value = str(raw_value or "").strip()
+        if not value or value.casefold() == "unknown":
+            value = "Not recorded"
+        normalised = value.casefold()
+        status = (
+            "positive" if normalised in positive else
+            "caution" if normalised in caution else
+            "negative" if normalised in negative else
+            "unknown"
+        )
+        features.append({"label": label, "value": value, "status": status})
+    return tuple(features)
 
 
 def _display_description(attraction: Mapping[str, Any]) -> str:
@@ -292,6 +369,7 @@ def _present_attraction(attraction: Mapping[str, Any]) -> dict[str, Any]:
     result["duration_summary"] = _duration_summary(attraction)
     result["accessibility_summary"] = _access_summary(attraction)
     result["accessibility_notes"] = _accessibility_detail(attraction)
+    result["accessibility_features"] = list(_accessibility_features(attraction))
     # Source links remain visible on the card. Missing facts are omitted instead
     # of repeatedly warning travellers that each individual field is unverified.
     result["verification_note"] = None
@@ -307,6 +385,7 @@ class ChatSession:
     latest_recommendation_ids: list[str] = field(default_factory=list)
     ranking_preference: str | None = None
     retrieval_query: str | None = None
+    accessibility_clarified: bool = False
 
     @classmethod
     def from_dict(cls, values: Mapping[str, Any] | None) -> "ChatSession":
@@ -322,6 +401,9 @@ class ChatSession:
             ),
             ranking_preference=values.get("ranking_preference"),
             retrieval_query=values.get("retrieval_query"),
+            accessibility_clarified=bool(
+                values.get("accessibility_clarified", False)
+            ),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -331,6 +413,7 @@ class ChatSession:
             "latest_recommendation_ids": list(self.latest_recommendation_ids),
             "ranking_preference": self.ranking_preference,
             "retrieval_query": self.retrieval_query,
+            "accessibility_clarified": self.accessibility_clarified,
         }
 
     def reset(self) -> None:
@@ -339,6 +422,7 @@ class ChatSession:
         self.latest_recommendation_ids.clear()
         self.ranking_preference = None
         self.retrieval_query = None
+        self.accessibility_clarified = False
 
 
 @dataclass(frozen=True)
@@ -546,6 +630,19 @@ class ChatbotService:
         replace_interests = bool(REPLACE_INTEREST_PATTERN.search(text)) or bool(
             message_preferences.state and message_preferences.interests
         )
+        no_special_access = bool(NO_SPECIAL_ACCESS_PATTERN.fullmatch(text))
+        if (
+            message_preferences.elderly_friendly
+            and not message_preferences.wheelchair_accessible
+            and not message_preferences.accessibility_needs
+        ):
+            session.accessibility_clarified = False
+        if (
+            message_preferences.wheelchair_accessible
+            or message_preferences.accessibility_needs
+            or no_special_access
+        ):
+            session.accessibility_clarified = True
         changes = session.context.update(
             message_preferences,
             replace_interests=replace_interests,
@@ -565,6 +662,20 @@ class ChatbotService:
         # A short slot answer such as "Penang" may have a weak or unexpected
         # intent prediction. Recognised structured preferences take priority.
         if changes:
+            if not session.context.is_ready_for_recommendation():
+                return self._clarification_response(prediction, session)
+            if self._needs_accessibility_clarification(session):
+                return self._accessibility_clarification_response(
+                    prediction,
+                    session,
+                )
+            return self._recommendation_response(
+                prediction,
+                session,
+                sort_by=session.ranking_preference,
+            )
+
+        if no_special_access:
             if not session.context.is_ready_for_recommendation():
                 return self._clarification_response(prediction, session)
             return self._recommendation_response(
@@ -694,6 +805,30 @@ class ChatbotService:
             prediction,
             session,
             suggestions=suggestions,
+        )
+
+    @staticmethod
+    def _needs_accessibility_clarification(session: ChatSession) -> bool:
+        return bool(
+            session.context.elderly_friendly
+            and not session.context.wheelchair_accessible
+            and not session.context.accessibility_needs
+            and not session.accessibility_clarified
+        )
+
+    def _accessibility_clarification_response(
+        self,
+        prediction: IntentPrediction,
+        session: ChatSession,
+    ) -> ChatbotResponse:
+        return self._response(
+            "To find a comfortable option, what is the traveller's most "
+            "important accessibility need? Choose one below, or type several "
+            "needs in your own words.",
+            "clarify_accessibility",
+            prediction,
+            session,
+            suggestions=ACCESSIBILITY_SUGGESTIONS,
         )
 
     def _recommendation_response(

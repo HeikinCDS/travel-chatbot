@@ -269,6 +269,26 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
 .recommendation-description { margin-top: 0.7rem !important; }
 .recommendation-facts { margin: 0.75rem 0; padding-left: 1.25rem; }
 .recommendation-facts li { margin-bottom: 0.35rem; }
+.accessibility-details { margin-top: 0.9rem; padding-top: 0.8rem; border-top: 1px solid var(--line); }
+.accessibility-details h4 { margin: 0 0 0.55rem; font-size: 0.92rem; }
+.accessibility-feature-list { display: grid; gap: 0.35rem; margin: 0; }
+.accessibility-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.38rem 0.5rem;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  font-size: 0.78rem;
+}
+.accessibility-feature dt { font-weight: 700; }
+.accessibility-feature dd { margin: 0; text-align: right; font-weight: 800; }
+.accessibility-positive { border-left: 4px solid var(--accent); }
+.accessibility-caution { border-left: 4px solid var(--focus); }
+.accessibility-negative { border-left: 4px solid var(--error); }
+.accessibility-unknown { border-left: 4px solid var(--line); color: var(--muted); }
+.accessibility-note { margin-top: 0.7rem !important; padding: 0.6rem; border-left: 4px solid var(--accent); background: var(--accent-soft); font-size: 0.78rem; }
 .verification-note { padding: 0.6rem; border-left: 4px solid var(--focus); background: var(--surface-soft); color: var(--muted); font-size: 0.82rem; }
 .source-links { display: grid; gap: 0.3rem; margin-top: 0.75rem; }
 .source-links strong { font-size: 0.85rem; }

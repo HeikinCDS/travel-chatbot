@@ -25,11 +25,13 @@ class TravelPreferences:
     family_friendly: bool | None = None
     elderly_friendly: bool | None = None
     wheelchair_accessible: bool | None = None
+    accessibility_needs: tuple[str, ...] = ()
 
     def to_dict(self, omit_empty: bool = True) -> dict[str, Any]:
         """Return a JSON-friendly representation of the extracted values."""
         result = asdict(self)
         result["interests"] = list(self.interests)
+        result["accessibility_needs"] = list(self.accessibility_needs)
         if omit_empty:
             result = {
                 key: value
@@ -232,6 +234,41 @@ def extract_preferences(text: str) -> TravelPreferences:
             re.IGNORECASE,
         )
     ) or None
+    accessibility_patterns = {
+        "low_walking": (
+            r"\b(?:cannot|can't|can not|unable to|difficulty|struggle(?:s)? to)\s+walk\b|"
+            r"\b(?:little|less|minimal|short|limited)\s+walking\b|"
+            r"\b(?:cannot|can't|can not)\s+walk\s+far\b"
+        ),
+        "step_free": (
+            r"\b(?:no|avoid)\s+(?:stairs|steps)\b|"
+            r"\b(?:step[- ]free|ramp|lift|elevator)\b|"
+            r"\b(?:cannot|can't|can not|unable to|difficulty|struggle(?:s)? to)\b"
+            r"[^.!?]{0,40}\bclimb\b"
+        ),
+        "seating": (
+            r"\b(?:bench(?:es)?|resting\s+(?:seat|seats|area|areas)|"
+            r"places?\s+to\s+(?:sit|rest)|need(?:s)?\s+to\s+rest)\b"
+        ),
+        "accessible_toilet": (
+            r"\b(?:accessible|disabled|wheelchair)[- ](?:toilet|toilets|restroom|restrooms)\b|"
+            r"\b(?:toilet|toilets|restroom|restrooms)\s+(?:nearby|access)\b"
+        ),
+        "nearby_parking": (
+            r"\b(?:nearby|close|convenient|easy)[- ]parking\b|"
+            r"\bparking\s+(?:nearby|close|near|access)\b|"
+            r"\b(?:short|minimal)\s+walk\s+from\s+parking\b"
+        ),
+        "shelter": (
+            r"\b(?:shelter(?:ed)?|shade(?:d)?|covered\s+(?:area|areas|walkway|walkways)|"
+            r"avoid(?:ing)?\s+(?:heat|sun|rain))\b"
+        ),
+    }
+    accessibility_needs = tuple(
+        need
+        for need, pattern in accessibility_patterns.items()
+        if re.search(pattern, text, re.IGNORECASE)
+    )
 
     return TravelPreferences(
         state=_extract_state(text),
@@ -242,6 +279,7 @@ def extract_preferences(text: str) -> TravelPreferences:
         family_friendly=family,
         elderly_friendly=elderly,
         wheelchair_accessible=wheelchair,
+        accessibility_needs=accessibility_needs,
     )
 
 
@@ -262,4 +300,6 @@ def to_recommendation_filters(preferences: TravelPreferences) -> dict[str, Any]:
         filters["elderly_friendly"] = True
     if preferences.wheelchair_accessible:
         filters["wheelchair_accessible"] = True
+    if preferences.accessibility_needs:
+        filters["accessibility_needs"] = preferences.accessibility_needs
     return filters

@@ -122,7 +122,30 @@ if (initialMessageRow && initialMessageText) {
 }
 
 function labelFor(key) {
+  const labels = {
+    accessibility_needs: "Elderly access needs",
+    elderly_friendly: "Elderly friendly",
+    wheelchair_accessible: "Wheelchair accessible",
+  };
+  if (labels[key]) return labels[key];
   return key.replaceAll("_", " ").replace(/^./, value => value.toUpperCase());
+}
+
+function displayPreferenceValue(key, rawValue) {
+  const accessibilityLabels = {
+    low_walking: "Minimal walking",
+    step_free: "Step-free access",
+    seating: "Resting seats",
+    accessible_toilet: "Accessible toilet",
+    nearby_parking: "Nearby parking",
+    shelter: "Shelter or shade",
+  };
+  if (Array.isArray(rawValue)) {
+    return rawValue
+      .map(value => key === "accessibility_needs" ? accessibilityLabels[value] || value : value)
+      .join(", ");
+  }
+  return String(rawValue);
 }
 
 function showPreferences(context) {
@@ -145,7 +168,7 @@ function showPreferences(context) {
     const term = document.createElement("dt");
     const detail = document.createElement("dd");
     term.textContent = labelFor(key);
-    detail.textContent = Array.isArray(rawValue) ? rawValue.join(", ") : String(rawValue);
+    detail.textContent = displayPreferenceValue(key, rawValue);
     wrapper.append(term, detail);
     preferences.appendChild(wrapper);
   }
@@ -200,7 +223,9 @@ function showRecommendations(items) {
     const facts = [
       item.cost_summary,
       item.duration_summary,
-      item.accessibility_summary,
+      Array.isArray(item.accessibility_features)
+        ? null
+        : item.accessibility_summary,
     ].filter(Boolean);
     if (facts.length) {
       const factList = document.createElement("ul");
@@ -211,6 +236,37 @@ function showRecommendations(items) {
         factList.appendChild(listItem);
       }
       card.appendChild(factList);
+    }
+
+    if (Array.isArray(item.accessibility_features) && item.accessibility_features.length) {
+      const accessSection = document.createElement("section");
+      accessSection.className = "accessibility-details";
+      accessSection.setAttribute("aria-label", `Accessibility details for ${item.attraction_name || "this attraction"}`);
+
+      const accessHeading = document.createElement("h4");
+      accessHeading.textContent = "Elderly-accessibility details";
+      const accessList = document.createElement("dl");
+      accessList.className = "accessibility-feature-list";
+
+      for (const feature of item.accessibility_features) {
+        const row = document.createElement("div");
+        row.className = `accessibility-feature accessibility-${feature.status || "unknown"}`;
+        const label = document.createElement("dt");
+        label.textContent = feature.label;
+        const value = document.createElement("dd");
+        value.textContent = feature.value;
+        row.append(label, value);
+        accessList.appendChild(row);
+      }
+      accessSection.append(accessHeading, accessList);
+      card.appendChild(accessSection);
+    }
+
+    if (item.accessibility_notes) {
+      const accessNote = document.createElement("p");
+      accessNote.className = "accessibility-note";
+      accessNote.textContent = item.accessibility_notes;
+      card.appendChild(accessNote);
     }
 
     if (item.verification_note) {

@@ -28,7 +28,10 @@ DATABASE_COLUMNS = [
     "short_description", "entrance_fee_status", "min_fee_myr",
     "max_fee_myr", "recommended_duration_hours", "suitable_travel_groups",
     "family_friendly", "elderly_friendly", "wheelchair_accessible",
-    "accessibility_notes", "latitude", "longitude", "official_url",
+    "accessibility_notes", "walking_difficulty", "step_free_access",
+    "resting_seats_available", "accessible_toilet", "parking_proximity",
+    "shelter_available", "elderly_suitability",
+    "elderly_accessibility_notes", "latitude", "longitude", "official_url",
     "source_url", "date_verified", "verification_status", "completeness",
     "reviewer_notes", "candidate_id", "coverage_lens", "source_basis",
     "source_status", "state_tourism_guide_url", "origin_batch",
@@ -172,9 +175,20 @@ def build_attractions(
             "elderly_friendly": "Unknown",
             "wheelchair_accessible": "Unknown",
             "accessibility_notes": "Accessibility information has not been confirmed.",
+            "walking_difficulty": "Unknown",
+            "step_free_access": "Unknown",
+            "resting_seats_available": "Unknown",
+            "accessible_toilet": "Unknown",
+            "parking_proximity": "Unknown",
+            "shelter_available": "Unknown",
+            "elderly_suitability": "Unknown",
+            "elderly_accessibility_notes": None,
         }
         for field, default in defaults.items():
-            if not _known(record.get(field)):
+            candidate_value = candidate.get(field)
+            if _known(candidate_value):
+                record[field] = _text(candidate_value)
+            elif not _known(record.get(field)):
                 record[field] = default
 
         if not _known(record.get("completeness")):

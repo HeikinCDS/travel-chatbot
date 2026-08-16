@@ -87,7 +87,19 @@
                                          "Please recommend an accessible tourist attraction",
                                          "Find me a place for a short holiday",
                                          "Recommend an attraction suitable for senior citizens",
-                                         "Where would you recommend I travel next?"
+                                         "Where would you recommend I travel next?",
+                                         "Recommend somewhere with very little walking for my mother",
+                                         "Find a quiet attraction for my elderly father",
+                                         "Show me a place with benches and nearby parking",
+                                         "I need a step-free attraction for a senior citizen",
+                                         "Recommend somewhere suitable for someone using a walking stick",
+                                         "Find an attraction with an accessible toilet and resting seats",
+                                         "Where can I take my parents without climbing many stairs?",
+                                         "Suggest a shaded place that does not require much walking",
+                                         "Recommend an elderly-friendly attraction with a lift or ramp",
+                                         "Find a calm place for an older adult who gets tired easily",
+                                         "I need somewhere close to parking for my elderly parents",
+                                         "Show me an easy-access destination for a person with limited mobility"
                                      ]
                     },
                     {
@@ -132,7 +144,19 @@
                                          "Keep everything else but change the state to Sabah",
                                          "Update my group type from friends to family",
                                          "Remove the budget limit from my preferences",
-                                         "Modify the current search to include free entry only"
+                                         "Modify the current search to include free entry only",
+                                         "Make it require less walking",
+                                         "Only show places without stairs",
+                                         "Add resting seats to my requirements",
+                                         "I also need an accessible toilet",
+                                         "Change it to somewhere with nearby parking",
+                                         "Make the recommendations suitable for someone using a walking stick",
+                                         "Avoid steep paths and difficult terrain",
+                                         "Add step-free access to my current preferences",
+                                         "Show places with shade because my mother cannot stay in the sun",
+                                         "Keep Penang but find somewhere easier for my elderly father",
+                                         "Remove attractions that need a long walk",
+                                         "Update the search to include benches and ramps"
                                      ]
                     },
                     {
@@ -177,7 +201,19 @@
                                          "Show me the official website for this place",
                                          "What is special about this attraction?",
                                          "Is this recommended place free to enter?",
-                                         "Give me more details about the current recommendation"
+                                         "Give me more details about the current recommendation",
+                                         "How much walking is required at this place?",
+                                         "Are there stairs or steep slopes?",
+                                         "Does this attraction have benches for resting?",
+                                         "Is there an accessible toilet?",
+                                         "How far is the parking area from the entrance?",
+                                         "Does this place have a ramp or lift?",
+                                         "Is the path flat and suitable for a walking stick?",
+                                         "Is there shade or a covered resting area?",
+                                         "Would an elderly visitor need assistance here?",
+                                         "Is this attraction suitable for someone who gets tired easily?",
+                                         "What mobility facilities are recorded for this place?",
+                                         "Why is this place recommended for senior citizens?"
                                      ]
                     },
                     {
