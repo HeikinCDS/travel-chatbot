@@ -114,7 +114,7 @@ class ImportAttractionsTests(unittest.TestCase):
                 "primary_category": "Nature",
                 "review_status": "Complete",
                 "elderly_recommendation_eligibility": "Excluded",
-                "accessibility_screening_notes": "No source-backed feature recorded.",
+                "accessibility_screening_notes": "No documented feature recorded.",
             },
         ])
 

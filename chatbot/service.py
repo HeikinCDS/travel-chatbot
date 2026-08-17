@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from difflib import SequenceMatcher
 import os
 import re
 from typing import Any, Mapping, Protocol
@@ -21,6 +22,7 @@ from recommendation_engine.recommendation_engine import (
     recommend_attractions,
 )
 from web_discovery import OpenDataDiscovery
+from chatbot.attraction_images import get_attraction_image
 
 
 class IntentPredictor(Protocol):
@@ -35,7 +37,7 @@ class AttractionDiscovery(Protocol):
         *,
         limit: int,
     ) -> list[dict[str, Any]]:
-        """Return current, source-backed attraction candidates."""
+        """Return current attraction candidates with supporting references."""
 
     def get_by_id(self, attraction_id: str) -> dict[str, Any] | None:
         """Retrieve one attraction that was returned earlier."""
@@ -106,6 +108,14 @@ DIRECT_INFORMATION_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+NEW_TRIP_REQUEST_PATTERN = re.compile(
+    r"\b(?:i\s+(?:would|'d)\s+like\s+to\s+visit|"
+    r"i\s+(?:want|plan)\s+to\s+(?:visit|travel\s+to|go\s+to)|"
+    r"plan(?:ning)?\s+(?:a\s+)?(?:new\s+)?trip\s+to|"
+    r"start(?:ing)?\s+(?:a\s+)?(?:new\s+)?trip\s+to)\b",
+    re.IGNORECASE,
+)
+
 STATE_SUGGESTIONS = (
     {"label": "Johor", "message": "Johor"},
     {"label": "Penang", "message": "Penang"},
@@ -153,6 +163,22 @@ SELECTION_PATTERNS = (
     (0, re.compile(r"\b(?:first|1st|option\s*1|number\s*1)\b", re.IGNORECASE)),
     (1, re.compile(r"\b(?:second|2nd|option\s*2|number\s*2)\b", re.IGNORECASE)),
     (2, re.compile(r"\b(?:third|3rd|option\s*3|number\s*3)\b", re.IGNORECASE)),
+)
+
+SELECTION_CUE_PATTERN = re.compile(
+    r"\b(?:choose|chose|select|pick|take|go\s+with|let'?s\s+go\s+with|"
+    r"tell\s+me\s+about|information\s+(?:about|on)|details?\s+(?:about|on))\b",
+    re.IGNORECASE,
+)
+
+AFFIRMATIVE_CONFIRMATION_PATTERN = re.compile(
+    r"^\s*(?:yes|yeah|yep|correct|that'?s\s+right|yes\s+please)\s*[.!]?\s*$",
+    re.IGNORECASE,
+)
+
+NEGATIVE_CONFIRMATION_PATTERN = re.compile(
+    r"^\s*(?:no|nope|not\s+that\s+one|that'?s\s+not\s+it)\s*[.!]?\s*$",
+    re.IGNORECASE,
 )
 
 ACCESS_COMPARISON_PATTERN = re.compile(
@@ -364,6 +390,11 @@ def _display_description(attraction: Mapping[str, Any]) -> str:
 
 def _present_attraction(attraction: Mapping[str, Any]) -> dict[str, Any]:
     result = dict(attraction)
+    for key, value in get_attraction_image(
+        attraction.get("attraction_id")
+    ).items():
+        if not result.get(key):
+            result[key] = value
     result["display_description"] = _display_description(attraction)
     result["cost_summary"] = _fee_summary(attraction)
     result["duration_summary"] = _duration_summary(attraction)
@@ -374,17 +405,22 @@ def _present_attraction(attraction: Mapping[str, Any]) -> dict[str, Any]:
         attraction.get("elderly_recommendation_eligibility") or ""
     ).strip().casefold()
     if eligibility == "eligible":
-        result["accessibility_evidence_badge"] = (
-            "Source-backed accessibility information"
-        )
+        # Keep evidence available under Sources without adding a prominent
+        # badge that competes with the attraction image and title.
+        result["accessibility_evidence_badge"] = None
         evidence_urls = re.findall(
             r"https?://[^\s;]+",
             str(attraction.get("accessibility_evidence_source") or ""),
         )
-        result["accessibility_evidence_links"] = [
-            {"title": "Accessibility evidence", "url": url}
-            for url in dict.fromkeys(evidence_urls)
-        ]
+        unique_evidence_urls = list(dict.fromkeys(evidence_urls))
+        result["accessibility_evidence_links"] = (
+            [{
+                "title": "Accessibility information",
+                "url": unique_evidence_urls[0],
+            }]
+            if unique_evidence_urls
+            else []
+        )
     else:
         result["accessibility_evidence_badge"] = None
         result["accessibility_evidence_links"] = []
@@ -404,6 +440,7 @@ class ChatSession:
     ranking_preference: str | None = None
     retrieval_query: str | None = None
     accessibility_clarified: bool = False
+    pending_attraction_id: str | None = None
 
     @classmethod
     def from_dict(cls, values: Mapping[str, Any] | None) -> "ChatSession":
@@ -422,6 +459,7 @@ class ChatSession:
             accessibility_clarified=bool(
                 values.get("accessibility_clarified", False)
             ),
+            pending_attraction_id=values.get("pending_attraction_id"),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -432,6 +470,7 @@ class ChatSession:
             "ranking_preference": self.ranking_preference,
             "retrieval_query": self.retrieval_query,
             "accessibility_clarified": self.accessibility_clarified,
+            "pending_attraction_id": self.pending_attraction_id,
         }
 
     def reset(self) -> None:
@@ -441,6 +480,7 @@ class ChatSession:
         self.ranking_preference = None
         self.retrieval_query = None
         self.accessibility_clarified = False
+        self.pending_attraction_id = None
 
 
 @dataclass(frozen=True)
@@ -569,6 +609,15 @@ class ChatbotService:
                     scores={interpretation.intent: interpretation.confidence},
                 )
 
+        starts_new_trip = bool(
+            message_preferences.state
+            and NEW_TRIP_REQUEST_PATTERN.search(text)
+        )
+        if starts_new_trip and session.context.to_dict():
+            # An explicit new-trip phrase should not silently reuse the
+            # previous destination's interests, budget or accessibility needs.
+            session.reset()
+
         intent = prediction.label
         state_changed = (
             message_preferences.state is not None
@@ -593,6 +642,18 @@ class ChatbotService:
                 prediction,
                 session,
             )
+
+        if session.pending_attraction_id:
+            pending_attraction_id = session.pending_attraction_id
+            session.pending_attraction_id = None
+            if AFFIRMATIVE_CONFIRMATION_PATTERN.fullmatch(text):
+                return self._information_response(
+                    prediction,
+                    session,
+                    attraction_id=pending_attraction_id,
+                )
+            if NEGATIVE_CONFIRMATION_PATTERN.fullmatch(text):
+                return self._previous_options_response(prediction, session)
 
         # A direct question about a saved attraction must be resolved before
         # state extraction starts a broad search. For example, "Tell me about
@@ -628,6 +689,28 @@ class ChatbotService:
                     prediction,
                     session,
                     attraction_id=selected_id,
+                )
+
+            fuzzy_selection = self._fuzzy_latest_selection(text, session)
+            if fuzzy_selection is not None:
+                attraction_id, attraction_name = fuzzy_selection
+                session.pending_attraction_id = attraction_id
+                return self._response(
+                    f"I may not have heard the place name correctly. Do you "
+                    f"mean {attraction_name}?",
+                    "confirm_attraction",
+                    prediction,
+                    session,
+                    suggestions=(
+                        {
+                            "label": f"Yes, {attraction_name}",
+                            "message": f"Tell me about {attraction_name}",
+                        },
+                        {
+                            "label": "Show options again",
+                            "message": "Show the previous options",
+                        },
+                    ),
                 )
 
             comparison = self._comparison_request(text, session)
@@ -877,23 +960,6 @@ class ChatbotService:
             session.latest_recommendation_ids.clear()
             state = session.context.state or "that location"
             interest = ", ".join(session.context.interests) or "selected"
-            accessibility_request = bool(
-                session.context.elderly_friendly
-                or session.context.wheelchair_accessible
-                or session.context.accessibility_needs
-            )
-            if accessibility_request:
-                return self._response(
-                    f"I could not find a {interest} attraction in {state} "
-                    "with a source-backed elderly accessibility feature in "
-                    "the reviewed collection. I have left out places whose "
-                    "accessibility information is unknown. Please choose "
-                    "another attraction type, or tell me a different state.",
-                    "no_results",
-                    prediction,
-                    session,
-                    suggestions=CHANGE_INTEREST_SUGGESTIONS,
-                )
             search_scope = (
                 "the saved collection or live open-data sources"
                 if self.enable_live_discovery
@@ -1173,6 +1239,45 @@ class ChatbotService:
             if pattern.search(text) and index < len(session.latest_recommendation_ids):
                 return session.latest_recommendation_ids[index]
         return None
+
+    def _fuzzy_latest_selection(
+        self,
+        text: str,
+        session: ChatSession,
+    ) -> tuple[str, str] | None:
+        """Offer a correction for a likely misheard recommendation name."""
+
+        if (
+            not session.latest_recommendation_ids
+            or not SELECTION_CUE_PATTERN.search(text)
+        ):
+            return None
+        normalised_text = _normalise_name(text)
+        message_tokens = normalised_text.split()
+        scored: list[tuple[float, str, str]] = []
+        for attraction in self._latest_attractions(session):
+            attraction_id = str(attraction["attraction_id"])
+            attraction_name = str(attraction["attraction_name"])
+            normalised_name = _normalise_name(attraction_name)
+            name_length = len(normalised_name.split())
+            window_scores = []
+            for size in range(max(1, name_length - 1), name_length + 2):
+                for start in range(0, max(0, len(message_tokens) - size) + 1):
+                    phrase = " ".join(message_tokens[start:start + size])
+                    window_scores.append(
+                        SequenceMatcher(None, phrase, normalised_name).ratio()
+                    )
+            if window_scores:
+                scored.append((max(window_scores), attraction_id, attraction_name))
+
+        if not scored:
+            return None
+        scored.sort(reverse=True)
+        best_score, attraction_id, attraction_name = scored[0]
+        second_score = scored[1][0] if len(scored) > 1 else 0.0
+        if best_score < 0.68 or best_score - second_score < 0.08:
+            return None
+        return attraction_id, attraction_name
 
     def _comparison_request(
         self,

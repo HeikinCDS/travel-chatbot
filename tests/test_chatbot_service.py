@@ -54,22 +54,20 @@ class FixedLanguageInterpreter:
 
 class ChatbotServiceTests(unittest.TestCase):
 
-    def test_eligible_attraction_shows_accessibility_evidence(self):
+    def test_eligible_attraction_shows_one_accessibility_source_without_badge(self):
         presented = _present_attraction({
             "attraction_name": "Accessible Garden",
             "short_description": "A quiet public garden.",
             "elderly_recommendation_eligibility": "Eligible",
             "accessibility_evidence_source": (
-                "https://example.org/access\nhttps://example.org/access"
+                "https://example.org/access\n"
+                "https://example.org/secondary-access"
             ),
         })
 
-        self.assertEqual(
-            presented["accessibility_evidence_badge"],
-            "Source-backed accessibility information",
-        )
+        self.assertIsNone(presented["accessibility_evidence_badge"])
         self.assertEqual(presented["accessibility_evidence_links"], [{
-            "title": "Accessibility evidence",
+            "title": "Accessibility information",
             "url": "https://example.org/access",
         }])
 
@@ -159,6 +157,32 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertNotIn("ESCAPE Penang", response.reply)
         self.assertEqual(session.latest_recommendation_ids, ["TEST-PENANG-HILL"])
         self.assertEqual(session.context.state, "Penang")
+
+    def test_misheard_place_name_asks_for_confirmation(self):
+        session = ChatSession(
+            context=ConversationContext(state="Johor", interests=["beach"]),
+            latest_recommendation_ids=["MC0025", "MC0029", "MC0024"],
+        )
+        service = self.make_service("request_information")
+
+        confirmation = service.process_message(
+            "OK let's go with a Poppin Beach",
+            session,
+        )
+
+        self.assertEqual(confirmation.action, "confirm_attraction")
+        self.assertIn("Do you mean Air Papan Beach?", confirmation.reply)
+        self.assertEqual(session.pending_attraction_id, "MC0025")
+        self.assertEqual(
+            confirmation.suggestions[0]["label"],
+            "Yes, Air Papan Beach",
+        )
+
+        details = service.process_message("Yes", session)
+
+        self.assertEqual(details.action, "information")
+        self.assertIn("Air Papan Beach:", details.reply)
+        self.assertIsNone(session.pending_attraction_id)
 
     def make_service(
         self,
@@ -306,7 +330,7 @@ class ChatbotServiceTests(unittest.TestCase):
             "city_district": "George Town",
             "primary_category": "Nature",
             "interests_tags": "nature, garden",
-            "short_description": "A source-backed test attraction.",
+            "short_description": "A referenced test attraction.",
             "entrance_fee_status": "Unknown",
             "min_fee_myr": None,
             "max_fee_myr": None,
@@ -548,6 +572,37 @@ class ChatbotServiceTests(unittest.TestCase):
             item["state_territory"] == "Kedah"
             for item in response.recommendations
         ))
+
+    def test_explicit_new_trip_asks_for_fresh_preferences(self):
+        session = ChatSession(
+            context=ConversationContext(
+                state="Penang",
+                interests=["nature"],
+                maximum_fee=30,
+                elderly_friendly=True,
+                accessibility_needs=["low_walking"],
+            ),
+            accessibility_clarified=True,
+        )
+        service = self.make_service("request_recommendation")
+
+        interest_question = service.process_message(
+            "Hello I would like to visit Sarawak with my elderly parents",
+            session,
+        )
+
+        self.assertEqual(interest_question.action, "clarify_preferences")
+        self.assertEqual(session.context.state, "Sarawak")
+        self.assertEqual(session.context.interests, [])
+        self.assertIsNone(session.context.maximum_fee)
+        self.assertTrue(session.context.elderly_friendly)
+        self.assertEqual(session.context.accessibility_needs, [])
+        self.assertIn("type of attraction", interest_question.reply)
+
+        access_question = service.process_message("Nature", session)
+
+        self.assertEqual(access_question.action, "clarify_accessibility")
+        self.assertIn("accessibility need", access_question.reply)
 
     def test_repeated_state_still_asks_for_missing_interest(self):
         session = ChatSession(
@@ -812,7 +867,7 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertIn("still saved", response.reply)
         self.assertGreater(len(response.suggestions), 0)
 
-    def test_elderly_no_results_explains_evidence_filter(self):
+    def test_elderly_request_can_use_full_collection(self):
         session = ChatSession(
             context=ConversationContext(
                 state="Perak",
@@ -827,10 +882,12 @@ class ChatbotServiceTests(unittest.TestCase):
             session,
         )
 
-        self.assertEqual(response.action, "no_results")
-        self.assertIn("source-backed elderly accessibility feature", response.reply)
-        self.assertIn("left out", response.reply)
-        self.assertIn("unknown", response.reply)
+        self.assertEqual(response.action, "recommend")
+        self.assertTrue(response.recommendations)
+        self.assertTrue(all(
+            item["state_territory"] == "Perak"
+            for item in response.recommendations
+        ))
 
     def test_session_round_trip(self):
         original = ChatSession(

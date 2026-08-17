@@ -289,17 +289,7 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
 .recommendation-facts { margin: 0.75rem 0; padding-left: 1.25rem; }
 .recommendation-facts li { margin-bottom: 0.35rem; }
 .accessibility-details { margin-top: 0.9rem; padding-top: 0.8rem; border-top: 1px solid var(--line); }
-.accessibility-evidence-badge {
-  display: inline-block;
-  margin: 0 0 0.7rem;
-  padding: 0.28rem 0.55rem;
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent-dark);
-  font-size: 0.75rem;
-  font-weight: 800;
-}
+.accessibility-evidence-badge { display: none !important; }
 .accessibility-details h4 { margin: 0 0 0.55rem; font-size: 0.92rem; }
 .accessibility-feature-list { display: grid; gap: 0.35rem; margin: 0; }
 .accessibility-feature {
@@ -350,7 +340,28 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
 .chat-form { display: flex; align-items: flex-end; gap: 0.55rem; width: min(820px, 100%); margin: 0 auto; padding: 0.55rem; border: 2px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: 0 5px 22px rgba(0,0,0,0.1); }
 .chat-form:focus-within { border-color: var(--accent); }
 .chat-form textarea { width: 100%; max-height: 160px; min-height: 54px; resize: none; padding: 0.7rem; border: 0; outline: 0; background: transparent; color: var(--text); line-height: 1.45; }
-.send-button { min-width: 96px; min-height: 54px; padding: 0.65rem 1rem; border: 0; border-radius: 12px; background: var(--accent); color: #ffffff; font-weight: 800; }
+.voice-input-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 108px;
+  height: 54px;
+  padding: 0.65rem 1rem;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--accent-dark);
+  font-weight: 800;
+}
+.voice-input-button:hover { background: var(--accent-soft); }
+.voice-input-button.is-listening {
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.voice-input-button:disabled { opacity: 0.55; cursor: not-allowed; }
+.send-button { min-width: 96px; height: 54px; padding: 0.65rem 1rem; border: 0; border-radius: 12px; background: var(--accent); color: #ffffff; font-weight: 800; }
 .send-button:hover { background: var(--accent-dark); }
 .high-contrast .send-button { color: #000000; }
 .form-status { width: min(820px, 100%); min-height: 1.4em; margin: 0.25rem auto 0; color: var(--error); font-weight: 700; }

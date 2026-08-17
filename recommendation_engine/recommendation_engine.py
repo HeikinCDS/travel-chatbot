@@ -269,6 +269,14 @@ def _accessibility_score(
 ):
     values = {"yes": 2, "partial": 1}
     score = 0
+    if elderly_friendly or wheelchair_accessible or accessibility_needs:
+        eligibility = str(
+            attraction.get("elderly_recommendation_eligibility") or ""
+        ).strip().casefold()
+        if eligibility == "eligible":
+            # Prefer reviewed records, while still allowing the complete
+            # catalogue to provide options in under-researched states.
+            score += 6
     if elderly_friendly:
         score += values.get(
             str(attraction.get("elderly_friendly") or "").casefold(),
@@ -366,14 +374,6 @@ def recommend_attractions(
         conditions.append("""
             LOWER(COALESCE(NULLIF(TRIM(wheelchair_accessible), ''), 'unknown'))
             != 'no'
-        """)
-
-    if elderly_friendly or wheelchair_accessible or accessibility_needs:
-        conditions.append("""
-            LOWER(COALESCE(
-                NULLIF(TRIM(elderly_recommendation_eligibility), ''),
-                'excluded'
-            )) = 'eligible'
         """)
 
     where_clause = ""

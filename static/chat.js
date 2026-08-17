@@ -1,6 +1,7 @@
 const form = document.querySelector("#chat-form");
 const input = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-button");
+const voiceInputButton = document.querySelector("#voice-input-button");
 const resetButton = document.querySelector("#reset-button");
 const preferenceResetButton = document.querySelector("#preference-reset-button");
 const textSizeButton = document.querySelector("#text-size-button");
@@ -19,6 +20,85 @@ let messageCounter = 0;
 let preferredSpeechVoice = null;
 let activeAudio = null;
 const generatedAudioUrls = new Set();
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let speechRecognition = null;
+let voiceInputActive = false;
+let inputBeforeSpeech = "";
+
+function resizeMessageInput() {
+  input.style.height = "auto";
+  input.style.height = `${Math.min(input.scrollHeight, 160)}px`;
+}
+
+function setVoiceInputState(active) {
+  voiceInputActive = active;
+  voiceInputButton.setAttribute("aria-pressed", String(active));
+  voiceInputButton.classList.toggle("is-listening", active);
+  voiceInputButton.querySelector(".voice-button-label").textContent = active
+    ? "Stop"
+    : "Speak";
+}
+
+if (SpeechRecognition) {
+  speechRecognition = new SpeechRecognition();
+  speechRecognition.lang = "en-MY";
+  speechRecognition.continuous = false;
+  speechRecognition.interimResults = true;
+
+  speechRecognition.addEventListener("start", () => {
+    setVoiceInputState(true);
+    formStatus.textContent = "Listening… Speak your travel request.";
+  });
+
+  speechRecognition.addEventListener("result", event => {
+    let transcript = "";
+    for (let index = 0; index < event.results.length; index += 1) {
+      transcript += event.results[index][0].transcript;
+    }
+    input.value = [inputBeforeSpeech, transcript.trim()].filter(Boolean).join(" ");
+    resizeMessageInput();
+  });
+
+  speechRecognition.addEventListener("end", () => {
+    setVoiceInputState(false);
+    formStatus.textContent = input.value.trim()
+      ? "Voice input added. Check the message, then press Send."
+      : "I could not hear a message. Please try again.";
+    input.focus();
+  });
+
+  speechRecognition.addEventListener("error", event => {
+    setVoiceInputState(false);
+    const messages = {
+      "not-allowed": "Microphone permission was not granted.",
+      "no-speech": "I could not hear any speech. Please try again.",
+      "audio-capture": "No microphone was detected.",
+      network: "Voice recognition is temporarily unavailable.",
+    };
+    formStatus.textContent = messages[event.error]
+      || "Voice recognition could not start. Please try again.";
+  });
+
+  voiceInputButton.addEventListener("click", () => {
+    if (voiceInputActive) {
+      speechRecognition.stop();
+      return;
+    }
+    inputBeforeSpeech = input.value.trim();
+    try {
+      speechRecognition.start();
+    } catch (error) {
+      formStatus.textContent = "Voice recognition is already starting.";
+    }
+  });
+} else {
+  voiceInputButton.disabled = true;
+  voiceInputButton.title = "Voice input is not supported by this browser.";
+  voiceInputButton.setAttribute(
+    "aria-label",
+    "Voice input is not supported by this browser",
+  );
+}
 
 function chooseGentleVoice() {
   if (!("speechSynthesis" in window)) return null;
@@ -217,13 +297,6 @@ function showRecommendations(items) {
     const card = document.createElement("article");
     card.className = "recommendation-card";
 
-    if (item.accessibility_evidence_badge) {
-      const evidenceBadge = document.createElement("p");
-      evidenceBadge.className = "accessibility-evidence-badge";
-      evidenceBadge.textContent = item.accessibility_evidence_badge;
-      card.appendChild(evidenceBadge);
-    }
-
     if (item.image_url) {
       const figure = document.createElement("figure");
       figure.className = "recommendation-image";
@@ -415,8 +488,7 @@ input.addEventListener("keydown", event => {
 });
 
 input.addEventListener("input", () => {
-  input.style.height = "auto";
-  input.style.height = `${Math.min(input.scrollHeight, 160)}px`;
+  resizeMessageInput();
 });
 
 quickReplies.addEventListener("click", event => {

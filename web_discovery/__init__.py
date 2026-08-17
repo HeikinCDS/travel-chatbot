@@ -1,4 +1,4 @@
-"""Free, source-backed attraction discovery for JomVoyage."""
+"""Free, referenced attraction discovery for JomVoyage."""
 
 from .service import LiveWebDiscovery, OpenDataDiscovery
 

@@ -1,0 +1,80 @@
+{
+  "A024": {
+    "image_url": "/static/images/attractions/A024.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Batu_Caves,_Selangor,_Malaysia_%F0%9F%87%B2%F0%9F%87%BE_-_Monkey_in_the_Hand.jpg",
+    "image_attribution": "Sharon Hahn Darlin",
+    "image_license": "CC BY 2.0"
+  },
+  "A028": {
+    "image_url": "/static/images/attractions/A028.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Lost_City_of_Gold_Sunway_Lagoon.jpg",
+    "image_attribution": "Lerdsuwa",
+    "image_license": "CC BY-SA 3.0"
+  },
+  "A023": {
+    "image_url": "/static/images/attractions/A023.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Jeti_Merdeka,_Pulau_Ketam_(220711).jpg",
+    "image_attribution": "*angys*",
+    "image_license": "CC BY-SA 4.0"
+  },
+  "A027": {
+    "image_url": "/static/images/attractions/A027.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Anthracoceros_albirostris_-Kuala_Lumpur_Bird_Park,_Malaysia-8a.jpg",
+    "image_attribution": "AbZahri AbAzizis from Kuala Lumpur, Malaysia",
+    "image_license": "CC BY 2.0"
+  },
+  "A029": {
+    "image_url": "/static/images/attractions/A029.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Labuan_Malaysia_War-Cemetery-01.jpg",
+    "image_attribution": "CEphoto, Uwe Aranas",
+    "image_license": "CC BY-SA 3.0"
+  },
+  "A031": {
+    "image_url": "/static/images/attractions/A031.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Map_of_Saujana_Hijau_Park.jpg",
+    "image_attribution": "Cerevisae",
+    "image_license": "CC BY-SA 4.0"
+  },
+  "A032": {
+    "image_url": "/static/images/attractions/A032.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Putrajaya_Wetlands_Park.JPG",
+    "image_attribution": "Chongkian",
+    "image_license": "CC BY-SA 4.0"
+  },
+  "A081": {
+    "image_url": "/static/images/attractions/A081.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:George_Town_(5606026033).jpg",
+    "image_attribution": "LeonardKong",
+    "image_license": "CC BY 2.0"
+  },
+  "A085": {
+    "image_url": "/static/images/attractions/A085.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Entopia_by_Penang_Butterfly_Farm.jpg",
+    "image_attribution": "Chongkian",
+    "image_license": "CC BY-SA 4.0"
+  },
+  "A082": {
+    "image_url": "/static/images/attractions/A082.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Penang_Hill_(8345232894).jpg",
+    "image_attribution": "Marufish from Alor Setar, Malaysia",
+    "image_license": "CC BY-SA 2.0"
+  },
+  "A088": {
+    "image_url": "/static/images/attractions/A088.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Penang_Botanic_Gardens.jpg",
+    "image_attribution": "Richard N Horne",
+    "image_license": "CC BY-SA 4.0"
+  },
+  "MC0180": {
+    "image_url": "/static/images/attractions/MC0180.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Pinang_Peranakan_Mansion_(I).jpg",
+    "image_attribution": "This Photo was taken by Supanut Arunoprayote. Feel free to use any of my images, but please mention me as the author and may send me a message. (สามารถใช้ภาพได้อิสระ แต่กรุณาใส่เครดิตผู้ถ่ายและอาจส่งข้อความบอกกล่าวด้วย) Please do not upload an updated image here without consultation with the Author. The author would like to make corrections only at his own source. This ensures that the changes are preserved.Please if you think that any changes should be required, please inform the author.Otherwise you can upload a new image with a new name. Please use one of the templates derivative or extract.",
+    "image_license": "CC BY 4.0"
+  },
+  "MC0194": {
+    "image_url": "/static/images/attractions/MC0194.jpg",
+    "image_page_url": "https://commons.wikimedia.org/wiki/File:Penang_Bird_Park_entrance_building_(12340610483).jpg",
+    "image_attribution": "shankar s. from Dubai, united arab emirates",
+    "image_license": "CC BY 2.0"
+  }
+}

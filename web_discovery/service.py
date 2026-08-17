@@ -1,4 +1,4 @@
-"""Free, source-backed attraction discovery for JomVoyage.
+"""Free, referenced attraction discovery for JomVoyage.
 
 Attractions come from Wikidata and OpenStreetMap. Photographs come from
 Wikimedia Commons with licence metadata.

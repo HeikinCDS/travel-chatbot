@@ -44,6 +44,8 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertIn(b"JomVoyage", response.data)
         self.assertIn(b"Maya", response.data)
         self.assertIn(b'id="message-input"', response.data)
+        self.assertIn(b'id="voice-input-button"', response.data)
+        self.assertIn(b'Speak your travel request', response.data)
         self.assertIn(b'id="text-size-button"', response.data)
         self.assertIn(b'id="contrast-button"', response.data)
         self.assertIn(b'class="composer-area"', response.data)

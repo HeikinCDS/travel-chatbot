@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="JomVoyage is an elderly-friendly AI travel companion for discovering Malaysian attractions.">
   <title>JomVoyage | Meet Maya</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v='20260817d') }}">
 </head>
 <body>
   <a class="skip-link" href="#message-input">Skip to the message box</a>
@@ -123,6 +123,11 @@
         placeholder="Message Maya"
         required
       ></textarea>
+      <button id="voice-input-button" class="voice-input-button" type="button"
+              aria-pressed="false" aria-label="Speak your travel request">
+        <span aria-hidden="true">🎤</span>
+        <span class="voice-button-label">Speak</span>
+      </button>
       <button id="send-button" class="send-button" type="submit">Send</button>
     </form>
     <p id="form-status" class="form-status" role="status"></p>
@@ -130,6 +135,6 @@
   </div>
 
   <noscript>This chatbot requires JavaScript to send messages.</noscript>
-  <script src="{{ url_for('static', filename='chat.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='chat.js', v='20260817c') }}" defer></script>
 </body>
 </html>
