@@ -6,6 +6,7 @@ const preferenceResetButton = document.querySelector("#preference-reset-button")
 const textSizeButton = document.querySelector("#text-size-button");
 const contrastButton = document.querySelector("#contrast-button");
 const sidebarToggleButton = document.querySelector("#sidebar-toggle-button");
+const easyAccessStartButton = document.querySelector("#easy-access-start-button");
 const tripSidebar = document.querySelector("#trip-sidebar");
 const messages = document.querySelector("#messages");
 const recommendations = document.querySelector("#recommendations");
@@ -16,6 +17,8 @@ const historyList = document.querySelector("#chat-history");
 const historyEmpty = document.querySelector("#history-empty");
 let messageCounter = 0;
 let preferredSpeechVoice = null;
+let activeAudio = null;
+const generatedAudioUrls = new Set();
 
 function chooseGentleVoice() {
   if (!("speechSynthesis" in window)) return null;
@@ -99,7 +102,7 @@ function addMessage(text, sender) {
   message.appendChild(paragraph);
   content.appendChild(message);
 
-  if (sender === "bot" && "speechSynthesis" in window) {
+  if (sender === "bot") {
     const speakButton = document.createElement("button");
     speakButton.className = "speak-button";
     speakButton.type = "button";
@@ -120,6 +123,21 @@ const initialMessageText = initialMessageRow?.querySelector(".assistant-message 
 if (initialMessageRow && initialMessageText) {
   registerHistoryItem(initialMessageRow, initialMessageText, "bot");
 }
+
+// Loading the NLP model can be the slowest part of the first message. Start it
+// while the welcome screen is visible so the first reply feels faster.
+formStatus.textContent = "Preparing Maya...";
+fetch("/api/warmup")
+  .then(response => {
+    if (!response.ok) throw new Error("Warm-up failed");
+    formStatus.textContent = "Maya is ready.";
+    window.setTimeout(() => {
+      if (formStatus.textContent === "Maya is ready.") formStatus.textContent = "";
+    }, 2500);
+  })
+  .catch(() => {
+    if (formStatus.textContent === "Preparing Maya...") formStatus.textContent = "";
+  });
 
 function labelFor(key) {
   const labels = {
@@ -145,14 +163,33 @@ function displayPreferenceValue(key, rawValue) {
       .map(value => key === "accessibility_needs" ? accessibilityLabels[value] || value : value)
       .join(", ");
   }
+  if (typeof rawValue === "boolean") return rawValue ? "Yes" : "No";
   return String(rawValue);
 }
 
 function showPreferences(context) {
   preferences.replaceChildren();
-  const entries = Object.entries(context || {}).filter(([, value]) => {
-    return value !== null && value !== "" && (!Array.isArray(value) || value.length > 0);
-  });
+  const preferenceOrder = [
+    "state",
+    "interests",
+    "elderly_friendly",
+    "accessibility_needs",
+    "wheelchair_accessible",
+    "maximum_fee",
+    "duration_days",
+    "duration_hours",
+    "family_friendly",
+  ];
+  const entries = Object.entries(context || {})
+    .filter(([, value]) => {
+      return value !== null && value !== "" && (!Array.isArray(value) || value.length > 0);
+    })
+    .sort(([firstKey], [secondKey]) => {
+      const firstIndex = preferenceOrder.indexOf(firstKey);
+      const secondIndex = preferenceOrder.indexOf(secondKey);
+      return (firstIndex < 0 ? preferenceOrder.length : firstIndex)
+        - (secondIndex < 0 ? preferenceOrder.length : secondIndex);
+    });
   if (!entries.length) {
     const wrapper = document.createElement("div");
     const term = document.createElement("dt");
@@ -179,6 +216,13 @@ function showRecommendations(items) {
   for (const item of items || []) {
     const card = document.createElement("article");
     card.className = "recommendation-card";
+
+    if (item.accessibility_evidence_badge) {
+      const evidenceBadge = document.createElement("p");
+      evidenceBadge.className = "accessibility-evidence-badge";
+      evidenceBadge.textContent = item.accessibility_evidence_badge;
+      card.appendChild(evidenceBadge);
+    }
 
     if (item.image_url) {
       const figure = document.createElement("figure");
@@ -279,7 +323,15 @@ function showRecommendations(items) {
     const sourceLinks = Array.isArray(item.source_links) && item.source_links.length
       ? item.source_links
       : [{ title: "Visitor information", url: item.official_url || item.source_url }];
-    const validSources = sourceLinks.filter(source => source && source.url);
+    const evidenceLinks = Array.isArray(item.accessibility_evidence_links)
+      ? item.accessibility_evidence_links
+      : [];
+    const seenSourceUrls = new Set();
+    const validSources = [...evidenceLinks, ...sourceLinks].filter(source => {
+      if (!source || !source.url || seenSourceUrls.has(source.url)) return false;
+      seenSourceUrls.add(source.url);
+      return true;
+    });
     if (validSources.length) {
       const sourceBlock = document.createElement("div");
       sourceBlock.className = "source-links";
@@ -351,6 +403,10 @@ form.addEventListener("submit", event => {
   if (message) submitMessage(message);
 });
 
+easyAccessStartButton.addEventListener("click", () => {
+  submitMessage("I am planning a comfortable trip for an elderly traveller");
+});
+
 input.addEventListener("keydown", event => {
   if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
@@ -379,9 +435,26 @@ historyList.addEventListener("click", event => {
 
 messages.addEventListener("click", event => {
   const button = event.target.closest("button[data-speak]");
-  if (!button || !("speechSynthesis" in window)) return;
+  if (button) playSpeechAudio(button);
+});
+
+function stopActiveAudio() {
+  if (!activeAudio) return;
+  activeAudio.pause();
+  activeAudio.currentTime = 0;
+  activeAudio = null;
+}
+
+function clearGeneratedAudio() {
+  stopActiveAudio();
+  for (const url of generatedAudioUrls) URL.revokeObjectURL(url);
+  generatedAudioUrls.clear();
+}
+
+function useBrowserSpeechFallback(text) {
+  if (!("speechSynthesis" in window)) return false;
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(button.dataset.speak);
+  const utterance = new SpeechSynthesisUtterance(text);
   if (preferredSpeechVoice) {
     utterance.voice = preferredSpeechVoice;
     utterance.lang = preferredSpeechVoice.lang;
@@ -391,10 +464,64 @@ messages.addEventListener("click", event => {
   utterance.rate = 0.86;
   utterance.pitch = 1.02;
   window.speechSynthesis.speak(utterance);
-});
+  return true;
+}
+
+async function playSpeechAudio(button) {
+  const content = button.closest(".message-content");
+  let player = content?.querySelector("audio.maya-audio-player");
+  if (player?.src) {
+    stopActiveAudio();
+    activeAudio = player;
+    player.currentTime = 0;
+    await player.play();
+    button.textContent = "Read aloud";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Preparing audio...";
+  try {
+    const response = await fetch("/api/speech", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: button.dataset.speak }),
+    });
+    if (!response.ok) throw new Error("Audio generation failed");
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    generatedAudioUrls.add(audioUrl);
+    player = document.createElement("audio");
+    player.className = "maya-audio-player";
+    player.controls = false;
+    player.hidden = true;
+    player.preload = "metadata";
+    player.src = audioUrl;
+    player.setAttribute("aria-label", "Maya's spoken response");
+    player.addEventListener("ended", () => {
+      if (activeAudio === player) activeAudio = null;
+      button.textContent = "Read aloud";
+    });
+    content?.appendChild(player);
+    stopActiveAudio();
+    activeAudio = player;
+    await player.play();
+    button.textContent = "Read aloud";
+  } catch (error) {
+    if (useBrowserSpeechFallback(button.dataset.speak)) {
+      formStatus.textContent = "Using the browser voice because generated audio is unavailable.";
+    } else {
+      formStatus.textContent = "Maya's audio is unavailable on this device.";
+    }
+    button.textContent = "Read aloud";
+  } finally {
+    button.disabled = false;
+  }
+}
 
 resetButton.addEventListener("click", async () => {
   resetButton.disabled = true;
+  clearGeneratedAudio();
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
   try {
     const data = await sendJson("/api/reset");
@@ -417,6 +544,7 @@ resetButton.addEventListener("click", async () => {
 
 preferenceResetButton.addEventListener("click", async () => {
   preferenceResetButton.disabled = true;
+  stopActiveAudio();
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
   try {
     const data = await sendJson("/api/reset-preferences");

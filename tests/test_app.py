@@ -33,6 +33,7 @@ class FlaskApplicationTests(unittest.TestCase):
         self.service = RecordingService()
         self.app = create_app(
             service=self.service,
+            speech_synthesizer=lambda text: b"RIFF" + (b"\x00" * 40) + b"WAVE",
             config={"TESTING": True, "SECRET_KEY": "test-key"},
         )
         self.client = self.app.test_client()
@@ -52,10 +53,30 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertIn(b'id="sidebar-toggle-button"', response.data)
         self.assertIn(b'id="trip-sidebar"', response.data)
         self.assertIn(b'id="chat-history"', response.data)
+        self.assertIn(b'id="easy-access-start-button"', response.data)
+        self.assertIn(b"Plan an easy-access trip", response.data)
 
     def test_health_endpoint(self):
         response = self.client.get("/health")
         self.assertEqual(response.get_json(), {"status": "ok"})
+
+    def test_warmup_endpoint_prepares_chatbot_service(self):
+        response = self.client.get("/api/warmup")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {"status": "ready"})
+
+    def test_speech_endpoint_returns_wav_audio(self):
+        response = self.client.post(
+            "/api/speech",
+            json={"text": "Hello from Maya"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "audio/wav")
+        self.assertTrue(response.data.startswith(b"RIFF"))
+
+    def test_speech_endpoint_rejects_empty_text(self):
+        response = self.client.post("/api/speech", json={"text": " "})
+        self.assertEqual(response.status_code, 400)
 
     def test_chat_rejects_empty_message(self):
         response = self.client.post("/api/chat", json={"message": "  "})

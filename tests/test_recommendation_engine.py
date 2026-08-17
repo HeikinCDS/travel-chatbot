@@ -126,6 +126,8 @@ class RecommendationEngineTests(unittest.TestCase):
                         shelter_available TEXT,
                         elderly_suitability TEXT,
                         elderly_accessibility_notes TEXT,
+                        elderly_recommendation_eligibility TEXT,
+                        accessibility_evidence_source TEXT,
                         official_url TEXT,
                         source_url TEXT,
                         date_verified TEXT,

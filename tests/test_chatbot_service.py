@@ -6,6 +6,7 @@ from chatbot.service import (
     ChatSession,
     _accessibility_detail,
     _accessibility_features,
+    _present_attraction,
 )
 from dialogue.context_manager import ConversationContext
 from nlp.entity_extractor import TravelPreferences
@@ -52,6 +53,25 @@ class FixedLanguageInterpreter:
 
 
 class ChatbotServiceTests(unittest.TestCase):
+
+    def test_eligible_attraction_shows_accessibility_evidence(self):
+        presented = _present_attraction({
+            "attraction_name": "Accessible Garden",
+            "short_description": "A quiet public garden.",
+            "elderly_recommendation_eligibility": "Eligible",
+            "accessibility_evidence_source": (
+                "https://example.org/access\nhttps://example.org/access"
+            ),
+        })
+
+        self.assertEqual(
+            presented["accessibility_evidence_badge"],
+            "Source-backed accessibility information",
+        )
+        self.assertEqual(presented["accessibility_evidence_links"], [{
+            "title": "Accessibility evidence",
+            "url": "https://example.org/access",
+        }])
 
     def test_specific_accessibility_need_overrides_wrong_intent_prediction(self):
         session = ChatSession()

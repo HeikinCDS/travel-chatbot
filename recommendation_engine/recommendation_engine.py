@@ -406,6 +406,8 @@ def recommend_attractions(
             shelter_available,
             elderly_suitability,
             elderly_accessibility_notes,
+            elderly_recommendation_eligibility,
+            accessibility_evidence_source,
             official_url,
             source_url,
             date_verified,
@@ -496,6 +498,8 @@ def get_attraction_by_id(attraction_id):
             shelter_available,
             elderly_suitability,
             elderly_accessibility_notes,
+            elderly_recommendation_eligibility,
+            accessibility_evidence_source,
             official_url,
             source_url
         FROM attractions
@@ -543,6 +547,8 @@ def find_attraction_by_name_in_text(text):
             shelter_available,
             elderly_suitability,
             elderly_accessibility_notes,
+            elderly_recommendation_eligibility,
+            accessibility_evidence_source,
             official_url,
             source_url
         FROM attractions

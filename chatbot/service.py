@@ -370,6 +370,24 @@ def _present_attraction(attraction: Mapping[str, Any]) -> dict[str, Any]:
     result["accessibility_summary"] = _access_summary(attraction)
     result["accessibility_notes"] = _accessibility_detail(attraction)
     result["accessibility_features"] = list(_accessibility_features(attraction))
+    eligibility = str(
+        attraction.get("elderly_recommendation_eligibility") or ""
+    ).strip().casefold()
+    if eligibility == "eligible":
+        result["accessibility_evidence_badge"] = (
+            "Source-backed accessibility information"
+        )
+        evidence_urls = re.findall(
+            r"https?://[^\s;]+",
+            str(attraction.get("accessibility_evidence_source") or ""),
+        )
+        result["accessibility_evidence_links"] = [
+            {"title": "Accessibility evidence", "url": url}
+            for url in dict.fromkeys(evidence_urls)
+        ]
+    else:
+        result["accessibility_evidence_badge"] = None
+        result["accessibility_evidence_links"] = []
     # Source links remain visible on the card. Missing facts are omitted instead
     # of repeatedly warning travellers that each individual field is unverified.
     result["verification_note"] = None
