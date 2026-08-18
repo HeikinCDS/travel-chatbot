@@ -45,7 +45,7 @@ class RecommendationEngineTests(unittest.TestCase):
         )
         self.assertEqual(nearby_seats[0]["attraction_name"], "Penang Bird Park")
 
-    def test_elderly_requests_keep_full_catalogue_and_prefer_reviewed_places(self):
+    def test_elderly_requests_use_only_verified_accessibility_subset(self):
         general_results = recommend_attractions(
             state="Penang",
             interest="nature",
@@ -65,11 +65,13 @@ class RecommendationEngineTests(unittest.TestCase):
             attraction["attraction_name"] for attraction in elderly_results
         }
         self.assertIn("Penang National Park", general_names)
-        self.assertIn("Penang National Park", elderly_names)
+        self.assertNotIn("Penang National Park", elderly_names)
         self.assertIn("Bukit Panchor State Park", elderly_names)
-        self.assertEqual(
-            elderly_results[0]["elderly_recommendation_eligibility"],
-            "Eligible",
+        self.assertTrue(
+            all(
+                item["elderly_recommendation_eligibility"] == "Eligible"
+                for item in elderly_results
+            )
         )
 
     def test_specific_elderly_needs_improve_accessibility_ranking(self):
@@ -132,6 +134,7 @@ class RecommendationEngineTests(unittest.TestCase):
                         elderly_accessibility_notes TEXT,
                         elderly_recommendation_eligibility TEXT,
                         accessibility_evidence_source TEXT,
+                        accessibility_screening_notes TEXT,
                         official_url TEXT,
                         source_url TEXT,
                         date_verified TEXT,

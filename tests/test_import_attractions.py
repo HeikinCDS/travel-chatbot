@@ -2,10 +2,24 @@ import unittest
 
 import pandas as pd
 
-from scripts.import_attractions import build_attractions
+from scripts.import_attractions import (
+    _structured_accessibility,
+    build_attractions,
+    load_verified_accessibility,
+)
 
 
 class ImportAttractionsTests(unittest.TestCase):
+    def test_verified_accessibility_workbook_contains_66_unique_records(self):
+        accessibility = load_verified_accessibility()
+
+        self.assertEqual(len(accessibility), 66)
+        self.assertEqual(accessibility["spot_id"].nunique(), 66)
+        self.assertEqual(
+            set(accessibility["evidence_tier"].str.casefold()),
+            {"verified"},
+        )
+
     def test_merge_preserves_verified_legacy_fields_and_excludes_rejected(self):
         legacy = pd.DataFrame([{
             "attraction_id": "A001",
@@ -135,6 +149,83 @@ class ImportAttractionsTests(unittest.TestCase):
             result.iloc[1]["elderly_recommendation_eligibility"],
             "Excluded",
         )
+
+    def test_accessibility_overlay_marks_only_matching_records_eligible(self):
+        master = pd.DataFrame([
+            {
+                "candidate_id": "MC0100",
+                "attraction_name": "Verified Place",
+                "state_territory": "Penang",
+                "primary_category": "Park",
+                "review_status": "Complete",
+            },
+            {
+                "candidate_id": "MC0101",
+                "attraction_name": "General Place",
+                "state_territory": "Penang",
+                "primary_category": "Park",
+                "review_status": "Complete",
+            },
+        ])
+        accessibility = pd.DataFrame([{
+            "spot_id": "MC0100",
+            "attraction_name": "Verified Place",
+            "evidence_tier": "Verified",
+            "elderly_suitability": "Suitable with assistance",
+            "documented_likely_accessibility_features": (
+                "Step-free access (partial); Resting seats; "
+                "Accessible toilet; Accessible parking"
+            ),
+            "elderly_accessibility_notes": (
+                "The main visitor area has a lower-barrier route."
+            ),
+            "why_it_qualifies": "A documented visitor route is available.",
+            "evidence_source_s": "https://example.org/accessibility",
+            "more_info_link_s": "https://example.org/place",
+        }])
+
+        result = build_attractions(master, pd.DataFrame(), accessibility)
+        verified = result[result["attraction_id"] == "MC0100"].iloc[0]
+        general = result[result["attraction_id"] == "MC0101"].iloc[0]
+
+        self.assertEqual(
+            verified["elderly_recommendation_eligibility"],
+            "Eligible",
+        )
+        self.assertEqual(verified["elderly_friendly"], "Partial")
+        self.assertEqual(verified["step_free_access"], "Partial")
+        self.assertEqual(verified["resting_seats_available"], "Yes")
+        self.assertEqual(verified["accessible_toilet"], "Yes")
+        self.assertEqual(verified["parking_proximity"], "Near")
+        self.assertEqual(
+            verified["accessibility_evidence_source"],
+            "https://example.org/accessibility",
+        )
+        self.assertEqual(
+            general["elderly_recommendation_eligibility"],
+            "General only",
+        )
+
+    def test_structured_accessibility_keeps_unknown_features_conservative(self):
+        values = _structured_accessibility(
+            "Rest huts; Step-free/wheelchair access not documented",
+            "Suitable with assistance",
+        )
+
+        self.assertEqual(values["elderly_friendly"], "Partial")
+        self.assertEqual(values["wheelchair_accessible"], "Unknown")
+        self.assertEqual(values["step_free_access"], "Unknown")
+        self.assertEqual(values["shelter_available"], "Yes")
+
+    def test_structured_accessibility_recognises_step_free_boardwalk(self):
+        values = _structured_accessibility(
+            "Wheelchair-accessible boardwalk; step-free flat wooden walkway",
+            "Suitable",
+        )
+
+        self.assertEqual(values["elderly_friendly"], "Yes")
+        self.assertEqual(values["wheelchair_accessible"], "Yes")
+        self.assertEqual(values["step_free_access"], "Yes")
 
 
 if __name__ == "__main__":

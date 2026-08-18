@@ -379,6 +379,17 @@ function showRecommendations(items) {
       card.appendChild(accessSection);
     }
 
+    if (item.accessibility_reason) {
+      const reasonSection = document.createElement("section");
+      reasonSection.className = "accessibility-reason";
+      const reasonHeading = document.createElement("h4");
+      reasonHeading.textContent = "Why it may suit elderly visitors";
+      const reasonText = document.createElement("p");
+      reasonText.textContent = item.accessibility_reason;
+      reasonSection.append(reasonHeading, reasonText);
+      card.appendChild(reasonSection);
+    }
+
     if (item.accessibility_notes) {
       const accessNote = document.createElement("p");
       accessNote.className = "accessibility-note";

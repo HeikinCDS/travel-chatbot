@@ -309,6 +309,9 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
 .accessibility-negative { border-left: 4px solid var(--error); }
 .accessibility-unknown { border-left: 4px solid var(--line); color: var(--muted); }
 .accessibility-note { margin-top: 0.7rem !important; padding: 0.6rem; border-left: 4px solid var(--accent); background: var(--accent-soft); font-size: 0.78rem; }
+.accessibility-reason { margin-top: 0.7rem; padding: 0.75rem; border-left: 4px solid var(--accent); background: var(--accent-soft); }
+.accessibility-reason h4 { margin: 0 0 0.35rem; font-size: 0.9rem; }
+.accessibility-reason p { margin: 0; }
 .verification-note { padding: 0.6rem; border-left: 4px solid var(--focus); background: var(--surface-soft); color: var(--muted); font-size: 0.82rem; }
 .source-links { display: grid; gap: 0.3rem; margin-top: 0.75rem; }
 .source-links strong { font-size: 0.85rem; }

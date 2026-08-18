@@ -20,6 +20,10 @@ from recommendation_engine.recommendation_engine import rebuild_search_index
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 MASTER_EXCEL_PATH = PROJECT_DIR / "data" / "Malaysia_Tourism_Master_Candidates.xlsx"
 LEGACY_EXCEL_PATH = PROJECT_DIR / "data" / "FYP_Malaysia_Tourism_Dataset.xlsx"
+ACCESSIBILITY_EXCEL_PATH = (
+    PROJECT_DIR / "data"
+    / "Elderly_Friendly_Malaysia_Travel_Spots_Verified.xlsx"
+)
 DATABASE_PATH = PROJECT_DIR / "instance" / "travel_recommender.db"
 
 DATABASE_COLUMNS = [
@@ -42,6 +46,17 @@ DATABASE_COLUMNS = [
 CONFIRMED_STATUSES = {"approved", "complete", "completed", "confirmed"}
 APPLICATION_STATE_NAMES = {
     "W.P. Kuala Lumpur": "Kuala Lumpur",
+}
+VERIFIED_ACCESSIBILITY_COLUMNS = {
+    "spot_id",
+    "attraction_name",
+    "evidence_tier",
+    "elderly_suitability",
+    "documented_likely_accessibility_features",
+    "elderly_accessibility_notes",
+    "why_it_qualifies",
+    "evidence_source_s",
+    "more_info_link_s",
 }
 
 
@@ -111,9 +126,198 @@ def load_master_candidates(path: Path = MASTER_EXCEL_PATH) -> pd.DataFrame:
     return _normalise_columns(dataframe)
 
 
+def load_verified_accessibility(
+    path: Path = ACCESSIBILITY_EXCEL_PATH,
+) -> pd.DataFrame:
+    """Load and validate the curated elderly-accessibility overlay."""
+
+    dataframe = pd.read_excel(path, sheet_name="Elderly-Friendly Spots")
+    dataframe = dataframe.dropna(subset=["Spot ID", "Attraction Name"])
+    dataframe = _normalise_columns(dataframe)
+    missing = VERIFIED_ACCESSIBILITY_COLUMNS - set(dataframe.columns)
+    if missing:
+        raise ValueError(
+            "The accessibility workbook is missing columns: "
+            + ", ".join(sorted(missing))
+        )
+    duplicate_ids = dataframe[
+        dataframe["spot_id"].astype(str).str.strip().duplicated()
+    ]["spot_id"].tolist()
+    if duplicate_ids:
+        raise ValueError(f"Duplicate accessibility Spot IDs: {duplicate_ids}")
+    unverified = dataframe[
+        dataframe["evidence_tier"].astype(str).str.strip().str.casefold()
+        != "verified"
+    ]
+    if not unverified.empty:
+        raise ValueError(
+            "Every accessibility overlay row must have Evidence Tier "
+            f"'Verified': {unverified['spot_id'].tolist()}"
+        )
+    return dataframe
+
+
+def _contains_any(text: str, patterns: tuple[str, ...]) -> bool:
+    return any(re.search(pattern, text, flags=re.IGNORECASE) for pattern in patterns)
+
+
+def _structured_accessibility(
+    feature_text: str | None,
+    suitability: str | None,
+) -> dict[str, str]:
+    """Conservatively derive filter fields from the curated feature summary."""
+
+    features = (feature_text or "").strip()
+    folded = features.casefold()
+    suitability_value = (suitability or "").strip()
+    elderly_friendly = {
+        "suitable": "Yes",
+        "suitable with assistance": "Partial",
+        "not recommended": "No",
+    }.get(suitability_value.casefold(), "Unknown")
+
+    walking_match = re.search(
+        r"walking difficulty:\s*(low|moderate|high)",
+        features,
+        flags=re.IGNORECASE,
+    )
+    walking = walking_match.group(1).title() if walking_match else "Unknown"
+
+    wheelchair = "Unknown"
+    if "wheelchair" in folded:
+        if _contains_any(folded, (
+            r"wheelchair[^;.]*(?:not documented|not confirmed)",
+            r"not wheelchair[- ]accessible",
+            r"no wheelchair access",
+        )):
+            wheelchair = "Unknown"
+        elif _contains_any(folded, (
+            r"partial",
+            r"ground floor only",
+            r"selected areas",
+            r"upper floor[^;.]*(?:not|no )",
+            r"broader .* not",
+        )):
+            wheelchair = "Partial"
+        elif _contains_any(folded, (
+            r"wheelchair[- ]accessible",
+            r"wheelchair access",
+            r"wheelchair friendly",
+            r"wheelchair provision",
+            r"wheelchair rental",
+        )):
+            wheelchair = "Yes"
+
+    if re.search(r"step-free access\s*\(partial\)", folded):
+        step_free = "Partial"
+    elif _contains_any(folded, (
+        r"no step-free route",
+        r"step-free[^;.]*(?:not documented|not confirmed)",
+    )):
+        step_free = "No" if "no step-free route" in folded else "Unknown"
+    elif _contains_any(folded, (
+        r"step-free access",
+        r"step-free (?:flat )?(?:wooden )?(?:walkway|boardwalk|route)",
+        r"fully step-free",
+        r"flat,? step-free",
+    )):
+        step_free = "Yes"
+    else:
+        step_free = "Unknown"
+
+    if re.search(r"shelter available\s*\(partial\)", folded):
+        shelter = "Partial"
+    elif _contains_any(folded, (
+        r"shelter available",
+        r"rest huts?",
+        r"covered rest",
+    )):
+        shelter = "Yes"
+    else:
+        shelter = "Unknown"
+
+    seating = "Yes" if _contains_any(folded, (
+        r"resting seats?",
+        r"seating(?:/rest)? areas?",
+        r"rest areas?",
+        r"benches",
+        r"rest huts?",
+    )) else "Unknown"
+
+    toilet_negative = _contains_any(folded, (
+        r"accessible[- ]toilet[^;.]*(?:not documented|not confirmed)",
+        r"accessible[- ]restroom[^;.]*(?:not documented|not confirmed)",
+        r"no accessible (?:toilet|restroom)",
+    ))
+    toilet = "Unknown"
+    if not toilet_negative and _contains_any(folded, (
+        r"accessible toilet",
+        r"accessible restroom",
+        r"pwd washroom",
+        r"oku toilet",
+    )):
+        toilet = "Yes"
+
+    if _contains_any(folded, (
+        r"parking proximity:\s*near",
+        r"designated accessible parking",
+        r"accessible parking",
+        r"oku parking",
+        r"nearby drop-off",
+    )):
+        parking = "Near"
+    elif "parking" in folded:
+        parking = "Moderate"
+    else:
+        parking = "Unknown"
+
+    return {
+        "elderly_friendly": elderly_friendly,
+        "wheelchair_accessible": wheelchair,
+        "walking_difficulty": walking,
+        "step_free_access": step_free,
+        "resting_seats_available": seating,
+        "accessible_toilet": toilet,
+        "parking_proximity": parking,
+        "shelter_available": shelter,
+        "elderly_suitability": suitability_value or "Unknown",
+    }
+
+
+def _apply_accessibility_overlay(
+    record: dict[str, Any],
+    accessibility: dict[str, Any],
+) -> None:
+    features = _text(
+        accessibility.get("documented_likely_accessibility_features")
+    )
+    notes = _text(accessibility.get("elderly_accessibility_notes"))
+    suitability = _text(accessibility.get("elderly_suitability"))
+    structured_text = "; ".join(
+        value for value in (features, notes) if value
+    )
+    record.update(_structured_accessibility(structured_text, suitability))
+    record.update({
+        "elderly_recommendation_eligibility": "Eligible",
+        "accessibility_notes": notes,
+        "elderly_accessibility_notes": notes,
+        "accessibility_evidence_source": _text(
+            accessibility.get("evidence_source_s")
+        ),
+        "accessibility_screening_notes": _text(
+            accessibility.get("why_it_qualifies")
+        ),
+    })
+    info_url = _first_direct_url(accessibility.get("more_info_link_s"))
+    if info_url:
+        record["official_url"] = info_url
+        record["source_url"] = info_url
+
+
 def build_attractions(
     master_candidates: pd.DataFrame,
     legacy_attractions: pd.DataFrame,
+    accessibility_records: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Merge confirmed master candidates with detailed legacy records."""
 
@@ -122,14 +326,24 @@ def build_attractions(
         for _, row in legacy_attractions.iterrows()
         if _text(row.get("attraction_id"))
     }
+    accessibility_by_id = {}
+    if accessibility_records is not None:
+        accessibility_by_id = {
+            str(row["spot_id"]).strip(): row.to_dict()
+            for _, row in accessibility_records.iterrows()
+            if _text(row.get("spot_id"))
+        }
+
     records = []
     for _, candidate in master_candidates.iterrows():
         status = (_text(candidate.get("review_status")) or "").casefold()
         if status not in CONFIRMED_STATUSES:
             continue
 
-        eligibility = _text(
-            candidate.get("elderly_recommendation_eligibility")
+        eligibility = (
+            "General only" if accessibility_records is not None else _text(
+                candidate.get("elderly_recommendation_eligibility")
+            )
         )
         candidate_id = _text(candidate.get("candidate_id"))
         existing_id = _text(candidate.get("existing_record_id"))
@@ -205,6 +419,10 @@ def build_attractions(
             elif not _known(record.get(field)):
                 record[field] = default
 
+        accessibility = accessibility_by_id.get(candidate_id or "")
+        if accessibility:
+            _apply_accessibility_overlay(record, accessibility)
+
         if not _known(record.get("completeness")):
             record["completeness"] = _completion_score(record)
         records.append(record)
@@ -221,11 +439,23 @@ def build_attractions(
 def import_attractions(
     master_path: Path = MASTER_EXCEL_PATH,
     legacy_path: Path = LEGACY_EXCEL_PATH,
+    accessibility_path: Path = ACCESSIBILITY_EXCEL_PATH,
     database_path: Path = DATABASE_PATH,
 ) -> int:
     master = load_master_candidates(master_path)
     legacy = load_legacy_attractions(legacy_path)
-    attractions = build_attractions(master, legacy)
+    accessibility = load_verified_accessibility(accessibility_path)
+    attractions = build_attractions(master, legacy, accessibility)
+
+    missing_ids = sorted(
+        set(accessibility["spot_id"].astype(str).str.strip())
+        - set(attractions["candidate_id"].dropna().astype(str).str.strip())
+    )
+    if missing_ids:
+        raise ValueError(
+            "Accessibility Spot IDs are absent from the confirmed catalogue: "
+            + ", ".join(missing_ids)
+        )
 
     database_path.parent.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(database_path) as connection:
@@ -243,8 +473,8 @@ def main() -> None:
     count = import_attractions()
     print(f"Successfully imported {count} confirmed attractions.")
     print(f"Database created at: {DATABASE_PATH}")
-    print("Elderly-ineligible attractions remain available for general travel searches.")
-    print("Elderly and accessibility requests use the workbook eligibility filter.")
+    print("All confirmed attractions remain available for general travel searches.")
+    print("Elderly and accessibility requests use the 66-record verified overlay.")
     print("Run scripts/build_semantic_index.py before enabling semantic search.")
 
 

@@ -364,16 +364,26 @@ def recommend_attractions(
             "LOWER(family_friendly) = 'yes'"
         )
 
+    accessibility_requested = bool(
+        elderly_friendly or wheelchair_accessible or accessibility_needs
+    )
+
+    if accessibility_requested:
+        conditions.append("""
+            LOWER(COALESCE(elderly_recommendation_eligibility, ''))
+            = 'eligible'
+        """)
+
     if elderly_friendly:
         conditions.append("""
             LOWER(COALESCE(NULLIF(TRIM(elderly_friendly), ''), 'unknown'))
-            != 'no'
+            IN ('yes', 'partial')
         """)
 
     if wheelchair_accessible:
         conditions.append("""
             LOWER(COALESCE(NULLIF(TRIM(wheelchair_accessible), ''), 'unknown'))
-            != 'no'
+            IN ('yes', 'partial')
         """)
 
     where_clause = ""
@@ -408,6 +418,7 @@ def recommend_attractions(
             elderly_accessibility_notes,
             elderly_recommendation_eligibility,
             accessibility_evidence_source,
+            accessibility_screening_notes,
             official_url,
             source_url,
             date_verified,
@@ -500,6 +511,7 @@ def get_attraction_by_id(attraction_id):
             elderly_accessibility_notes,
             elderly_recommendation_eligibility,
             accessibility_evidence_source,
+            accessibility_screening_notes,
             official_url,
             source_url
         FROM attractions
@@ -549,6 +561,7 @@ def find_attraction_by_name_in_text(text):
             elderly_accessibility_notes,
             elderly_recommendation_eligibility,
             accessibility_evidence_source,
+            accessibility_screening_notes,
             official_url,
             source_url
         FROM attractions

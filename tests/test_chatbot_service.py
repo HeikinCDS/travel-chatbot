@@ -71,6 +71,41 @@ class ChatbotServiceTests(unittest.TestCase):
             "url": "https://example.org/access",
         }])
 
+    def test_eligible_attraction_exposes_why_it_suits_elderly_visitors(self):
+        presented = _present_attraction({
+            "attraction_name": "Accessible Garden",
+            "short_description": "A quiet public garden.",
+            "elderly_recommendation_eligibility": "Eligible",
+            "accessibility_screening_notes": (
+                "A level boardwalk and resting areas reduce walking barriers."
+            ),
+        })
+
+        self.assertEqual(
+            presented["accessibility_reason"],
+            "A level boardwalk and resting areas reduce walking barriers.",
+        )
+
+    def test_tanjung_piai_information_explains_elderly_accessibility(self):
+        session = ChatSession(latest_recommendation_ids=["A036"])
+        response = self.make_service("request_information").process_message(
+            "Tell me about Tanjung Piai National Park",
+            session,
+        )
+
+        self.assertEqual(response.action, "information")
+        self.assertIn("Why it may suit elderly visitors", response.reply)
+        self.assertIn("wheelchair-accessible boardwalk", response.reply)
+        self.assertEqual(
+            response.recommendations[0]["accessibility_reason"],
+            (
+                "Confirmed wheelchair-accessible boardwalk for most of its "
+                "length by independent travel guide; official Johor National "
+                "Parks site confirms extensive boardwalk network with "
+                "observation towers; senior discount pricing explicitly listed."
+            ),
+        )
+
     def test_specific_accessibility_need_overrides_wrong_intent_prediction(self):
         session = ChatSession()
         response = self.make_service("goodbye").process_message(
@@ -867,11 +902,11 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertIn("still saved", response.reply)
         self.assertGreater(len(response.suggestions), 0)
 
-    def test_elderly_request_can_use_full_collection(self):
+    def test_elderly_request_uses_verified_accessibility_collection(self):
         session = ChatSession(
             context=ConversationContext(
                 state="Perak",
-                interests=["nature"],
+                interests=["history"],
                 elderly_friendly=True,
                 accessibility_needs=["low_walking"],
             ),
@@ -886,6 +921,10 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertTrue(response.recommendations)
         self.assertTrue(all(
             item["state_territory"] == "Perak"
+            for item in response.recommendations
+        ))
+        self.assertTrue(all(
+            item["elderly_recommendation_eligibility"] == "Eligible"
             for item in response.recommendations
         ))
 

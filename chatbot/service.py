@@ -305,6 +305,7 @@ def _accessibility_detail(attraction: Mapping[str, Any]) -> str | None:
         "information is not available",
         "information has not been verified",
         "information has not been confirmed",
+        "confirmed via independent research pass",
     )
     note_is_specific = note and not any(
         marker in note.casefold() for marker in generic_markers
@@ -421,9 +422,14 @@ def _present_attraction(attraction: Mapping[str, Any]) -> dict[str, Any]:
             if unique_evidence_urls
             else []
         )
+        reason = str(
+            attraction.get("accessibility_screening_notes") or ""
+        ).strip()
+        result["accessibility_reason"] = reason or None
     else:
         result["accessibility_evidence_badge"] = None
         result["accessibility_evidence_links"] = []
+        result["accessibility_reason"] = None
     # Source links remain visible on the card. Missing facts are omitted instead
     # of repeatedly warning travellers that each individual field is unverified.
     result["verification_note"] = None
@@ -1175,6 +1181,9 @@ class ChatbotService:
             attraction.get("duration_summary"),
             attraction.get("accessibility_summary"),
         ]
+        reason = attraction.get("accessibility_reason")
+        if reason:
+            details.append(f"Why it may suit elderly visitors: {reason}")
         access = attraction.get("accessibility_notes")
         if access:
             details.append(access)
