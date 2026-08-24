@@ -28,6 +28,18 @@ class IntentClassifierRuntimeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.classifier.predict("   ")
 
+    def test_jomvoyage_usage_question_is_classified_as_help(self):
+        prediction = self.classifier.predict(
+            "How can I use Maya to plan a trip?"
+        )
+        self.assertEqual(prediction.label, "help")
+
+    def test_non_travel_question_is_classified_as_out_of_scope(self):
+        prediction = self.classifier.predict(
+            "How do I repair my laptop?"
+        )
+        self.assertEqual(prediction.label, "out_of_scope")
+
 
 if __name__ == "__main__":
     unittest.main()
