@@ -10,7 +10,6 @@ const sidebarToggleButton = document.querySelector("#sidebar-toggle-button");
 const easyAccessStartButton = document.querySelector("#easy-access-start-button");
 const tripSidebar = document.querySelector("#trip-sidebar");
 const messages = document.querySelector("#messages");
-const recommendations = document.querySelector("#recommendations");
 const quickReplies = document.querySelector("#quick-replies");
 const preferences = document.querySelector("#preference-list");
 const formStatus = document.querySelector("#form-status");
@@ -196,6 +195,7 @@ function addMessage(text, sender) {
   messages.appendChild(row);
   registerHistoryItem(row, text, sender);
   row.scrollIntoView({ block: "nearest" });
+  return row;
 }
 
 const initialMessageRow = messages.querySelector(".message-row");
@@ -291,8 +291,19 @@ function showPreferences(context) {
   }
 }
 
-function showRecommendations(items) {
-  recommendations.replaceChildren();
+function showRecommendations(items, messageRow) {
+  if (!messageRow || !Array.isArray(items) || !items.length) return;
+
+  const content = messageRow.querySelector(".message-content");
+  if (!content) return;
+  content.classList.add("has-recommendations");
+
+  const recommendationGroup = document.createElement("section");
+  recommendationGroup.className = "recommendations message-recommendations";
+  recommendationGroup.setAttribute(
+    "aria-label",
+    "Attractions recommended in this reply",
+  );
   for (const item of items || []) {
     const card = document.createElement("article");
     card.className = "recommendation-card";
@@ -432,8 +443,9 @@ function showRecommendations(items) {
       }
       card.appendChild(sourceBlock);
     }
-    recommendations.appendChild(card);
+    recommendationGroup.appendChild(card);
   }
+  content.appendChild(recommendationGroup);
 }
 
 function showQuickReplies(suggestions) {
@@ -468,9 +480,10 @@ async function submitMessage(message) {
 
   try {
     const data = await sendJson("/api/chat", { message });
-    addMessage(data.reply, "bot");
+    const replyRow = addMessage(data.reply, "bot");
     showPreferences(data.context);
-    showRecommendations(data.recommendations);
+    showRecommendations(data.recommendations, replyRow);
+    replyRow.scrollIntoView({ block: "nearest" });
     showQuickReplies(data.suggestions);
     formStatus.textContent = "";
   } catch (error) {
@@ -614,7 +627,6 @@ resetButton.addEventListener("click", async () => {
     messageCounter = 0;
     addMessage(data.reply, "bot");
     showPreferences({});
-    showRecommendations([]);
     showQuickReplies(data.suggestions);
     formStatus.textContent = "";
   } catch (error) {
@@ -631,9 +643,9 @@ preferenceResetButton.addEventListener("click", async () => {
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
   try {
     const data = await sendJson("/api/reset-preferences");
-    addMessage(data.reply, "bot");
+    const replyRow = addMessage(data.reply, "bot");
     showPreferences(data.context);
-    showRecommendations(data.recommendations);
+    showRecommendations(data.recommendations, replyRow);
     showQuickReplies(data.suggestions);
     formStatus.textContent = "Trip preferences cleared.";
   } catch (error) {

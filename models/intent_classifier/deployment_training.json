@@ -1,0 +1,129 @@
+{
+  "retrained_on_all_examples": true,
+  "training_examples": 655,
+  "epochs": 30,
+  "seed": 42,
+  "evaluation_reports_describe_split_model": true,
+  "training_history": [
+    {
+      "epoch": 1,
+      "textcat_loss": 15.004608
+    },
+    {
+      "epoch": 2,
+      "textcat_loss": 10.947484
+    },
+    {
+      "epoch": 3,
+      "textcat_loss": 5.823306
+    },
+    {
+      "epoch": 4,
+      "textcat_loss": 2.993019
+    },
+    {
+      "epoch": 5,
+      "textcat_loss": 1.778598
+    },
+    {
+      "epoch": 6,
+      "textcat_loss": 0.907342
+    },
+    {
+      "epoch": 7,
+      "textcat_loss": 0.696635
+    },
+    {
+      "epoch": 8,
+      "textcat_loss": 0.509909
+    },
+    {
+      "epoch": 9,
+      "textcat_loss": 0.187065
+    },
+    {
+      "epoch": 10,
+      "textcat_loss": 0.114906
+    },
+    {
+      "epoch": 11,
+      "textcat_loss": 0.086707
+    },
+    {
+      "epoch": 12,
+      "textcat_loss": 0.146904
+    },
+    {
+      "epoch": 13,
+      "textcat_loss": 0.063294
+    },
+    {
+      "epoch": 14,
+      "textcat_loss": 0.098977
+    },
+    {
+      "epoch": 15,
+      "textcat_loss": 0.266924
+    },
+    {
+      "epoch": 16,
+      "textcat_loss": 0.06657
+    },
+    {
+      "epoch": 17,
+      "textcat_loss": 0.134752
+    },
+    {
+      "epoch": 18,
+      "textcat_loss": 0.144967
+    },
+    {
+      "epoch": 19,
+      "textcat_loss": 0.130688
+    },
+    {
+      "epoch": 20,
+      "textcat_loss": 0.204281
+    },
+    {
+      "epoch": 21,
+      "textcat_loss": 0.166833
+    },
+    {
+      "epoch": 22,
+      "textcat_loss": 0.108607
+    },
+    {
+      "epoch": 23,
+      "textcat_loss": 0.019181
+    },
+    {
+      "epoch": 24,
+      "textcat_loss": 0.029828
+    },
+    {
+      "epoch": 25,
+      "textcat_loss": 0.002229
+    },
+    {
+      "epoch": 26,
+      "textcat_loss": 0.060311
+    },
+    {
+      "epoch": 27,
+      "textcat_loss": 0.123154
+    },
+    {
+      "epoch": 28,
+      "textcat_loss": 0.076559
+    },
+    {
+      "epoch": 29,
+      "textcat_loss": 0.226978
+    },
+    {
+      "epoch": 30,
+      "textcat_loss": 0.15846
+    }
+  ]
+}

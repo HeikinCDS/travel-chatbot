@@ -259,6 +259,10 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
 .assistant-row { align-items: flex-start; }
 .user-row { justify-content: flex-end; }
 .message-content { min-width: 0; max-width: min(710px, calc(100vw - 6rem)); }
+.assistant-row .message-content.has-recommendations {
+  flex: 1;
+  max-width: calc(100% - 3.25rem);
+}
 .speaker-name { margin: 0 0 0.25rem; color: var(--muted); font-size: 0.82rem; font-weight: 800; }
 .assistant-message { padding: 0.2rem 0; }
 .assistant-message p, .user-message p { margin: 0; white-space: pre-wrap; }
@@ -269,7 +273,7 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
   display: none;
 }
 
-.recommendations { display: grid; grid-template-columns: repeat(auto-fit, minmax(245px, 1fr)); gap: 0.8rem; margin: 0.5rem 0 1rem 3.25rem; }
+.recommendations { display: grid; grid-template-columns: repeat(auto-fit, minmax(225px, 1fr)); gap: 0.8rem; margin: 0.75rem 0 0; }
 .recommendation-card { padding: 1rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
 .recommendation-card h3 { margin: 0 0 0.35rem; font-size: 1.05rem; }
 .recommendation-card p { margin: 0 0 0.45rem; }
@@ -407,6 +411,7 @@ button:disabled { cursor: wait; opacity: 0.6; }
   .intro-card { flex-direction: column; }
   .help-details { width: 100%; }
   .recommendations, .choice-area { margin-left: 0; }
+  .assistant-row .message-content.has-recommendations { max-width: calc(100vw - 5rem); }
   .message-content { max-width: calc(100vw - 5rem); }
   .chat-form { border-radius: 14px; }
   .send-button { min-width: 82px; }

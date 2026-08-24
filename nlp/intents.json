@@ -42,7 +42,13 @@
                                          "Hey assistant",
                                          "Hi travel chatbot",
                                          "Good afternoon, how are you?",
-                                         "Hello and good day"
+                                         "Hello and good day",
+                                         "Evening Maya, are you ready?",
+                                         "Good morning, let us plan something",
+                                         "Hello Maya, shall we get started?",
+                                         "Hi again, I am ready to begin",
+                                         "Greetings Maya, let us have a chat",
+                                         "Good day, can we begin planning?"
                                      ]
                     },
                     {
@@ -99,7 +105,19 @@
                                          "Recommend an elderly-friendly attraction with a lift or ramp",
                                          "Find a calm place for an older adult who gets tired easily",
                                          "I need somewhere close to parking for my elderly parents",
-                                         "Show me an easy-access destination for a person with limited mobility"
+                                         "Show me an easy-access destination for a person with limited mobility",
+                                         "Find a wheelchair-accessible attraction in Melaka",
+                                         "Suggest somewhere in Johor with easy paths",
+                                         "I am searching for a museum that an older adult can visit",
+                                         "Recommend a place in Sabah for a visitor using a walking frame",
+                                         "Where could my grandmother spend a comfortable afternoon?",
+                                         "Find senior-friendly attractions near Kuala Lumpur",
+                                         "Can you locate a park in Selangor with accessible facilities?",
+                                         "I need a destination with minimal walking in Kedah",
+                                         "Suggest an attraction that provides convenient access for seniors",
+                                         "Which Penang attraction is suitable for limited mobility?",
+                                         "Find somewhere cultural and accessible in Perak",
+                                         "Recommend a destination with wheelchair access in Malaysia"
                                      ]
                     },
                     {
@@ -156,7 +174,19 @@
                                          "Show places with shade because my mother cannot stay in the sun",
                                          "Keep Penang but find somewhere easier for my elderly father",
                                          "Remove attractions that need a long walk",
-                                         "Update the search to include benches and ramps"
+                                         "Update the search to include benches and ramps",
+                                         "Now prioritise places with seating areas",
+                                         "Change the interest from islands to heritage",
+                                         "Instead, limit the results to gentle walking routes",
+                                         "Update my preference to wheelchair access",
+                                         "Make parking proximity more important",
+                                         "Replace the beach preference with museums",
+                                         "I have changed my budget to forty ringgit",
+                                         "From now on, search in Pahang rather than Perak",
+                                         "Adjust the plan for somebody who uses a cane",
+                                         "Please change the trip type to cultural tourism",
+                                         "Modify my selections to include sheltered places",
+                                         "I want fewer stairs in the recommended attractions"
                                      ]
                     },
                     {
@@ -213,7 +243,17 @@
                                          "Would an elderly visitor need assistance here?",
                                          "Is this attraction suitable for someone who gets tired easily?",
                                          "What mobility facilities are recorded for this place?",
-                                         "Why is this place recommended for senior citizens?"
+                                         "Why is this place recommended for senior citizens?",
+                                         "Which activities can visitors enjoy at the chosen attraction?",
+                                         "Describe what people normally do at this location",
+                                         "Does the current result provide rest areas?",
+                                         "Tell me about the amenities at the selected destination",
+                                         "What makes the second place worth visiting?",
+                                         "How accessible is the attraction you just showed?",
+                                         "Is parking located near the entrance of that place?",
+                                         "What should I know before visiting this result?",
+                                         "Explain the elderly-friendly features of the selected attraction",
+                                         "How difficult is it to walk around this destination?"
                                      ]
                     },
                     {
@@ -258,7 +298,47 @@
                                          "This result is not for me, show another",
                                          "Give me an alternative to the current place",
                                          "Next recommendation please",
-                                         "Keep my preferences and suggest another place"
+                                         "Keep my preferences and suggest another place",
+                                         "None of the displayed places interest me",
+                                         "Please load the following group of matching results",
+                                         "Can I look at some additional attractions?",
+                                         "Skip these choices and continue to the next ones",
+                                         "I do not want any of the current three",
+                                         "Offer several different places using the same filters",
+                                         "Let me browse more matching destinations",
+                                         "These suggestions are unsuitable, find replacements",
+                                         "Continue searching for other attractions",
+                                         "Please give me three new choices",
+                                         "I would prefer options that were not shown yet",
+                                         "Move past this set and continue the recommendations",
+                                         "Are more matching results available?",
+                                         "Show the following page of destinations",
+                                         "I reject these choices and want different ones",
+                                         "Could you bring up more places to consider?",
+                                         "Present another batch of suitable attractions",
+                                         "I need other possibilities besides these",
+                                         "Please continue with further recommendations",
+                                         "Do not use these results; display different attractions",
+                                         "Let me see more destinations with my existing preferences",
+                                         "Find alternatives to all three current suggestions",
+                                         "I would like another collection of results",
+                                         "What additional places match my trip?",
+                                         "Cycle to the next available recommendations",
+                                         "These are not right for me, keep searching",
+                                         "Offer other locations without resetting anything",
+                                         "Show further attractions that fit the same request",
+                                         "Can we move to the next three places?",
+                                         "Give me more choices from the saved collection",
+                                         "I want to compare a different set of destinations",
+                                         "Please replace every displayed option",
+                                         "Continue browsing beyond these recommendations",
+                                         "Are there more results after this group?",
+                                         "Find me some other matching options",
+                                         "Let us look at different places instead",
+                                         "Bring up the next available attractions",
+                                         "I dislike this group, please suggest a new group",
+                                         "More options using the same state and interests, please",
+                                         "Do you have further destinations for me?"
                                      ]
                     },
                     {
@@ -303,7 +383,15 @@
                                          "Forget every preference I entered",
                                          "Restart without keeping any filters",
                                          "Clear my session and begin again",
-                                         "Start from zero"
+                                         "Start from zero",
+                                         "Restore the planner to its initial settings",
+                                         "Return everything to the beginning and remove my choices",
+                                         "Put the conversation back to a blank state",
+                                         "Remove the complete trip and open a clean session",
+                                         "Begin again with no location or interests stored",
+                                         "Undo the whole plan and clear all details",
+                                         "Reset every saved item to the default",
+                                         "Abandon all current selections and restart Maya"
                                      ]
                     },
                     {
@@ -453,7 +541,19 @@
                                          "I will end the chat here",
                                          "My planning is complete, thank you",
                                          "Okay bye, talk to you later",
-                                         "I am signing off now"
+                                         "I am signing off now",
+                                         "That concludes my search, thank you Maya",
+                                         "I will come back another day, goodbye",
+                                         "My travel planning has now ended",
+                                         "I have completed the search and can leave",
+                                         "There is nothing else I need today",
+                                         "We can finish this conversation now",
+                                         "I am all done with JomVoyage",
+                                         "Thank you, I will return in the future",
+                                         "Close our planning session please",
+                                         "I have enough information, farewell",
+                                         "The trip search is complete, bye Maya",
+                                         "That is the end of my session"
                                      ]
                     },
                     {
@@ -567,7 +667,37 @@
                                          "Can you help me understand my blood test?",
                                          "How can I recover deleted files?",
                                          "Explain the steps for filing income tax",
-                                         "Which smartphone has the best camera?"
+                                         "Which smartphone has the best camera?",
+                                         "Can you assist me in repairing my refrigerator?",
+                                         "Help me troubleshoot a noisy washing machine",
+                                         "How should I repair a damaged television?",
+                                         "Which processor is best for a desktop computer?",
+                                         "Help me select a graphics card for gaming",
+                                         "Can you compare two computer monitors?",
+                                         "Calculate the repayment amount for my bank loan",
+                                         "Work out the interest charged on this mortgage",
+                                         "How much tax must I pay on my salary?",
+                                         "Please improve the writing in my university report",
+                                         "Help rewrite this paragraph in formal English",
+                                         "Can you correct the grammar in my cover letter?",
+                                         "Which tablets are suitable for stomach discomfort?",
+                                         "What treatment should I use for back pain?",
+                                         "Help me understand these medical symptoms",
+                                         "Suggest a meal made with potatoes and eggs",
+                                         "What can I prepare for lunch with chicken?",
+                                         "Teach me to make a bowl of vegetable noodles",
+                                         "Can you produce a strength-training programme?",
+                                         "Help me exercise my shoulders and arms",
+                                         "Create a weekly fitness routine for me",
+                                         "Write a Java program that searches an array",
+                                         "Help debug an error in my website code",
+                                         "Can you build a spreadsheet formula for me?",
+                                         "Which company stock should a beginner purchase?",
+                                         "Advise me about investing in cryptocurrency",
+                                         "How should I divide my investment portfolio?",
+                                         "Write a poem for my partner's birthday",
+                                         "Create a short story about a space explorer",
+                                         "Translate these sentences into Korean"
                                      ]
                     }
                 ]

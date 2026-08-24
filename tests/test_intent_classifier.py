@@ -40,6 +40,18 @@ class IntentClassifierRuntimeTests(unittest.TestCase):
         )
         self.assertEqual(prediction.label, "out_of_scope")
 
+    def test_request_for_more_matching_places_is_an_alternative(self):
+        prediction = self.classifier.predict(
+            "Could you show more places that match these preferences?"
+        )
+        self.assertEqual(prediction.label, "request_alternative")
+
+    def test_help_word_does_not_make_a_technology_question_help(self):
+        prediction = self.classifier.predict(
+            "Can you help me choose a graphics card?"
+        )
+        self.assertEqual(prediction.label, "out_of_scope")
+
 
 if __name__ == "__main__":
     unittest.main()

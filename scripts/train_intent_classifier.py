@@ -62,6 +62,14 @@ def parse_args() -> argparse.Namespace:
         default=42,
         help="Random seed for a reproducible split and training run (default: 42)",
     )
+    parser.add_argument(
+        "--retrain-on-all",
+        action="store_true",
+        help=(
+            "After measuring the split model, train the deployable model on "
+            "all approved examples while retaining the split evaluation reports."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -348,11 +356,44 @@ def main() -> None:
         test_ratio=args.test_ratio,
     )
 
+    if args.retrain_on_all:
+        all_data = [
+            (text, label)
+            for label, examples in dataset.items()
+            for text in examples
+        ]
+        print("\nRetraining deployable model on all approved examples")
+        print("-" * 57)
+        deployed_nlp, deployment_history = train_model(
+            train_data=all_data,
+            labels=labels,
+            epochs=args.epochs,
+            seed=args.seed,
+        )
+        deployed_nlp.to_disk(output_path)
+        deployment = {
+            "retrained_on_all_examples": True,
+            "training_examples": len(all_data),
+            "epochs": args.epochs,
+            "seed": args.seed,
+            "evaluation_reports_describe_split_model": True,
+            "training_history": deployment_history,
+        }
+        with (output_path / "deployment_training.json").open(
+            "w", encoding="utf-8"
+        ) as file:
+            json.dump(deployment, file, indent=2, ensure_ascii=False)
+
     print("\nEvaluation")
     print("-" * 40)
     print(f"Accuracy: {metrics['accuracy']:.2%}")
     print(f"Macro F1 score: {metrics['macro_f1_score']:.2%}")
     print(f"Correct: {metrics['correct_predictions']}/{metrics['test_examples']}")
+    if args.retrain_on_all:
+        print(
+            "Deployed model retrained on all "
+            f"{sum(map(len, dataset.values()))} examples."
+        )
     print(f"Model and reports saved to: {output_path}")
 
 

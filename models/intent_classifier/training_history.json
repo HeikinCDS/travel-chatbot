@@ -1,122 +1,122 @@
 [
   {
     "epoch": 1,
-    "textcat_loss": 7.68707
+    "textcat_loss": 12.079767
   },
   {
     "epoch": 2,
-    "textcat_loss": 6.256708
+    "textcat_loss": 9.72884
   },
   {
     "epoch": 3,
-    "textcat_loss": 4.369464
+    "textcat_loss": 6.157621
   },
   {
     "epoch": 4,
-    "textcat_loss": 2.777758
+    "textcat_loss": 3.645282
   },
   {
     "epoch": 5,
-    "textcat_loss": 1.892625
+    "textcat_loss": 2.173102
   },
   {
     "epoch": 6,
-    "textcat_loss": 1.215027
+    "textcat_loss": 1.409899
   },
   {
     "epoch": 7,
-    "textcat_loss": 0.604242
+    "textcat_loss": 0.499501
   },
   {
     "epoch": 8,
-    "textcat_loss": 0.535083
+    "textcat_loss": 0.426554
   },
   {
     "epoch": 9,
-    "textcat_loss": 0.258328
+    "textcat_loss": 0.238724
   },
   {
     "epoch": 10,
-    "textcat_loss": 0.240216
+    "textcat_loss": 0.267061
   },
   {
     "epoch": 11,
-    "textcat_loss": 0.056732
+    "textcat_loss": 0.049249
   },
   {
     "epoch": 12,
-    "textcat_loss": 0.018901
+    "textcat_loss": 0.162097
   },
   {
     "epoch": 13,
-    "textcat_loss": 0.070053
+    "textcat_loss": 0.081047
   },
   {
     "epoch": 14,
-    "textcat_loss": 0.105284
+    "textcat_loss": 0.188114
   },
   {
     "epoch": 15,
-    "textcat_loss": 0.132821
+    "textcat_loss": 0.147501
   },
   {
     "epoch": 16,
-    "textcat_loss": 0.109075
+    "textcat_loss": 0.038712
   },
   {
     "epoch": 17,
-    "textcat_loss": 0.126593
+    "textcat_loss": 0.099899
   },
   {
     "epoch": 18,
-    "textcat_loss": 0.037193
+    "textcat_loss": 0.130645
   },
   {
     "epoch": 19,
-    "textcat_loss": 0.031023
+    "textcat_loss": 0.052238
   },
   {
     "epoch": 20,
-    "textcat_loss": 0.037496
+    "textcat_loss": 0.00412
   },
   {
     "epoch": 21,
-    "textcat_loss": 0.003611
+    "textcat_loss": 0.090233
   },
   {
     "epoch": 22,
-    "textcat_loss": 0.023652
+    "textcat_loss": 0.055829
   },
   {
     "epoch": 23,
-    "textcat_loss": 0.005671
+    "textcat_loss": 0.046798
   },
   {
     "epoch": 24,
-    "textcat_loss": 0.037878
+    "textcat_loss": 0.076298
   },
   {
     "epoch": 25,
-    "textcat_loss": 0.017841
+    "textcat_loss": 0.049898
   },
   {
     "epoch": 26,
-    "textcat_loss": 0.002085
+    "textcat_loss": 0.067095
   },
   {
     "epoch": 27,
-    "textcat_loss": 0.000753
+    "textcat_loss": 0.012673
   },
   {
     "epoch": 28,
-    "textcat_loss": 0.000173
+    "textcat_loss": 0.067383
   },
   {
     "epoch": 29,
-    "textcat_loss": 0.011392
+    "textcat_loss": 0.134279
   },
   {
     "epoch": 30,
-    "textcat_loss": 0.002562
+    "textcat_loss": 0.223162
   }
 ]

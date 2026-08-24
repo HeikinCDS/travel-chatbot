@@ -43,6 +43,10 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"JomVoyage", response.data)
         self.assertIn(b"Maya", response.data)
+        self.assertIn(
+            b"Plan holiday trip in Malaysia with Maya",
+            response.data,
+        )
         self.assertIn(b'id="message-input"', response.data)
         self.assertIn(b'id="voice-input-button"', response.data)
         self.assertIn(b'Speak your travel request', response.data)
@@ -56,7 +60,17 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertIn(b'id="trip-sidebar"', response.data)
         self.assertIn(b'id="chat-history"', response.data)
         self.assertIn(b'id="easy-access-start-button"', response.data)
-        self.assertIn(b"Plan an easy-access trip", response.data)
+        self.assertIn(b"Plan an elderly-friendly trip", response.data)
+
+    def test_chat_script_attaches_cards_to_their_maya_reply(self):
+        response = self.client.get("/static/chat.js")
+        self.addCleanup(response.close)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"message-recommendations", response.data)
+        self.assertIn(
+            b"showRecommendations(data.recommendations, replyRow)",
+            response.data,
+        )
 
     def test_health_endpoint(self):
         response = self.client.get("/health")
