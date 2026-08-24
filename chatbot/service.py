@@ -209,6 +209,18 @@ SHOW_PREVIOUS_OPTIONS_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+SHOW_MORE_OPTIONS_PATTERN = re.compile(
+    r"\b(?:show|give|find|see)\s+(?:me\s+)?(?:some\s+)?"
+    r"(?:more|additional|different)\s+"
+    r"(?:options?|choices?|recommendations?|results?|places?)\b|"
+    r"\b(?:more|additional|different)\s+"
+    r"(?:options?|choices?|recommendations?|results?|places?)\b|"
+    r"\b(?:show|give)\s+(?:me\s+)?(?:the\s+)?next\s+"
+    r"(?:three|3|few|options?|choices?|results?|places?)\b|"
+    r"\bwhat\s+else\s+(?:is\s+there|can\s+you\s+(?:show|recommend))\b",
+    re.IGNORECASE,
+)
+
 
 def _ranking_criterion(text: str) -> str | None:
     if ACCESS_COMPARISON_PATTERN.search(text):
@@ -791,6 +803,20 @@ class ChatbotService:
                 sort_by=session.ranking_preference,
             )
 
+        # Recommendation pagination is a direct conversational command.  It
+        # should remain reliable even when the statistical intent classifier
+        # assigns a weak or unrelated label to a short phrase such as
+        # "show me more options".
+        if SHOW_MORE_OPTIONS_PATTERN.search(text):
+            if not session.context.is_ready_for_recommendation():
+                return self._clarification_response(prediction, session)
+            return self._recommendation_response(
+                prediction,
+                session,
+                alternative=True,
+                sort_by=session.ranking_preference,
+            )
+
         if NO_CHANGE_PATTERN.fullmatch(text):
             if not session.context.is_ready_for_recommendation():
                 return self._clarification_response(prediction, session)
@@ -1008,7 +1034,14 @@ class ChatbotService:
 
         presented = [_present_attraction(item) for item in selected]
         names = ", ".join(item["attraction_name"] for item in presented)
-        prefix = "Here is another match" if alternative else "I found"
+        if alternative:
+            prefix = (
+                "Here is another option"
+                if len(presented) == 1
+                else "Here are more options"
+            )
+        else:
+            prefix = "I found"
         accessibility_requested = bool(
             session.context.elderly_friendly
             or session.context.wheelchair_accessible
@@ -1038,7 +1071,10 @@ class ChatbotService:
                 "collection, so Maya has not labelled those details as "
                 "confirmed."
             )
-        suggestions = self._result_suggestions(presented)
+        suggestions = self._result_suggestions(presented) + ({
+            "label": "Show me more options",
+            "message": "Show me more options",
+        },)
         return self._response(
             reply,
             "alternative" if alternative else "recommend",

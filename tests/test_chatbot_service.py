@@ -718,6 +718,77 @@ class ChatbotServiceTests(unittest.TestCase):
             second.recommendations[0]["attraction_id"],
         )
 
+    def test_show_more_phrase_returns_next_unseen_batch_despite_wrong_intent(self):
+        session = ChatSession(
+            context=ConversationContext(
+                state="Penang",
+                interests=["nature"],
+            )
+        )
+        first = self.make_service(
+            "request_recommendation",
+            limit=3,
+        ).process_message("Recommend some nature places", session)
+        second = self.make_service(
+            "help",
+            limit=3,
+        ).process_message("Show me more options", session)
+
+        first_ids = {
+            item["attraction_id"] for item in first.recommendations
+        }
+        second_ids = {
+            item["attraction_id"] for item in second.recommendations
+        }
+        self.assertEqual(second.action, "alternative")
+        self.assertTrue(second_ids)
+        self.assertTrue(first_ids.isdisjoint(second_ids))
+
+    def test_repeated_show_more_requests_do_not_repeat_earlier_places(self):
+        session = ChatSession(
+            context=ConversationContext(
+                state="Penang",
+                interests=["nature"],
+            )
+        )
+        first = self.make_service(
+            "request_recommendation",
+            limit=1,
+        ).process_message("Recommend a nature place", session)
+        second = self.make_service(
+            "out_of_scope",
+            limit=1,
+        ).process_message("Show me more options", session)
+        third = self.make_service(
+            "greeting",
+            limit=1,
+        ).process_message("Give me additional choices", session)
+
+        result_ids = [
+            response.recommendations[0]["attraction_id"]
+            for response in (first, second, third)
+        ]
+        self.assertEqual(len(result_ids), len(set(result_ids)))
+
+    def test_recommendation_suggestions_include_show_more_button(self):
+        session = ChatSession(
+            context=ConversationContext(
+                state="Johor",
+                interests=["nature"],
+            )
+        )
+        response = self.make_service(
+            "request_recommendation",
+        ).process_message("Recommend nature places", session)
+
+        self.assertIn(
+            {
+                "label": "Show me more options",
+                "message": "Show me more options",
+            },
+            response.suggestions,
+        )
+
     def test_information_request_uses_latest_recommendation(self):
         session = ChatSession(
             context=ConversationContext(
