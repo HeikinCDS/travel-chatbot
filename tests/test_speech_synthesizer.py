@@ -18,13 +18,18 @@ class SpeechSynthesizerTests(unittest.TestCase):
     def test_returns_generated_wav_bytes(self, run_windows_sapi):
         expected = b"RIFF" + (b"\x00" * 40) + b"WAVE"
 
-        def create_audio(text: str, output_path: Path) -> None:
+        def create_audio(text: str, output_path: Path, language: str) -> None:
             self.assertEqual(text, "Hello from Maya")
+            self.assertEqual(language, "en")
             output_path.write_bytes(expected)
 
         run_windows_sapi.side_effect = create_audio
 
         self.assertEqual(synthesize_speech(" Hello   from Maya "), expected)
+
+    def test_rejects_unsupported_language(self):
+        with self.assertRaises(ValueError):
+            synthesize_speech("Bonjour", language="fr")
 
 
 if __name__ == "__main__":

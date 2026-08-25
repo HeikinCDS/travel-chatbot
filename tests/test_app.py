@@ -33,7 +33,7 @@ class FlaskApplicationTests(unittest.TestCase):
         self.service = RecordingService()
         self.app = create_app(
             service=self.service,
-            speech_synthesizer=lambda text: b"RIFF" + (b"\x00" * 40) + b"WAVE",
+            speech_synthesizer=lambda text, language="en": b"RIFF" + (b"\x00" * 40) + b"WAVE",
             config={"TESTING": True, "SECRET_KEY": "test-key"},
         )
         self.client = self.app.test_client()
@@ -49,6 +49,9 @@ class FlaskApplicationTests(unittest.TestCase):
         )
         self.assertIn(b'id="message-input"', response.data)
         self.assertIn(b'id="voice-input-button"', response.data)
+        self.assertIn(b'id="language-select"', response.data)
+        self.assertIn(b'option value="ms"', response.data)
+        self.assertIn(b'option value="zh"', response.data)
         self.assertIn(b'Speak your travel request', response.data)
         self.assertIn(b'id="text-size-button"', response.data)
         self.assertIn(b'id="contrast-button"', response.data)
@@ -71,6 +74,8 @@ class FlaskApplicationTests(unittest.TestCase):
             b"showRecommendations(data.recommendations, replyRow)",
             response.data,
         )
+        self.assertIn("Rancang percutian".encode(), response.data)
+        self.assertIn("\u4e0e Maya \u4e00\u8d77\u89c4\u5212".encode(), response.data)
 
     def test_health_endpoint(self):
         response = self.client.get("/health")
@@ -92,6 +97,20 @@ class FlaskApplicationTests(unittest.TestCase):
 
     def test_speech_endpoint_rejects_empty_text(self):
         response = self.client.post("/api/speech", json={"text": " "})
+        self.assertEqual(response.status_code, 400)
+
+    def test_speech_endpoint_accepts_supported_language(self):
+        response = self.client.post(
+            "/api/speech",
+            json={"text": "Selamat datang", "language": "ms"},
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_speech_endpoint_rejects_unsupported_language(self):
+        response = self.client.post(
+            "/api/speech",
+            json={"text": "Hello", "language": "fr"},
+        )
         self.assertEqual(response.status_code, 400)
 
     def test_chat_rejects_empty_message(self):

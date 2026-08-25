@@ -22,11 +22,12 @@ from speech import SpeechSynthesisError, synthesize_speech
 
 
 MAX_MESSAGE_LENGTH = 500
+SUPPORTED_LANGUAGES = {"en", "ms", "zh"}
 
 
 def create_app(
     service: ChatbotService | None = None,
-    speech_synthesizer: Callable[[str], bytes] | None = None,
+    speech_synthesizer: Callable[[str, str], bytes] | None = None,
     config: dict[str, Any] | None = None,
 ) -> Flask:
     """Create the web application, optionally with a test chatbot service."""
@@ -66,10 +67,13 @@ def create_app(
         if not isinstance(payload, dict):
             return _error("Send the speech text as JSON.", 400)
         text = payload.get("text")
+        language = payload.get("language", "en")
         if not isinstance(text, str) or not text.strip():
             return _error("Please provide text for Maya to read.", 400)
+        if language not in SUPPORTED_LANGUAGES:
+            return _error("Unsupported speech language.", 400)
         try:
-            audio = _get_speech_synthesizer()(text)
+            audio = _get_speech_synthesizer()(text, language)
         except ValueError as error:
             return _error(str(error), 400)
         except SpeechSynthesisError:
@@ -154,7 +158,7 @@ def _get_service() -> ChatbotService:
     return current_app.extensions["chatbot_service"]
 
 
-def _get_speech_synthesizer() -> Callable[[str], bytes]:
+def _get_speech_synthesizer() -> Callable[[str, str], bytes]:
     return current_app.extensions.get("speech_synthesizer", synthesize_speech)
 
 

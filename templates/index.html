@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="JomVoyage is an elderly-friendly AI travel companion for discovering Malaysian attractions.">
   <title>JomVoyage | Meet Maya</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v='20260819a') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css', v='20260825a') }}">
 </head>
 <body>
   <a class="skip-link" href="#message-input">Skip to the message box</a>
@@ -15,22 +15,30 @@
       <span class="brand-mark" aria-hidden="true">MY</span>
       <span>
         <strong>JomVoyage</strong>
-        <small>Plan holiday trip in Malaysia with Maya</small>
+        <small data-i18n="brandSubtitle">Plan holiday trip in Malaysia with Maya</small>
       </span>
     </a>
 
     <nav class="accessibility-controls" aria-label="Accessibility and conversation controls">
+      <label class="language-control" for="language-select">
+        <span data-i18n="language">Display language</span>
+        <select id="language-select" aria-label="Chatbot language">
+          <option value="en">English</option>
+          <option value="ms">Bahasa Melayu</option>
+          <option value="zh">中文</option>
+        </select>
+      </label>
       <button id="text-size-button" class="control-button" type="button" aria-pressed="false">
         <span aria-hidden="true">A+</span>
-        <span class="control-label">Larger text</span>
+        <span class="control-label" data-i18n="largerText">Larger text</span>
       </button>
       <button id="contrast-button" class="control-button" type="button" aria-pressed="false">
         <span aria-hidden="true">HC</span>
-        <span class="control-label">High contrast</span>
+        <span class="control-label" data-i18n="highContrast">High contrast</span>
       </button>
       <button id="reset-button" class="control-button" type="button">
         <span aria-hidden="true">+</span>
-        <span class="control-label">New chat</span>
+        <span class="control-label" data-i18n="newChat">New chat</span>
       </button>
     </nav>
   </header>
@@ -40,24 +48,24 @@
       <button id="sidebar-toggle-button" class="sidebar-toggle-button" type="button"
               aria-controls="trip-sidebar" aria-expanded="true">
         <span aria-hidden="true">◀</span>
-        <span class="control-label">Hide trip panel</span>
+        <span class="control-label" data-i18n="hideTripPanel">Hide trip panel</span>
       </button>
       <aside id="trip-sidebar" class="trip-sidebar" aria-label="Trip preferences and chat history">
       <details class="sidebar-card preference-panel" open>
-        <summary>Saved trip preferences</summary>
-        <p class="sidebar-help">Maya updates these details while you chat.</p>
+        <summary data-i18n="savedPreferences">Saved trip preferences</summary>
+        <p class="sidebar-help" data-i18n="preferencesHelp">Maya updates these details while you chat.</p>
         <dl id="preference-list" class="preference-list">
           <div><dt>Status</dt><dd>Not provided yet</dd></div>
         </dl>
         <button id="preference-reset-button" class="sidebar-reset-button" type="button">
-          Reset trip preferences
+          <span data-i18n="resetPreferences">Reset trip preferences</span>
         </button>
       </details>
 
       <details class="sidebar-card history-panel" open>
-        <summary>Chat history</summary>
-        <p class="sidebar-help">Current conversation. Select a message to return to it.</p>
-        <p id="history-empty" class="history-empty">Your messages will appear here.</p>
+        <summary data-i18n="chatHistory">Chat history</summary>
+        <p class="sidebar-help" data-i18n="historyHelp">Current conversation. Select a message to return to it.</p>
+        <p id="history-empty" class="history-empty" data-i18n="historyEmpty">Your messages will appear here.</p>
         <ol id="chat-history" class="chat-history" aria-label="Messages in this conversation"></ol>
       </details>
       </aside>
@@ -66,17 +74,17 @@
     <main class="conversation-shell">
       <section class="intro-card" aria-labelledby="intro-title">
       <div>
-        <p class="eyebrow">Plan a trip in Malaysia</p>
-        <h1 id="intro-title">Where would you like to explore?</h1>
-        <p>Tell me a state and what you enjoy. I will remember your choices while we chat.</p>
+        <p class="eyebrow" data-i18n="eyebrow">Plan a trip in Malaysia</p>
+        <h1 id="intro-title" data-i18n="introTitle">Where would you like to explore?</h1>
+        <p data-i18n="introDescription">Tell me a state and what you enjoy. I will remember your choices while we chat.</p>
         <button id="easy-access-start-button" class="easy-access-start-button" type="button">
           <span aria-hidden="true">✓</span>
-          Plan an elderly-friendly trip
+          <span data-i18n="elderlyTrip">Plan an elderly-friendly trip</span>
         </button>
       </div>
       <details class="help-details">
-        <summary>How to use</summary>
-        <p>You may type a message or tap one of the large choices. You can also mention your budget, mobility needs, or a preference for elderly-friendly places.</p>
+        <summary data-i18n="howToUse">How to use</summary>
+        <p data-i18n="howToUseText">You may type a message or tap one of the large choices. You can also mention your budget, mobility needs, or a preference for elderly-friendly places.</p>
       </details>
       </section>
 
@@ -86,7 +94,7 @@
         <div class="message-content">
           <p class="speaker-name">Maya</p>
           <div class="assistant-message">
-            <p>Hello, I am Maya, your JomVoyage travel companion. Which Malaysian state would you like to visit?</p>
+            <p data-initial-welcome="true">Hello, I am Maya, your JomVoyage travel companion. Which Malaysian state would you like to visit?</p>
           </div>
           <button class="speak-button" type="button" data-speak="Hello, I am Maya, your JomVoyage travel companion. Which Malaysian state would you like to visit?">
             Read aloud
@@ -96,7 +104,7 @@
       </section>
 
       <section class="choice-area" aria-labelledby="choice-heading">
-      <h2 id="choice-heading">Suggested answers</h2>
+      <h2 id="choice-heading" data-i18n="suggestedAnswers">Suggested answers</h2>
       <div id="quick-replies" class="quick-replies">
         <button type="button" data-message="Johor">Johor</button>
         <button type="button" data-message="Penang">Penang</button>
@@ -119,20 +127,21 @@
         maxlength="500"
         autocomplete="off"
         placeholder="Message Maya"
+        data-i18n-placeholder="messageMaya"
         required
       ></textarea>
       <button id="voice-input-button" class="voice-input-button" type="button"
               aria-pressed="false" aria-label="Speak your travel request">
         <span aria-hidden="true">🎤</span>
-        <span class="voice-button-label">Speak</span>
+        <span class="voice-button-label" data-i18n="speak">Speak</span>
       </button>
-      <button id="send-button" class="send-button" type="submit">Send</button>
+      <button id="send-button" class="send-button" type="submit" data-i18n="send">Send</button>
     </form>
     <p id="form-status" class="form-status" role="status"></p>
-    <p class="safety-note">Confirm prices, opening hours and accessibility with official sources before travelling.</p>
+    <p class="safety-note" data-i18n="safetyNote">Confirm prices, opening hours and accessibility with official sources before travelling.</p>
   </div>
 
   <noscript>This chatbot requires JavaScript to send messages.</noscript>
-  <script src="{{ url_for('static', filename='chat.js', v='20260824b') }}" defer></script>
+  <script src="{{ url_for('static', filename='chat.js', v='20260825a') }}" defer></script>
 </body>
 </html>
