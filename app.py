@@ -18,6 +18,7 @@ from flask import (
 )
 
 from chatbot.service import ChatSession, ChatbotService, STATE_SUGGESTIONS
+from nlp.multilingual_normalizer import normalize_user_input
 from speech import SpeechSynthesisError, synthesize_speech
 
 
@@ -91,8 +92,11 @@ def create_app(
             return _error("Send the message as JSON.", 400)
 
         message = payload.get("message")
+        language = payload.get("language", "en")
         if not isinstance(message, str) or not message.strip():
             return _error("Please enter a message.", 400)
+        if language not in SUPPORTED_LANGUAGES:
+            return _error("Unsupported chat language.", 400)
         message = message.strip()
         if len(message) > MAX_MESSAGE_LENGTH:
             return _error(
@@ -102,7 +106,8 @@ def create_app(
 
         try:
             chat_session = ChatSession.from_dict(session.get("chatbot_session"))
-            response = _get_service().process_message(message, chat_session)
+            nlp_message = normalize_user_input(message, language)
+            response = _get_service().process_message(nlp_message, chat_session)
         except (TypeError, ValueError) as error:
             return _error(str(error), 400)
 

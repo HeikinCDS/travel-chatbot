@@ -14,8 +14,10 @@ except ModuleNotFoundError as error:
 class RecordingService:
     def __init__(self):
         self.received_contexts = []
+        self.received_texts = []
 
     def process_message(self, text, chat_session):
+        self.received_texts.append(text)
         self.received_contexts.append(chat_session.to_dict())
         chat_session.context.state = "Johor"
         return ChatbotResponse(
@@ -74,6 +76,7 @@ class FlaskApplicationTests(unittest.TestCase):
             b"showRecommendations(data.recommendations, replyRow)",
             response.data,
         )
+        self.assertIn(b"language: currentLanguage", response.data)
         self.assertIn("Rancang percutian".encode(), response.data)
         self.assertIn("\u4e0e Maya \u4e00\u8d77\u89c4\u5212".encode(), response.data)
 
@@ -129,6 +132,38 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertEqual(data["reply"], "Received: Johor")
         self.assertEqual(data["context"]["state"], "Johor")
         self.assertEqual(data["suggestions"], [])
+
+    def test_chat_normalizes_malay_before_nlp_processing(self):
+        response = self.client.post(
+            "/api/chat",
+            json={
+                "message": "Cadangkan tempat mesra warga emas di Pulau Pinang",
+                "language": "ms",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self.service.received_texts[-1],
+            "recommend place elderly friendly in Pulau Pinang",
+        )
+
+    def test_chat_normalizes_chinese_before_nlp_processing(self):
+        response = self.client.post(
+            "/api/chat",
+            json={"message": "推荐槟城适合长者的景点", "language": "zh"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self.service.received_texts[-1],
+            "recommend Penang suitable for elderly attraction",
+        )
+
+    def test_chat_rejects_unsupported_language(self):
+        response = self.client.post(
+            "/api/chat",
+            json={"message": "Bonjour", "language": "fr"},
+        )
+        self.assertEqual(response.status_code, 400)
 
     def test_session_state_is_kept_between_requests(self):
         self.client.post("/api/chat", json={"message": "Johor"})

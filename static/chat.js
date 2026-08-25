@@ -36,7 +36,7 @@ if (!SUPPORTED_LANGUAGES.has(currentLanguage)) currentLanguage = "en";
 const UI_TEXT = {
   en: {
     brandSubtitle: "Plan holiday trip in Malaysia with Maya",
-    language: "Display language",
+    language: "Language",
     largerText: "Larger text",
     normalText: "Normal text",
     highContrast: "High contrast",
@@ -55,7 +55,7 @@ const UI_TEXT = {
     introDescription: "Tell me a state and what you enjoy. I will remember your choices while we chat.",
     elderlyTrip: "Plan an elderly-friendly trip",
     howToUse: "How to use",
-    howToUseText: "You may type a message or tap one of the large choices. You can also mention your budget or mobility needs. In this prototype, free-text requests use English.",
+    howToUseText: "You may type common travel requests in English, Malay or Chinese, or tap one of the large choices. You can also mention your budget or mobility needs.",
     suggestedAnswers: "Suggested answers",
     messageMaya: "Message Maya",
     speak: "Speak",
@@ -76,7 +76,7 @@ const UI_TEXT = {
   },
   ms: {
     brandSubtitle: "Rancang percutian di Malaysia bersama Maya",
-    language: "Bahasa paparan",
+    language: "Bahasa",
     largerText: "Teks lebih besar",
     normalText: "Teks biasa",
     highContrast: "Kontras tinggi",
@@ -95,7 +95,7 @@ const UI_TEXT = {
     introDescription: "Beritahu saya negeri dan minat anda. Saya akan mengingati pilihan anda semasa kita berbual.",
     elderlyTrip: "Rancang perjalanan mesra warga emas",
     howToUse: "Cara menggunakan",
-    howToUseText: "Pilih salah satu butang terjemahan atau nyatakan bajet dan keperluan mobiliti anda. Dalam prototaip ini, permintaan teks bebas menggunakan bahasa Inggeris.",
+    howToUseText: "Anda boleh menaip permintaan perjalanan biasa dalam bahasa Inggeris, Melayu atau Cina, atau memilih salah satu butang besar. Anda juga boleh menyatakan bajet atau keperluan mobiliti.",
     suggestedAnswers: "Cadangan jawapan",
     messageMaya: "Mesej kepada Maya",
     speak: "Bercakap",
@@ -116,7 +116,7 @@ const UI_TEXT = {
   },
   zh: {
     brandSubtitle: "与 Maya 一起规划马来西亚假期",
-    language: "显示语言",
+    language: "语言",
     largerText: "放大字体",
     normalText: "标准字体",
     highContrast: "高对比度",
@@ -135,7 +135,7 @@ const UI_TEXT = {
     introDescription: "告诉我您想去的州属和兴趣。聊天期间，我会记住您的选择。",
     elderlyTrip: "规划长者友善之旅",
     howToUse: "使用方法",
-    howToUseText: "您可以使用已翻译的大按钮，并说明预算或行动需求。在此原型中，自由输入的请求使用英语。",
+    howToUseText: "您可以用英语、马来语或中文输入常见的旅游需求，也可以点击大按钮，并说明预算或行动需求。",
     suggestedAnswers: "建议回答",
     messageMaya: "给 Maya 发消息",
     speak: "语音输入",
@@ -163,10 +163,15 @@ function t(key) {
 const LOCALIZED_LABELS = {
   ms: {
     "Show me more options": "Tunjukkan lebih banyak pilihan",
+    "Minimal walking": "Sedikit berjalan",
+    "Wheelchair access": "Akses kerusi roda",
+    "Nearby seats": "Tempat duduk berdekatan",
+    "No special requirements": "Tiada keperluan khas",
     "Easiest access": "Akses paling mudah",
     "Lowest cost": "Kos paling rendah",
     "Shortest visit": "Lawatan paling singkat",
     Nature: "Alam semula jadi",
+    nature: "alam semula jadi",
     Beach: "Pantai",
     History: "Sejarah",
     Wildlife: "Hidupan liar",
@@ -176,23 +181,36 @@ const LOCALIZED_LABELS = {
     "Resting seats": "Tempat duduk rehat",
     "Accessible toilet": "Tandas mesra OKU",
     "Nearby parking": "Tempat letak kereta berdekatan",
+    "Parking proximity": "Kedekatan tempat letak kereta",
     "Shelter or shade": "Tempat berteduh",
     "Walking difficulty": "Kesukaran berjalan",
     Shelter: "Tempat berteduh",
     "Overall elderly suitability": "Kesesuaian keseluruhan untuk warga emas",
     "Not recorded": "Tidak direkodkan",
     "Visitor information": "Maklumat pelawat",
+    "Accessibility information": "Maklumat aksesibiliti",
     Suitable: "Sesuai",
     Partial: "Sebahagian",
     Yes: "Ya",
     No: "Tidak",
+    State: "Negeri",
+    Interests: "Minat",
+    "Maximum fee": "Bayaran maksimum",
+    "Elderly friendly": "Mesra warga emas",
+    "Wheelchair accessible": "Boleh diakses kerusi roda",
+    "Accessibility needs": "Keperluan aksesibiliti",
   },
   zh: {
     "Show me more options": "显示更多选择",
+    "Minimal walking": "少量步行",
+    "Wheelchair access": "轮椅通道",
+    "Nearby seats": "附近休息座椅",
+    "No special requirements": "没有特殊需求",
     "Easiest access": "最容易到达",
     "Lowest cost": "最低费用",
     "Shortest visit": "最短游览时间",
     Nature: "自然",
+    nature: "自然",
     Beach: "海滩",
     History: "历史",
     Wildlife: "野生动物",
@@ -202,16 +220,24 @@ const LOCALIZED_LABELS = {
     "Resting seats": "休息座椅",
     "Accessible toilet": "无障碍厕所",
     "Nearby parking": "附近停车位",
+    "Parking proximity": "停车距离",
     "Shelter or shade": "遮阳或有盖空间",
     "Walking difficulty": "步行难度",
     Shelter: "遮蔽处",
     "Overall elderly suitability": "整体长者适宜度",
     "Not recorded": "未记录",
     "Visitor information": "访客资料",
+    "Accessibility information": "无障碍资料",
     Suitable: "适合",
     Partial: "部分适合",
     Yes: "是",
     No: "否",
+    State: "州属",
+    Interests: "兴趣",
+    "Maximum fee": "最高费用",
+    "Elderly friendly": "长者友善",
+    "Wheelchair accessible": "轮椅无障碍",
+    "Accessibility needs": "无障碍需求",
   },
 };
 
@@ -773,7 +799,10 @@ async function submitMessage(message) {
   quickReplies.querySelectorAll("button").forEach(button => { button.disabled = true; });
 
   try {
-    const data = await sendJson("/api/chat", { message });
+    const data = await sendJson("/api/chat", {
+      message,
+      language: currentLanguage,
+    });
     const localizedReply = localizeReply(data);
     const replyRow = addMessage(localizedReply, "bot");
     replyRow.chatData = data;
