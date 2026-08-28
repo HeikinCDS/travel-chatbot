@@ -62,9 +62,17 @@
         </button>
       </details>
 
+      <details class="sidebar-card saved-conversations-panel" open>
+        <summary data-i18n="savedConversations">Saved conversations</summary>
+        <p class="sidebar-help" data-i18n="savedConversationsHelp">Reopen an earlier trip and continue planning.</p>
+        <p id="saved-conversations-empty" class="history-empty" data-i18n="savedConversationsEmpty">Your saved trips will appear here.</p>
+        <ul id="saved-conversations" class="saved-conversations" aria-label="Saved trip conversations"></ul>
+      </details>
+
       <details class="sidebar-card history-panel" open>
         <summary data-i18n="chatHistory">Chat history</summary>
         <p class="sidebar-help" data-i18n="historyHelp">Current conversation. Select a message to return to it.</p>
+        <p id="current-conversation-title" class="current-conversation-title">New Malaysia Trip</p>
         <p id="history-empty" class="history-empty" data-i18n="historyEmpty">Your messages will appear here.</p>
         <ol id="chat-history" class="chat-history" aria-label="Messages in this conversation"></ol>
       </details>

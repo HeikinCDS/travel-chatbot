@@ -251,6 +251,73 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
 .sidebar-reset-button:disabled { cursor: wait; opacity: 0.65; }
 
 .history-empty { margin: 0; color: var(--muted); font-size: 0.82rem; }
+.current-conversation-title {
+  margin: 0 0 0.55rem;
+  color: var(--accent-dark);
+  font-weight: 800;
+}
+.saved-conversations {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.saved-conversation-item {
+  padding: 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface-soft);
+}
+.saved-conversation-item.active { border: 2px solid var(--accent); }
+.saved-conversation-open {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.25rem;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.saved-conversation-open strong,
+.saved-conversation-open small { display: block; }
+.saved-conversation-open strong { color: var(--accent-dark); }
+.saved-conversation-open small { margin-top: 0.15rem; color: var(--muted); }
+.saved-conversation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.3rem;
+}
+.saved-conversation-actions button {
+  flex: 1;
+  min-height: 38px;
+  border: 1px solid var(--accent);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--accent-dark);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.saved-conversation-actions button:hover,
+.saved-conversation-actions button:focus-visible { background: var(--accent-soft); }
+.saved-conversation-name-input {
+  width: 100%;
+  min-height: 40px;
+  padding: 0.4rem 0.5rem;
+  border: 2px solid var(--accent);
+  border-radius: 9px;
+  font: inherit;
+}
+.saved-conversation-confirmation {
+  flex-basis: 100%;
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
 .chat-history { display: grid; gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
 .chat-history button {
   display: block;
@@ -265,7 +332,15 @@ h1 { margin: 0 0 0.3rem; font-size: clamp(1.55rem, 4vw, 2.1rem); line-height: 1.
   text-align: left;
 }
 .chat-history button:hover { border-color: var(--accent); background: var(--accent-soft); }
-.history-speaker { display: block; color: var(--accent-dark); font-size: 0.75rem; font-weight: 800; }
+.history-speaker {
+  display: block;
+  overflow: hidden;
+  color: var(--accent-dark);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .history-preview {
   display: -webkit-box;
   overflow: hidden;

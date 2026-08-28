@@ -40,6 +40,10 @@ class EntityExtractorTests(unittest.TestCase):
         result = extract_preferences("My budget is RM 1,500")
         self.assertEqual(result.maximum_fee, 1500.0)
 
+    def test_extracts_budget_after_change_command(self):
+        result = extract_preferences("Change my budget to RM30")
+        self.assertEqual(result.maximum_fee, 30.0)
+
     def test_extracts_free_entry(self):
         result = extract_preferences("I only want somewhere with free entry")
         self.assertEqual(result.maximum_fee, 0.0)

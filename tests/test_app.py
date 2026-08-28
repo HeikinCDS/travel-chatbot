@@ -64,6 +64,8 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertIn(b'id="sidebar-toggle-button"', response.data)
         self.assertIn(b'id="trip-sidebar"', response.data)
         self.assertIn(b'id="chat-history"', response.data)
+        self.assertIn(b'id="saved-conversations"', response.data)
+        self.assertIn(b'id="current-conversation-title"', response.data)
         self.assertIn(b'id="easy-access-start-button"', response.data)
         self.assertIn(b"Plan an elderly-friendly trip", response.data)
 
@@ -77,6 +79,14 @@ class FlaskApplicationTests(unittest.TestCase):
             response.data,
         )
         self.assertIn(b"language: currentLanguage", response.data)
+        self.assertIn(b"function historyTopic", response.data)
+        self.assertIn(b"refreshHistoryItem(replyRow)", response.data)
+        self.assertIn(b'Recommendations', response.data)
+        self.assertIn("Cadangan tempat".encode(), response.data)
+        self.assertIn("景点推荐".encode(), response.data)
+        self.assertIn(b"function saveCurrentConversation", response.data)
+        self.assertIn(b"function openSavedConversation", response.data)
+        self.assertIn(b'MAX_SAVED_CONVERSATIONS = 8', response.data)
         self.assertIn("Rancang percutian".encode(), response.data)
         self.assertIn("\u4e0e Maya \u4e00\u8d77\u89c4\u5212".encode(), response.data)
 
@@ -132,6 +142,7 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertEqual(data["reply"], "Received: Johor")
         self.assertEqual(data["context"]["state"], "Johor")
         self.assertEqual(data["suggestions"], [])
+        self.assertEqual(data["session_state"]["context"]["state"], "Johor")
 
     def test_chat_normalizes_malay_before_nlp_processing(self):
         response = self.client.post(
@@ -187,6 +198,36 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertEqual(response.get_json()["action"], "reset_preferences")
         self.assertEqual(response.get_json()["context"], {})
         self.assertEqual(self.service.received_contexts[1]["context"], {})
+
+    def test_saved_conversation_session_can_be_restored(self):
+        response = self.client.post(
+            "/api/restore-session",
+            json={
+                "session_state": {
+                    "context": {"state": "Johor", "interests": ["nature"]},
+                    "shown_attraction_ids": ["A001"],
+                    "latest_recommendation_ids": ["A001"],
+                    "ranking_preference": None,
+                    "retrieval_query": "nature in Johor",
+                    "accessibility_clarified": False,
+                    "pending_attraction_id": None,
+                }
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["context"]["state"], "Johor")
+        self.client.post("/api/chat", json={"message": "Show me more options"})
+        self.assertEqual(
+            self.service.received_contexts[-1]["context"]["interests"],
+            ["nature"],
+        )
+
+    def test_restore_rejects_unsupported_session_fields(self):
+        response = self.client.post(
+            "/api/restore-session",
+            json={"session_state": {"context": {}, "admin": True}},
+        )
+        self.assertEqual(response.status_code, 400)
 
 
 if __name__ == "__main__":

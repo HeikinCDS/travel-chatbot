@@ -1,0 +1,73 @@
+[
+  {"id":"MS-G01","language":"ms","text":"Hai Maya","expected_intent":"greeting"},
+  {"id":"MS-G02","language":"ms","text":"Selamat pagi, Maya","expected_intent":"greeting"},
+  {"id":"MS-G03","language":"ms","text":"Helo, boleh kita mula?","expected_intent":"greeting"},
+
+  {"id":"MS-REC01","language":"ms","text":"Cadangkan tempat alam semula jadi di Johor","expected_intent":"request_recommendation","expected_preferences":{"state":"Johor","interests":["nature"]}},
+  {"id":"MS-REC02","language":"ms","text":"Saya mahu melawat pantai mesra warga emas di Penang","expected_intent":"request_recommendation","expected_preferences":{"state":"Penang","interests":["beach"],"elderly_friendly":true}},
+  {"id":"MS-REC03","language":"ms","text":"Syorkan muzium mesra kerusi roda di Selangor","expected_intent":"request_recommendation","expected_preferences":{"state":"Selangor","interests":["history"],"wheelchair_accessible":true}},
+
+  {"id":"MS-REF01","language":"ms","text":"Tukar negeri kepada Perak","expected_intent":"refine_preferences","expected_preferences":{"state":"Perak"}},
+  {"id":"MS-REF02","language":"ms","text":"Ubah bajet kepada RM30","expected_intent":"refine_preferences","expected_preferences":{"maximum_fee":30.0}},
+  {"id":"MS-REF03","language":"ms","text":"Sekarang saya mahu tempat duduk berdekatan","expected_intent":"refine_preferences","expected_preferences":{"accessibility_needs":["seating"]}},
+
+  {"id":"MS-INF01","language":"ms","text":"Ceritakan tentang Penang Hill","expected_intent":"request_information"},
+  {"id":"MS-INF02","language":"ms","text":"Berapakah bayaran masuk tempat ini?","expected_intent":"request_information"},
+  {"id":"MS-INF03","language":"ms","text":"Adakah tempat ini mempunyai tandas OKU?","expected_intent":"request_information"},
+
+  {"id":"MS-ALT01","language":"ms","text":"Tunjukkan lebih banyak pilihan","expected_intent":"request_alternative"},
+  {"id":"MS-ALT02","language":"ms","text":"Beri saya pilihan lain","expected_intent":"request_alternative"},
+  {"id":"MS-ALT03","language":"ms","text":"Apa lagi yang tersedia?","expected_intent":"request_alternative"},
+
+  {"id":"MS-RST01","language":"ms","text":"Padam pilihan perjalanan","expected_intent":"reset_conversation"},
+  {"id":"MS-RST02","language":"ms","text":"Mulakan semula dari awal","expected_intent":"reset_conversation"},
+  {"id":"MS-RST03","language":"ms","text":"Lupakan semua pilihan saya","expected_intent":"reset_conversation"},
+
+  {"id":"MS-HLP01","language":"ms","text":"Bagaimana saya menggunakan Maya?","expected_intent":"help"},
+  {"id":"MS-HLP02","language":"ms","text":"Apakah yang boleh Maya lakukan?","expected_intent":"help"},
+  {"id":"MS-HLP03","language":"ms","text":"Tolong bantu saya merancang perjalanan","expected_intent":"help"},
+
+  {"id":"MS-BYE01","language":"ms","text":"Selamat tinggal, Maya","expected_intent":"goodbye"},
+  {"id":"MS-BYE02","language":"ms","text":"Terima kasih, jumpa lagi","expected_intent":"goodbye"},
+  {"id":"MS-BYE03","language":"ms","text":"Saya sudah selesai merancang","expected_intent":"goodbye"},
+
+  {"id":"MS-OOS01","language":"ms","text":"Boleh tolong baiki mesin basuh?","expected_intent":"out_of_scope"},
+  {"id":"MS-OOS02","language":"ms","text":"Tulis kod Python untuk saya","expected_intent":"out_of_scope"},
+  {"id":"MS-OOS03","language":"ms","text":"Apakah ubat untuk sakit perut?","expected_intent":"out_of_scope"},
+
+  {"id":"ZH-G01","language":"zh","text":"你好，Maya","expected_intent":"greeting"},
+  {"id":"ZH-G02","language":"zh","text":"早上好，Maya","expected_intent":"greeting"},
+  {"id":"ZH-G03","language":"zh","text":"下午好，我们可以开始吗？","expected_intent":"greeting"},
+
+  {"id":"ZH-REC01","language":"zh","text":"推荐柔佛的自然景点","expected_intent":"request_recommendation","expected_preferences":{"state":"Johor","interests":["nature"]}},
+  {"id":"ZH-REC02","language":"zh","text":"我想去槟城适合长者的海滩","expected_intent":"request_recommendation","expected_preferences":{"state":"Penang","interests":["beach"],"elderly_friendly":true}},
+  {"id":"ZH-REC03","language":"zh","text":"推荐雪兰莪轮椅无障碍的博物馆","expected_intent":"request_recommendation","expected_preferences":{"state":"Selangor","interests":["history"],"wheelchair_accessible":true}},
+
+  {"id":"ZH-REF01","language":"zh","text":"把州属改为霹雳","expected_intent":"refine_preferences","expected_preferences":{"state":"Perak"}},
+  {"id":"ZH-REF02","language":"zh","text":"把预算改为RM30","expected_intent":"refine_preferences","expected_preferences":{"maximum_fee":30.0}},
+  {"id":"ZH-REF03","language":"zh","text":"现在我想要休息座椅","expected_intent":"refine_preferences","expected_preferences":{"accessibility_needs":["seating"]}},
+
+  {"id":"ZH-INF01","language":"zh","text":"介绍一下 Penang Hill","expected_intent":"request_information"},
+  {"id":"ZH-INF02","language":"zh","text":"这个地方的入场费是多少？","expected_intent":"request_information"},
+  {"id":"ZH-INF03","language":"zh","text":"这个地方有无障碍厕所吗？","expected_intent":"request_information"},
+
+  {"id":"ZH-ALT01","language":"zh","text":"显示更多选择","expected_intent":"request_alternative"},
+  {"id":"ZH-ALT02","language":"zh","text":"给我不同的选择","expected_intent":"request_alternative"},
+  {"id":"ZH-ALT03","language":"zh","text":"还有什么选择？","expected_intent":"request_alternative"},
+
+  {"id":"ZH-RST01","language":"zh","text":"清除旅行偏好","expected_intent":"reset_conversation"},
+  {"id":"ZH-RST02","language":"zh","text":"从头重新开始","expected_intent":"reset_conversation"},
+  {"id":"ZH-RST03","language":"zh","text":"忘记我所有的选择","expected_intent":"reset_conversation"},
+
+  {"id":"ZH-HLP01","language":"zh","text":"我该如何使用Maya？","expected_intent":"help"},
+  {"id":"ZH-HLP02","language":"zh","text":"Maya可以做什么？","expected_intent":"help"},
+  {"id":"ZH-HLP03","language":"zh","text":"请教我如何规划旅程","expected_intent":"help"},
+
+  {"id":"ZH-BYE01","language":"zh","text":"再见，Maya","expected_intent":"goodbye"},
+  {"id":"ZH-BYE02","language":"zh","text":"谢谢，下次再见","expected_intent":"goodbye"},
+  {"id":"ZH-BYE03","language":"zh","text":"我的旅行规划完成了","expected_intent":"goodbye"},
+
+  {"id":"ZH-OOS01","language":"zh","text":"你可以修理洗衣机吗？","expected_intent":"out_of_scope"},
+  {"id":"ZH-OOS02","language":"zh","text":"为我编写Python代码","expected_intent":"out_of_scope"},
+  {"id":"ZH-OOS03","language":"zh","text":"胃痛应该吃什么药？","expected_intent":"out_of_scope"}
+]

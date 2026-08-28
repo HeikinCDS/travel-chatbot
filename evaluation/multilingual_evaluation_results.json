@@ -1,0 +1,1867 @@
+{
+  "dataset_summary": {
+    "total_examples": 54,
+    "language_counts": {
+      "ms": 27,
+      "zh": 27
+    },
+    "intent_counts": {
+      "greeting": 6,
+      "request_recommendation": 6,
+      "refine_preferences": 6,
+      "request_information": 6,
+      "request_alternative": 6,
+      "reset_conversation": 6,
+      "help": 6,
+      "goodbye": 6,
+      "out_of_scope": 6
+    }
+  },
+  "intent_classification": {
+    "total_examples": 54,
+    "correct_predictions": 54,
+    "accuracy": 1.0,
+    "macro_precision": 1.0,
+    "macro_recall": 1.0,
+    "macro_f1_score": 1.0,
+    "per_intent": {
+      "goodbye": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 6
+      },
+      "greeting": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 6
+      },
+      "help": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 6
+      },
+      "out_of_scope": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 6
+      },
+      "refine_preferences": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 6
+      },
+      "request_alternative": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 6
+      },
+      "request_information": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 6
+      },
+      "request_recommendation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 6
+      },
+      "reset_conversation": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 6
+      }
+    },
+    "confusion_matrix": {
+      "goodbye": {
+        "goodbye": 6,
+        "greeting": 0,
+        "help": 0,
+        "out_of_scope": 0,
+        "refine_preferences": 0,
+        "request_alternative": 0,
+        "request_information": 0,
+        "request_recommendation": 0,
+        "reset_conversation": 0
+      },
+      "greeting": {
+        "goodbye": 0,
+        "greeting": 6,
+        "help": 0,
+        "out_of_scope": 0,
+        "refine_preferences": 0,
+        "request_alternative": 0,
+        "request_information": 0,
+        "request_recommendation": 0,
+        "reset_conversation": 0
+      },
+      "help": {
+        "goodbye": 0,
+        "greeting": 0,
+        "help": 6,
+        "out_of_scope": 0,
+        "refine_preferences": 0,
+        "request_alternative": 0,
+        "request_information": 0,
+        "request_recommendation": 0,
+        "reset_conversation": 0
+      },
+      "out_of_scope": {
+        "goodbye": 0,
+        "greeting": 0,
+        "help": 0,
+        "out_of_scope": 6,
+        "refine_preferences": 0,
+        "request_alternative": 0,
+        "request_information": 0,
+        "request_recommendation": 0,
+        "reset_conversation": 0
+      },
+      "refine_preferences": {
+        "goodbye": 0,
+        "greeting": 0,
+        "help": 0,
+        "out_of_scope": 0,
+        "refine_preferences": 6,
+        "request_alternative": 0,
+        "request_information": 0,
+        "request_recommendation": 0,
+        "reset_conversation": 0
+      },
+      "request_alternative": {
+        "goodbye": 0,
+        "greeting": 0,
+        "help": 0,
+        "out_of_scope": 0,
+        "refine_preferences": 0,
+        "request_alternative": 6,
+        "request_information": 0,
+        "request_recommendation": 0,
+        "reset_conversation": 0
+      },
+      "request_information": {
+        "goodbye": 0,
+        "greeting": 0,
+        "help": 0,
+        "out_of_scope": 0,
+        "refine_preferences": 0,
+        "request_alternative": 0,
+        "request_information": 6,
+        "request_recommendation": 0,
+        "reset_conversation": 0
+      },
+      "request_recommendation": {
+        "goodbye": 0,
+        "greeting": 0,
+        "help": 0,
+        "out_of_scope": 0,
+        "refine_preferences": 0,
+        "request_alternative": 0,
+        "request_information": 0,
+        "request_recommendation": 6,
+        "reset_conversation": 0
+      },
+      "reset_conversation": {
+        "goodbye": 0,
+        "greeting": 0,
+        "help": 0,
+        "out_of_scope": 0,
+        "refine_preferences": 0,
+        "request_alternative": 0,
+        "request_information": 0,
+        "request_recommendation": 0,
+        "reset_conversation": 6
+      }
+    },
+    "predictions": [
+      {
+        "id": "MS-G01",
+        "expected_intent": "greeting",
+        "predicted_intent": "greeting",
+        "confidence": 0.999999,
+        "correct": true,
+        "original_text": "Hai Maya",
+        "language": "ms",
+        "normalized_text": "hello Maya"
+      },
+      {
+        "id": "MS-G02",
+        "expected_intent": "greeting",
+        "predicted_intent": "greeting",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Selamat pagi, Maya",
+        "language": "ms",
+        "normalized_text": "good morning, Maya"
+      },
+      {
+        "id": "MS-G03",
+        "expected_intent": "greeting",
+        "predicted_intent": "greeting",
+        "confidence": 0.999999,
+        "correct": true,
+        "original_text": "Helo, boleh kita mula?",
+        "language": "ms",
+        "normalized_text": "hello, can we begin?"
+      },
+      {
+        "id": "MS-REC01",
+        "expected_intent": "request_recommendation",
+        "predicted_intent": "request_recommendation",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Cadangkan tempat alam semula jadi di Johor",
+        "language": "ms",
+        "normalized_text": "recommend place nature in Johor"
+      },
+      {
+        "id": "MS-REC02",
+        "expected_intent": "request_recommendation",
+        "predicted_intent": "request_recommendation",
+        "confidence": 0.999969,
+        "correct": true,
+        "original_text": "Saya mahu melawat pantai mesra warga emas di Penang",
+        "language": "ms",
+        "normalized_text": "I want to visit beach elderly friendly in Penang"
+      },
+      {
+        "id": "MS-REC03",
+        "expected_intent": "request_recommendation",
+        "predicted_intent": "request_recommendation",
+        "confidence": 0.999993,
+        "correct": true,
+        "original_text": "Syorkan muzium mesra kerusi roda di Selangor",
+        "language": "ms",
+        "normalized_text": "recommend museum wheelchair accessible in Selangor"
+      },
+      {
+        "id": "MS-REF01",
+        "expected_intent": "refine_preferences",
+        "predicted_intent": "refine_preferences",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Tukar negeri kepada Perak",
+        "language": "ms",
+        "normalized_text": "change the state to Perak"
+      },
+      {
+        "id": "MS-REF02",
+        "expected_intent": "refine_preferences",
+        "predicted_intent": "refine_preferences",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Ubah bajet kepada RM30",
+        "language": "ms",
+        "normalized_text": "change the budget to RM30"
+      },
+      {
+        "id": "MS-REF03",
+        "expected_intent": "refine_preferences",
+        "predicted_intent": "refine_preferences",
+        "confidence": 0.999997,
+        "correct": true,
+        "original_text": "Sekarang saya mahu tempat duduk berdekatan",
+        "language": "ms",
+        "normalized_text": "change my preference to benches and places to rest"
+      },
+      {
+        "id": "MS-INF01",
+        "expected_intent": "request_information",
+        "predicted_intent": "request_information",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Ceritakan tentang Penang Hill",
+        "language": "ms",
+        "normalized_text": "tell me about Penang Hill"
+      },
+      {
+        "id": "MS-INF02",
+        "expected_intent": "request_information",
+        "predicted_intent": "request_information",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Berapakah bayaran masuk tempat ini?",
+        "language": "ms",
+        "normalized_text": "how much is the entrance fee at this place?"
+      },
+      {
+        "id": "MS-INF03",
+        "expected_intent": "request_information",
+        "predicted_intent": "request_information",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Adakah tempat ini mempunyai tandas OKU?",
+        "language": "ms",
+        "normalized_text": "does this place have accessible toilet?"
+      },
+      {
+        "id": "MS-ALT01",
+        "expected_intent": "request_alternative",
+        "predicted_intent": "request_alternative",
+        "confidence": 0.989883,
+        "correct": true,
+        "original_text": "Tunjukkan lebih banyak pilihan",
+        "language": "ms",
+        "normalized_text": "show me more options"
+      },
+      {
+        "id": "MS-ALT02",
+        "expected_intent": "request_alternative",
+        "predicted_intent": "request_alternative",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Beri saya pilihan lain",
+        "language": "ms",
+        "normalized_text": "give me different options"
+      },
+      {
+        "id": "MS-ALT03",
+        "expected_intent": "request_alternative",
+        "predicted_intent": "request_alternative",
+        "confidence": 0.999985,
+        "correct": true,
+        "original_text": "Apa lagi yang tersedia?",
+        "language": "ms",
+        "normalized_text": "what else is available?"
+      },
+      {
+        "id": "MS-RST01",
+        "expected_intent": "reset_conversation",
+        "predicted_intent": "reset_conversation",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Padam pilihan perjalanan",
+        "language": "ms",
+        "normalized_text": "clear my preferences"
+      },
+      {
+        "id": "MS-RST02",
+        "expected_intent": "reset_conversation",
+        "predicted_intent": "reset_conversation",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Mulakan semula dari awal",
+        "language": "ms",
+        "normalized_text": "start over from the beginning"
+      },
+      {
+        "id": "MS-RST03",
+        "expected_intent": "reset_conversation",
+        "predicted_intent": "reset_conversation",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Lupakan semua pilihan saya",
+        "language": "ms",
+        "normalized_text": "forget all my preferences"
+      },
+      {
+        "id": "MS-HLP01",
+        "expected_intent": "help",
+        "predicted_intent": "help",
+        "confidence": 0.999995,
+        "correct": true,
+        "original_text": "Bagaimana saya menggunakan Maya?",
+        "language": "ms",
+        "normalized_text": "how do I use Maya?"
+      },
+      {
+        "id": "MS-HLP02",
+        "expected_intent": "help",
+        "predicted_intent": "help",
+        "confidence": 0.999999,
+        "correct": true,
+        "original_text": "Apakah yang boleh Maya lakukan?",
+        "language": "ms",
+        "normalized_text": "what can Maya do?"
+      },
+      {
+        "id": "MS-HLP03",
+        "expected_intent": "help",
+        "predicted_intent": "help",
+        "confidence": 0.999998,
+        "correct": true,
+        "original_text": "Tolong bantu saya merancang perjalanan",
+        "language": "ms",
+        "normalized_text": "please help me planning a trip"
+      },
+      {
+        "id": "MS-BYE01",
+        "expected_intent": "goodbye",
+        "predicted_intent": "goodbye",
+        "confidence": 0.999614,
+        "correct": true,
+        "original_text": "Selamat tinggal, Maya",
+        "language": "ms",
+        "normalized_text": "goodbye, Maya"
+      },
+      {
+        "id": "MS-BYE02",
+        "expected_intent": "goodbye",
+        "predicted_intent": "goodbye",
+        "confidence": 0.999998,
+        "correct": true,
+        "original_text": "Terima kasih, jumpa lagi",
+        "language": "ms",
+        "normalized_text": "thank you, see you again"
+      },
+      {
+        "id": "MS-BYE03",
+        "expected_intent": "goodbye",
+        "predicted_intent": "goodbye",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Saya sudah selesai merancang",
+        "language": "ms",
+        "normalized_text": "I am finished planning"
+      },
+      {
+        "id": "MS-OOS01",
+        "expected_intent": "out_of_scope",
+        "predicted_intent": "out_of_scope",
+        "confidence": 0.999992,
+        "correct": true,
+        "original_text": "Boleh tolong baiki mesin basuh?",
+        "language": "ms",
+        "normalized_text": "Boleh tolong repair a washing machine?"
+      },
+      {
+        "id": "MS-OOS02",
+        "expected_intent": "out_of_scope",
+        "predicted_intent": "out_of_scope",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "Tulis kod Python untuk saya",
+        "language": "ms",
+        "normalized_text": "write Python code untuk saya"
+      },
+      {
+        "id": "MS-OOS03",
+        "expected_intent": "out_of_scope",
+        "predicted_intent": "out_of_scope",
+        "confidence": 0.999997,
+        "correct": true,
+        "original_text": "Apakah ubat untuk sakit perut?",
+        "language": "ms",
+        "normalized_text": "Apakah medicine for stomach pain?"
+      },
+      {
+        "id": "ZH-G01",
+        "expected_intent": "greeting",
+        "predicted_intent": "greeting",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "你好，Maya",
+        "language": "zh",
+        "normalized_text": "hello ，Maya"
+      },
+      {
+        "id": "ZH-G02",
+        "expected_intent": "greeting",
+        "predicted_intent": "greeting",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "早上好，Maya",
+        "language": "zh",
+        "normalized_text": "good morning ，Maya"
+      },
+      {
+        "id": "ZH-G03",
+        "expected_intent": "greeting",
+        "predicted_intent": "greeting",
+        "confidence": 0.999998,
+        "correct": true,
+        "original_text": "下午好，我们可以开始吗？",
+        "language": "zh",
+        "normalized_text": "good afternoon ，我们可以开始吗？"
+      },
+      {
+        "id": "ZH-REC01",
+        "expected_intent": "request_recommendation",
+        "predicted_intent": "request_recommendation",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "推荐柔佛的自然景点",
+        "language": "zh",
+        "normalized_text": "recommend Johor nature attraction"
+      },
+      {
+        "id": "ZH-REC02",
+        "expected_intent": "request_recommendation",
+        "predicted_intent": "request_recommendation",
+        "confidence": 0.999699,
+        "correct": true,
+        "original_text": "我想去槟城适合长者的海滩",
+        "language": "zh",
+        "normalized_text": "I want to visit Penang suitable for elderly beach"
+      },
+      {
+        "id": "ZH-REC03",
+        "expected_intent": "request_recommendation",
+        "predicted_intent": "request_recommendation",
+        "confidence": 0.999806,
+        "correct": true,
+        "original_text": "推荐雪兰莪轮椅无障碍的博物馆",
+        "language": "zh",
+        "normalized_text": "recommend Selangor wheelchair accessible museum"
+      },
+      {
+        "id": "ZH-REF01",
+        "expected_intent": "refine_preferences",
+        "predicted_intent": "refine_preferences",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "把州属改为霹雳",
+        "language": "zh",
+        "normalized_text": "change the state to Perak"
+      },
+      {
+        "id": "ZH-REF02",
+        "expected_intent": "refine_preferences",
+        "predicted_intent": "refine_preferences",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "把预算改为RM30",
+        "language": "zh",
+        "normalized_text": "change the budget to RM30"
+      },
+      {
+        "id": "ZH-REF03",
+        "expected_intent": "refine_preferences",
+        "predicted_intent": "refine_preferences",
+        "confidence": 0.999997,
+        "correct": true,
+        "original_text": "现在我想要休息座椅",
+        "language": "zh",
+        "normalized_text": "change my preference to benches and places to rest"
+      },
+      {
+        "id": "ZH-INF01",
+        "expected_intent": "request_information",
+        "predicted_intent": "request_information",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "介绍一下 Penang Hill",
+        "language": "zh",
+        "normalized_text": "tell me about Penang Hill"
+      },
+      {
+        "id": "ZH-INF02",
+        "expected_intent": "request_information",
+        "predicted_intent": "request_information",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "这个地方的入场费是多少？",
+        "language": "zh",
+        "normalized_text": "how much is the entrance fee at this place ？"
+      },
+      {
+        "id": "ZH-INF03",
+        "expected_intent": "request_information",
+        "predicted_intent": "request_information",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "这个地方有无障碍厕所吗？",
+        "language": "zh",
+        "normalized_text": "does this place have an accessible toilet ？"
+      },
+      {
+        "id": "ZH-ALT01",
+        "expected_intent": "request_alternative",
+        "predicted_intent": "request_alternative",
+        "confidence": 0.989883,
+        "correct": true,
+        "original_text": "显示更多选择",
+        "language": "zh",
+        "normalized_text": "show me more options"
+      },
+      {
+        "id": "ZH-ALT02",
+        "expected_intent": "request_alternative",
+        "predicted_intent": "request_alternative",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "给我不同的选择",
+        "language": "zh",
+        "normalized_text": "give me different options"
+      },
+      {
+        "id": "ZH-ALT03",
+        "expected_intent": "request_alternative",
+        "predicted_intent": "request_alternative",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "还有什么选择？",
+        "language": "zh",
+        "normalized_text": "what other options are available ？"
+      },
+      {
+        "id": "ZH-RST01",
+        "expected_intent": "reset_conversation",
+        "predicted_intent": "reset_conversation",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "清除旅行偏好",
+        "language": "zh",
+        "normalized_text": "clear my preferences"
+      },
+      {
+        "id": "ZH-RST02",
+        "expected_intent": "reset_conversation",
+        "predicted_intent": "reset_conversation",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "从头重新开始",
+        "language": "zh",
+        "normalized_text": "start over from the beginning"
+      },
+      {
+        "id": "ZH-RST03",
+        "expected_intent": "reset_conversation",
+        "predicted_intent": "reset_conversation",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "忘记我所有的选择",
+        "language": "zh",
+        "normalized_text": "forget all my preferences"
+      },
+      {
+        "id": "ZH-HLP01",
+        "expected_intent": "help",
+        "predicted_intent": "help",
+        "confidence": 0.999987,
+        "correct": true,
+        "original_text": "我该如何使用Maya？",
+        "language": "zh",
+        "normalized_text": "how do I use Maya ？"
+      },
+      {
+        "id": "ZH-HLP02",
+        "expected_intent": "help",
+        "predicted_intent": "help",
+        "confidence": 0.999994,
+        "correct": true,
+        "original_text": "Maya可以做什么？",
+        "language": "zh",
+        "normalized_text": "what can Maya do ？"
+      },
+      {
+        "id": "ZH-HLP03",
+        "expected_intent": "help",
+        "predicted_intent": "help",
+        "confidence": 0.999628,
+        "correct": true,
+        "original_text": "请教我如何规划旅程",
+        "language": "zh",
+        "normalized_text": "please guide me through planning a trip"
+      },
+      {
+        "id": "ZH-BYE01",
+        "expected_intent": "goodbye",
+        "predicted_intent": "goodbye",
+        "confidence": 0.999925,
+        "correct": true,
+        "original_text": "再见，Maya",
+        "language": "zh",
+        "normalized_text": "goodbye ，Maya"
+      },
+      {
+        "id": "ZH-BYE02",
+        "expected_intent": "goodbye",
+        "predicted_intent": "goodbye",
+        "confidence": 0.999998,
+        "correct": true,
+        "original_text": "谢谢，下次再见",
+        "language": "zh",
+        "normalized_text": "thank you, see you again"
+      },
+      {
+        "id": "ZH-BYE03",
+        "expected_intent": "goodbye",
+        "predicted_intent": "goodbye",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "我的旅行规划完成了",
+        "language": "zh",
+        "normalized_text": "I am finished planning my trip"
+      },
+      {
+        "id": "ZH-OOS01",
+        "expected_intent": "out_of_scope",
+        "predicted_intent": "out_of_scope",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "你可以修理洗衣机吗？",
+        "language": "zh",
+        "normalized_text": "你可以 repair a washing machine 吗？"
+      },
+      {
+        "id": "ZH-OOS02",
+        "expected_intent": "out_of_scope",
+        "predicted_intent": "out_of_scope",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "为我编写Python代码",
+        "language": "zh",
+        "normalized_text": "为我 write Python code"
+      },
+      {
+        "id": "ZH-OOS03",
+        "expected_intent": "out_of_scope",
+        "predicted_intent": "out_of_scope",
+        "confidence": 1.0,
+        "correct": true,
+        "original_text": "胃痛应该吃什么药？",
+        "language": "zh",
+        "normalized_text": "what medicine should I take for stomach pain ？"
+      }
+    ]
+  },
+  "per_language": {
+    "ms": {
+      "total_examples": 27,
+      "correct_predictions": 27,
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1_score": 1.0,
+      "per_intent": {
+        "goodbye": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "greeting": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "help": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "out_of_scope": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "refine_preferences": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "request_alternative": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "request_information": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "request_recommendation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "reset_conversation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        }
+      },
+      "confusion_matrix": {
+        "goodbye": {
+          "goodbye": 3,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "greeting": {
+          "goodbye": 0,
+          "greeting": 3,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "help": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 3,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "out_of_scope": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 3,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "refine_preferences": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 3,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "request_alternative": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 3,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "request_information": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 3,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "request_recommendation": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 3,
+          "reset_conversation": 0
+        },
+        "reset_conversation": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 3
+        }
+      },
+      "predictions": [
+        {
+          "id": "MS-G01",
+          "expected_intent": "greeting",
+          "predicted_intent": "greeting",
+          "confidence": 0.999999,
+          "correct": true,
+          "original_text": "Hai Maya",
+          "language": "ms",
+          "normalized_text": "hello Maya"
+        },
+        {
+          "id": "MS-G02",
+          "expected_intent": "greeting",
+          "predicted_intent": "greeting",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Selamat pagi, Maya",
+          "language": "ms",
+          "normalized_text": "good morning, Maya"
+        },
+        {
+          "id": "MS-G03",
+          "expected_intent": "greeting",
+          "predicted_intent": "greeting",
+          "confidence": 0.999999,
+          "correct": true,
+          "original_text": "Helo, boleh kita mula?",
+          "language": "ms",
+          "normalized_text": "hello, can we begin?"
+        },
+        {
+          "id": "MS-REC01",
+          "expected_intent": "request_recommendation",
+          "predicted_intent": "request_recommendation",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Cadangkan tempat alam semula jadi di Johor",
+          "language": "ms",
+          "normalized_text": "recommend place nature in Johor"
+        },
+        {
+          "id": "MS-REC02",
+          "expected_intent": "request_recommendation",
+          "predicted_intent": "request_recommendation",
+          "confidence": 0.999969,
+          "correct": true,
+          "original_text": "Saya mahu melawat pantai mesra warga emas di Penang",
+          "language": "ms",
+          "normalized_text": "I want to visit beach elderly friendly in Penang"
+        },
+        {
+          "id": "MS-REC03",
+          "expected_intent": "request_recommendation",
+          "predicted_intent": "request_recommendation",
+          "confidence": 0.999993,
+          "correct": true,
+          "original_text": "Syorkan muzium mesra kerusi roda di Selangor",
+          "language": "ms",
+          "normalized_text": "recommend museum wheelchair accessible in Selangor"
+        },
+        {
+          "id": "MS-REF01",
+          "expected_intent": "refine_preferences",
+          "predicted_intent": "refine_preferences",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Tukar negeri kepada Perak",
+          "language": "ms",
+          "normalized_text": "change the state to Perak"
+        },
+        {
+          "id": "MS-REF02",
+          "expected_intent": "refine_preferences",
+          "predicted_intent": "refine_preferences",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Ubah bajet kepada RM30",
+          "language": "ms",
+          "normalized_text": "change the budget to RM30"
+        },
+        {
+          "id": "MS-REF03",
+          "expected_intent": "refine_preferences",
+          "predicted_intent": "refine_preferences",
+          "confidence": 0.999997,
+          "correct": true,
+          "original_text": "Sekarang saya mahu tempat duduk berdekatan",
+          "language": "ms",
+          "normalized_text": "change my preference to benches and places to rest"
+        },
+        {
+          "id": "MS-INF01",
+          "expected_intent": "request_information",
+          "predicted_intent": "request_information",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Ceritakan tentang Penang Hill",
+          "language": "ms",
+          "normalized_text": "tell me about Penang Hill"
+        },
+        {
+          "id": "MS-INF02",
+          "expected_intent": "request_information",
+          "predicted_intent": "request_information",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Berapakah bayaran masuk tempat ini?",
+          "language": "ms",
+          "normalized_text": "how much is the entrance fee at this place?"
+        },
+        {
+          "id": "MS-INF03",
+          "expected_intent": "request_information",
+          "predicted_intent": "request_information",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Adakah tempat ini mempunyai tandas OKU?",
+          "language": "ms",
+          "normalized_text": "does this place have accessible toilet?"
+        },
+        {
+          "id": "MS-ALT01",
+          "expected_intent": "request_alternative",
+          "predicted_intent": "request_alternative",
+          "confidence": 0.989883,
+          "correct": true,
+          "original_text": "Tunjukkan lebih banyak pilihan",
+          "language": "ms",
+          "normalized_text": "show me more options"
+        },
+        {
+          "id": "MS-ALT02",
+          "expected_intent": "request_alternative",
+          "predicted_intent": "request_alternative",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Beri saya pilihan lain",
+          "language": "ms",
+          "normalized_text": "give me different options"
+        },
+        {
+          "id": "MS-ALT03",
+          "expected_intent": "request_alternative",
+          "predicted_intent": "request_alternative",
+          "confidence": 0.999985,
+          "correct": true,
+          "original_text": "Apa lagi yang tersedia?",
+          "language": "ms",
+          "normalized_text": "what else is available?"
+        },
+        {
+          "id": "MS-RST01",
+          "expected_intent": "reset_conversation",
+          "predicted_intent": "reset_conversation",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Padam pilihan perjalanan",
+          "language": "ms",
+          "normalized_text": "clear my preferences"
+        },
+        {
+          "id": "MS-RST02",
+          "expected_intent": "reset_conversation",
+          "predicted_intent": "reset_conversation",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Mulakan semula dari awal",
+          "language": "ms",
+          "normalized_text": "start over from the beginning"
+        },
+        {
+          "id": "MS-RST03",
+          "expected_intent": "reset_conversation",
+          "predicted_intent": "reset_conversation",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Lupakan semua pilihan saya",
+          "language": "ms",
+          "normalized_text": "forget all my preferences"
+        },
+        {
+          "id": "MS-HLP01",
+          "expected_intent": "help",
+          "predicted_intent": "help",
+          "confidence": 0.999995,
+          "correct": true,
+          "original_text": "Bagaimana saya menggunakan Maya?",
+          "language": "ms",
+          "normalized_text": "how do I use Maya?"
+        },
+        {
+          "id": "MS-HLP02",
+          "expected_intent": "help",
+          "predicted_intent": "help",
+          "confidence": 0.999999,
+          "correct": true,
+          "original_text": "Apakah yang boleh Maya lakukan?",
+          "language": "ms",
+          "normalized_text": "what can Maya do?"
+        },
+        {
+          "id": "MS-HLP03",
+          "expected_intent": "help",
+          "predicted_intent": "help",
+          "confidence": 0.999998,
+          "correct": true,
+          "original_text": "Tolong bantu saya merancang perjalanan",
+          "language": "ms",
+          "normalized_text": "please help me planning a trip"
+        },
+        {
+          "id": "MS-BYE01",
+          "expected_intent": "goodbye",
+          "predicted_intent": "goodbye",
+          "confidence": 0.999614,
+          "correct": true,
+          "original_text": "Selamat tinggal, Maya",
+          "language": "ms",
+          "normalized_text": "goodbye, Maya"
+        },
+        {
+          "id": "MS-BYE02",
+          "expected_intent": "goodbye",
+          "predicted_intent": "goodbye",
+          "confidence": 0.999998,
+          "correct": true,
+          "original_text": "Terima kasih, jumpa lagi",
+          "language": "ms",
+          "normalized_text": "thank you, see you again"
+        },
+        {
+          "id": "MS-BYE03",
+          "expected_intent": "goodbye",
+          "predicted_intent": "goodbye",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Saya sudah selesai merancang",
+          "language": "ms",
+          "normalized_text": "I am finished planning"
+        },
+        {
+          "id": "MS-OOS01",
+          "expected_intent": "out_of_scope",
+          "predicted_intent": "out_of_scope",
+          "confidence": 0.999992,
+          "correct": true,
+          "original_text": "Boleh tolong baiki mesin basuh?",
+          "language": "ms",
+          "normalized_text": "Boleh tolong repair a washing machine?"
+        },
+        {
+          "id": "MS-OOS02",
+          "expected_intent": "out_of_scope",
+          "predicted_intent": "out_of_scope",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "Tulis kod Python untuk saya",
+          "language": "ms",
+          "normalized_text": "write Python code untuk saya"
+        },
+        {
+          "id": "MS-OOS03",
+          "expected_intent": "out_of_scope",
+          "predicted_intent": "out_of_scope",
+          "confidence": 0.999997,
+          "correct": true,
+          "original_text": "Apakah ubat untuk sakit perut?",
+          "language": "ms",
+          "normalized_text": "Apakah medicine for stomach pain?"
+        }
+      ]
+    },
+    "zh": {
+      "total_examples": 27,
+      "correct_predictions": 27,
+      "accuracy": 1.0,
+      "macro_precision": 1.0,
+      "macro_recall": 1.0,
+      "macro_f1_score": 1.0,
+      "per_intent": {
+        "goodbye": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "greeting": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "help": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "out_of_scope": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "refine_preferences": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "request_alternative": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "request_information": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "request_recommendation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        },
+        "reset_conversation": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0,
+          "support": 3
+        }
+      },
+      "confusion_matrix": {
+        "goodbye": {
+          "goodbye": 3,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "greeting": {
+          "goodbye": 0,
+          "greeting": 3,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "help": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 3,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "out_of_scope": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 3,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "refine_preferences": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 3,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "request_alternative": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 3,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "request_information": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 3,
+          "request_recommendation": 0,
+          "reset_conversation": 0
+        },
+        "request_recommendation": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 3,
+          "reset_conversation": 0
+        },
+        "reset_conversation": {
+          "goodbye": 0,
+          "greeting": 0,
+          "help": 0,
+          "out_of_scope": 0,
+          "refine_preferences": 0,
+          "request_alternative": 0,
+          "request_information": 0,
+          "request_recommendation": 0,
+          "reset_conversation": 3
+        }
+      },
+      "predictions": [
+        {
+          "id": "ZH-G01",
+          "expected_intent": "greeting",
+          "predicted_intent": "greeting",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "你好，Maya",
+          "language": "zh",
+          "normalized_text": "hello ，Maya"
+        },
+        {
+          "id": "ZH-G02",
+          "expected_intent": "greeting",
+          "predicted_intent": "greeting",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "早上好，Maya",
+          "language": "zh",
+          "normalized_text": "good morning ，Maya"
+        },
+        {
+          "id": "ZH-G03",
+          "expected_intent": "greeting",
+          "predicted_intent": "greeting",
+          "confidence": 0.999998,
+          "correct": true,
+          "original_text": "下午好，我们可以开始吗？",
+          "language": "zh",
+          "normalized_text": "good afternoon ，我们可以开始吗？"
+        },
+        {
+          "id": "ZH-REC01",
+          "expected_intent": "request_recommendation",
+          "predicted_intent": "request_recommendation",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "推荐柔佛的自然景点",
+          "language": "zh",
+          "normalized_text": "recommend Johor nature attraction"
+        },
+        {
+          "id": "ZH-REC02",
+          "expected_intent": "request_recommendation",
+          "predicted_intent": "request_recommendation",
+          "confidence": 0.999699,
+          "correct": true,
+          "original_text": "我想去槟城适合长者的海滩",
+          "language": "zh",
+          "normalized_text": "I want to visit Penang suitable for elderly beach"
+        },
+        {
+          "id": "ZH-REC03",
+          "expected_intent": "request_recommendation",
+          "predicted_intent": "request_recommendation",
+          "confidence": 0.999806,
+          "correct": true,
+          "original_text": "推荐雪兰莪轮椅无障碍的博物馆",
+          "language": "zh",
+          "normalized_text": "recommend Selangor wheelchair accessible museum"
+        },
+        {
+          "id": "ZH-REF01",
+          "expected_intent": "refine_preferences",
+          "predicted_intent": "refine_preferences",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "把州属改为霹雳",
+          "language": "zh",
+          "normalized_text": "change the state to Perak"
+        },
+        {
+          "id": "ZH-REF02",
+          "expected_intent": "refine_preferences",
+          "predicted_intent": "refine_preferences",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "把预算改为RM30",
+          "language": "zh",
+          "normalized_text": "change the budget to RM30"
+        },
+        {
+          "id": "ZH-REF03",
+          "expected_intent": "refine_preferences",
+          "predicted_intent": "refine_preferences",
+          "confidence": 0.999997,
+          "correct": true,
+          "original_text": "现在我想要休息座椅",
+          "language": "zh",
+          "normalized_text": "change my preference to benches and places to rest"
+        },
+        {
+          "id": "ZH-INF01",
+          "expected_intent": "request_information",
+          "predicted_intent": "request_information",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "介绍一下 Penang Hill",
+          "language": "zh",
+          "normalized_text": "tell me about Penang Hill"
+        },
+        {
+          "id": "ZH-INF02",
+          "expected_intent": "request_information",
+          "predicted_intent": "request_information",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "这个地方的入场费是多少？",
+          "language": "zh",
+          "normalized_text": "how much is the entrance fee at this place ？"
+        },
+        {
+          "id": "ZH-INF03",
+          "expected_intent": "request_information",
+          "predicted_intent": "request_information",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "这个地方有无障碍厕所吗？",
+          "language": "zh",
+          "normalized_text": "does this place have an accessible toilet ？"
+        },
+        {
+          "id": "ZH-ALT01",
+          "expected_intent": "request_alternative",
+          "predicted_intent": "request_alternative",
+          "confidence": 0.989883,
+          "correct": true,
+          "original_text": "显示更多选择",
+          "language": "zh",
+          "normalized_text": "show me more options"
+        },
+        {
+          "id": "ZH-ALT02",
+          "expected_intent": "request_alternative",
+          "predicted_intent": "request_alternative",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "给我不同的选择",
+          "language": "zh",
+          "normalized_text": "give me different options"
+        },
+        {
+          "id": "ZH-ALT03",
+          "expected_intent": "request_alternative",
+          "predicted_intent": "request_alternative",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "还有什么选择？",
+          "language": "zh",
+          "normalized_text": "what other options are available ？"
+        },
+        {
+          "id": "ZH-RST01",
+          "expected_intent": "reset_conversation",
+          "predicted_intent": "reset_conversation",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "清除旅行偏好",
+          "language": "zh",
+          "normalized_text": "clear my preferences"
+        },
+        {
+          "id": "ZH-RST02",
+          "expected_intent": "reset_conversation",
+          "predicted_intent": "reset_conversation",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "从头重新开始",
+          "language": "zh",
+          "normalized_text": "start over from the beginning"
+        },
+        {
+          "id": "ZH-RST03",
+          "expected_intent": "reset_conversation",
+          "predicted_intent": "reset_conversation",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "忘记我所有的选择",
+          "language": "zh",
+          "normalized_text": "forget all my preferences"
+        },
+        {
+          "id": "ZH-HLP01",
+          "expected_intent": "help",
+          "predicted_intent": "help",
+          "confidence": 0.999987,
+          "correct": true,
+          "original_text": "我该如何使用Maya？",
+          "language": "zh",
+          "normalized_text": "how do I use Maya ？"
+        },
+        {
+          "id": "ZH-HLP02",
+          "expected_intent": "help",
+          "predicted_intent": "help",
+          "confidence": 0.999994,
+          "correct": true,
+          "original_text": "Maya可以做什么？",
+          "language": "zh",
+          "normalized_text": "what can Maya do ？"
+        },
+        {
+          "id": "ZH-HLP03",
+          "expected_intent": "help",
+          "predicted_intent": "help",
+          "confidence": 0.999628,
+          "correct": true,
+          "original_text": "请教我如何规划旅程",
+          "language": "zh",
+          "normalized_text": "please guide me through planning a trip"
+        },
+        {
+          "id": "ZH-BYE01",
+          "expected_intent": "goodbye",
+          "predicted_intent": "goodbye",
+          "confidence": 0.999925,
+          "correct": true,
+          "original_text": "再见，Maya",
+          "language": "zh",
+          "normalized_text": "goodbye ，Maya"
+        },
+        {
+          "id": "ZH-BYE02",
+          "expected_intent": "goodbye",
+          "predicted_intent": "goodbye",
+          "confidence": 0.999998,
+          "correct": true,
+          "original_text": "谢谢，下次再见",
+          "language": "zh",
+          "normalized_text": "thank you, see you again"
+        },
+        {
+          "id": "ZH-BYE03",
+          "expected_intent": "goodbye",
+          "predicted_intent": "goodbye",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "我的旅行规划完成了",
+          "language": "zh",
+          "normalized_text": "I am finished planning my trip"
+        },
+        {
+          "id": "ZH-OOS01",
+          "expected_intent": "out_of_scope",
+          "predicted_intent": "out_of_scope",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "你可以修理洗衣机吗？",
+          "language": "zh",
+          "normalized_text": "你可以 repair a washing machine 吗？"
+        },
+        {
+          "id": "ZH-OOS02",
+          "expected_intent": "out_of_scope",
+          "predicted_intent": "out_of_scope",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "为我编写Python代码",
+          "language": "zh",
+          "normalized_text": "为我 write Python code"
+        },
+        {
+          "id": "ZH-OOS03",
+          "expected_intent": "out_of_scope",
+          "predicted_intent": "out_of_scope",
+          "confidence": 1.0,
+          "correct": true,
+          "original_text": "胃痛应该吃什么药？",
+          "language": "zh",
+          "normalized_text": "what medicine should I take for stomach pain ？"
+        }
+      ]
+    }
+  },
+  "entity_extraction": {
+    "evaluated_cases": 12,
+    "perfect_cases": 12,
+    "case_accuracy": 1.0,
+    "evaluated_fields": 22,
+    "correct_fields": 22,
+    "field_accuracy": 1.0,
+    "predictions": [
+      {
+        "id": "MS-REC01",
+        "language": "ms",
+        "original_text": "Cadangkan tempat alam semula jadi di Johor",
+        "normalized_text": "recommend place nature in Johor",
+        "perfect": true,
+        "fields": {
+          "state": {
+            "expected": "Johor",
+            "actual": "Johor",
+            "correct": true
+          },
+          "interests": {
+            "expected": [
+              "nature"
+            ],
+            "actual": [
+              "nature"
+            ],
+            "correct": true
+          }
+        }
+      },
+      {
+        "id": "MS-REC02",
+        "language": "ms",
+        "original_text": "Saya mahu melawat pantai mesra warga emas di Penang",
+        "normalized_text": "I want to visit beach elderly friendly in Penang",
+        "perfect": true,
+        "fields": {
+          "state": {
+            "expected": "Penang",
+            "actual": "Penang",
+            "correct": true
+          },
+          "interests": {
+            "expected": [
+              "beach"
+            ],
+            "actual": [
+              "beach"
+            ],
+            "correct": true
+          },
+          "elderly_friendly": {
+            "expected": true,
+            "actual": true,
+            "correct": true
+          }
+        }
+      },
+      {
+        "id": "MS-REC03",
+        "language": "ms",
+        "original_text": "Syorkan muzium mesra kerusi roda di Selangor",
+        "normalized_text": "recommend museum wheelchair accessible in Selangor",
+        "perfect": true,
+        "fields": {
+          "state": {
+            "expected": "Selangor",
+            "actual": "Selangor",
+            "correct": true
+          },
+          "interests": {
+            "expected": [
+              "history"
+            ],
+            "actual": [
+              "history"
+            ],
+            "correct": true
+          },
+          "wheelchair_accessible": {
+            "expected": true,
+            "actual": true,
+            "correct": true
+          }
+        }
+      },
+      {
+        "id": "MS-REF01",
+        "language": "ms",
+        "original_text": "Tukar negeri kepada Perak",
+        "normalized_text": "change the state to Perak",
+        "perfect": true,
+        "fields": {
+          "state": {
+            "expected": "Perak",
+            "actual": "Perak",
+            "correct": true
+          }
+        }
+      },
+      {
+        "id": "MS-REF02",
+        "language": "ms",
+        "original_text": "Ubah bajet kepada RM30",
+        "normalized_text": "change the budget to RM30",
+        "perfect": true,
+        "fields": {
+          "maximum_fee": {
+            "expected": 30.0,
+            "actual": 30.0,
+            "correct": true
+          }
+        }
+      },
+      {
+        "id": "MS-REF03",
+        "language": "ms",
+        "original_text": "Sekarang saya mahu tempat duduk berdekatan",
+        "normalized_text": "change my preference to benches and places to rest",
+        "perfect": true,
+        "fields": {
+          "accessibility_needs": {
+            "expected": [
+              "seating"
+            ],
+            "actual": [
+              "seating"
+            ],
+            "correct": true
+          }
+        }
+      },
+      {
+        "id": "ZH-REC01",
+        "language": "zh",
+        "original_text": "推荐柔佛的自然景点",
+        "normalized_text": "recommend Johor nature attraction",
+        "perfect": true,
+        "fields": {
+          "state": {
+            "expected": "Johor",
+            "actual": "Johor",
+            "correct": true
+          },
+          "interests": {
+            "expected": [
+              "nature"
+            ],
+            "actual": [
+              "nature"
+            ],
+            "correct": true
+          }
+        }
+      },
+      {
+        "id": "ZH-REC02",
+        "language": "zh",
+        "original_text": "我想去槟城适合长者的海滩",
+        "normalized_text": "I want to visit Penang suitable for elderly beach",
+        "perfect": true,
+        "fields": {
+          "state": {
+            "expected": "Penang",
+            "actual": "Penang",
+            "correct": true
+          },
+          "interests": {
+            "expected": [
+              "beach"
+            ],
+            "actual": [
+              "beach"
+            ],
+            "correct": true
+          },
+          "elderly_friendly": {
+            "expected": true,
+            "actual": true,
+            "correct": true
+          }
+        }
+      },
+      {
+        "id": "ZH-REC03",
+        "language": "zh",
+        "original_text": "推荐雪兰莪轮椅无障碍的博物馆",
+        "normalized_text": "recommend Selangor wheelchair accessible museum",
+        "perfect": true,
+        "fields": {
+          "state": {
+            "expected": "Selangor",
+            "actual": "Selangor",
+            "correct": true
+          },
+          "interests": {
+            "expected": [
+              "history"
+            ],
+            "actual": [
+              "history"
+            ],
+            "correct": true
+          },
+          "wheelchair_accessible": {
+            "expected": true,
+            "actual": true,
+            "correct": true
+          }
+        }
+      },
+      {
+        "id": "ZH-REF01",
+        "language": "zh",
+        "original_text": "把州属改为霹雳",
+        "normalized_text": "change the state to Perak",
+        "perfect": true,
+        "fields": {
+          "state": {
+            "expected": "Perak",
+            "actual": "Perak",
+            "correct": true
+          }
+        }
+      },
+      {
+        "id": "ZH-REF02",
+        "language": "zh",
+        "original_text": "把预算改为RM30",
+        "normalized_text": "change the budget to RM30",
+        "perfect": true,
+        "fields": {
+          "maximum_fee": {
+            "expected": 30.0,
+            "actual": 30.0,
+            "correct": true
+          }
+        }
+      },
+      {
+        "id": "ZH-REF03",
+        "language": "zh",
+        "original_text": "现在我想要休息座椅",
+        "normalized_text": "change my preference to benches and places to rest",
+        "perfect": true,
+        "fields": {
+          "accessibility_needs": {
+            "expected": [
+              "seating"
+            ],
+            "actual": [
+              "seating"
+            ],
+            "correct": true
+          }
+        }
+      }
+    ]
+  },
+  "model_path": "C:\\Users\\User\\Documents\\UTAR\\Y3 S1\\FYP1\\travel chatbot\\models\\intent_classifier",
+  "cases_path": "C:\\Users\\User\\Documents\\UTAR\\Y3 S1\\FYP1\\travel chatbot\\evaluation\\multilingual_queries.json",
+  "training_data_path": "C:\\Users\\User\\Documents\\UTAR\\Y3 S1\\FYP1\\travel chatbot\\nlp\\intents.json",
+  "training_overlap_count": 0
+}

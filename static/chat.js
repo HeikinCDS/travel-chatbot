@@ -16,6 +16,9 @@ const preferences = document.querySelector("#preference-list");
 const formStatus = document.querySelector("#form-status");
 const historyList = document.querySelector("#chat-history");
 const historyEmpty = document.querySelector("#history-empty");
+const savedConversationsList = document.querySelector("#saved-conversations");
+const savedConversationsEmpty = document.querySelector("#saved-conversations-empty");
+const currentConversationTitle = document.querySelector("#current-conversation-title");
 let messageCounter = 0;
 let preferredSpeechVoice = null;
 let activeAudio = null;
@@ -25,6 +28,7 @@ let speechRecognition = null;
 let voiceInputActive = false;
 let inputBeforeSpeech = "";
 let latestContext = {};
+let latestSessionState = null;
 let latestSuggestions = Array.from(
   quickReplies.querySelectorAll("button[data-message]"),
   button => ({ label: button.textContent.trim(), message: button.dataset.message }),
@@ -32,6 +36,12 @@ let latestSuggestions = Array.from(
 const SUPPORTED_LANGUAGES = new Set(["en", "ms", "zh"]);
 let currentLanguage = localStorage.getItem("jomvoyageLanguage") || "en";
 if (!SUPPORTED_LANGUAGES.has(currentLanguage)) currentLanguage = "en";
+const SAVED_CONVERSATIONS_KEY = "jomvoyageSavedConversations";
+const ACTIVE_CONVERSATION_KEY = "jomvoyageActiveConversation";
+const MAX_SAVED_CONVERSATIONS = 8;
+const MAX_SAVED_MESSAGES = 40;
+let activeConversationId = localStorage.getItem(ACTIVE_CONVERSATION_KEY) || createConversationId();
+let skipCurrentSaveOnReset = false;
 
 const UI_TEXT = {
   en: {
@@ -50,6 +60,17 @@ const UI_TEXT = {
     chatHistory: "Chat history",
     historyHelp: "Current conversation. Select a message to return to it.",
     historyEmpty: "Your messages will appear here.",
+    savedConversations: "Saved conversations",
+    savedConversationsHelp: "Reopen an earlier trip and continue planning.",
+    savedConversationsEmpty: "Your saved trips will appear here.",
+    renameConversation: "Rename",
+    deleteConversation: "Delete",
+    deleteConversationConfirm: "Delete this saved conversation?",
+    saveConversationName: "Save",
+    cancelConversationAction: "Cancel",
+    confirmDeleteConversation: "Yes, delete",
+    newTripTitle: "New Malaysia Trip",
+    tripTitleSuffix: "Trip",
     eyebrow: "Plan a trip in Malaysia",
     introTitle: "Where would you like to explore?",
     introDescription: "Tell me a state and what you enjoy. I will remember your choices while we chat.",
@@ -90,6 +111,17 @@ const UI_TEXT = {
     chatHistory: "Sejarah sembang",
     historyHelp: "Perbualan semasa. Pilih mesej untuk kembali kepadanya.",
     historyEmpty: "Mesej anda akan dipaparkan di sini.",
+    savedConversations: "Perbualan tersimpan",
+    savedConversationsHelp: "Buka semula perjalanan terdahulu dan teruskan merancang.",
+    savedConversationsEmpty: "Perjalanan tersimpan akan dipaparkan di sini.",
+    renameConversation: "Namakan semula",
+    deleteConversation: "Padam",
+    deleteConversationConfirm: "Padam perbualan tersimpan ini?",
+    saveConversationName: "Simpan",
+    cancelConversationAction: "Batal",
+    confirmDeleteConversation: "Ya, padam",
+    newTripTitle: "Perjalanan Malaysia Baharu",
+    tripTitleSuffix: "Perjalanan",
     eyebrow: "Rancang perjalanan di Malaysia",
     introTitle: "Ke manakah anda ingin pergi?",
     introDescription: "Beritahu saya negeri dan minat anda. Saya akan mengingati pilihan anda semasa kita berbual.",
@@ -130,6 +162,17 @@ const UI_TEXT = {
     chatHistory: "聊天记录",
     historyHelp: "当前对话。选择一条消息即可返回查看。",
     historyEmpty: "您的消息将显示在这里。",
+    savedConversations: "已保存的对话",
+    savedConversationsHelp: "重新打开之前的旅程并继续规划。",
+    savedConversationsEmpty: "保存的旅程将显示在这里。",
+    renameConversation: "重命名",
+    deleteConversation: "删除",
+    deleteConversationConfirm: "删除这个已保存的对话吗？",
+    saveConversationName: "保存",
+    cancelConversationAction: "取消",
+    confirmDeleteConversation: "确认删除",
+    newTripTitle: "新的马来西亚之旅",
+    tripTitleSuffix: "之旅",
     eyebrow: "规划马来西亚之旅",
     introTitle: "您想探索哪里？",
     introDescription: "告诉我您想去的州属和兴趣。聊天期间，我会记住您的选择。",
@@ -153,6 +196,90 @@ const UI_TEXT = {
     sources: "资料来源",
     visitorInformation: "查看访客资料",
     you: "您",
+  },
+};
+
+const HISTORY_TOPICS = {
+  en: {
+    greeting: "Welcome",
+    help: "Help",
+    out_of_scope: "Travel questions only",
+    low_confidence: "Clarify request",
+    clarify_preferences: "Trip preferences",
+    clarify_accessibility: "Accessibility needs",
+    recommend: "Recommendations",
+    alternative: "More options",
+    no_alternatives: "No more options",
+    no_results: "No matching places",
+    information: "Attraction details",
+    information_unavailable: "Attraction details",
+    choose_recommendation: "Choose a place",
+    comparison: "Place comparison",
+    comparison_unavailable: "Place comparison",
+    request_refinement: "Change preferences",
+    show_previous_options: "Previous options",
+    previous_options_unavailable: "Previous options",
+    confirm_attraction: "Confirm place",
+    reset: "New trip",
+    reset_preferences: "Reset preferences",
+    preferences_unchanged: "Preferences unchanged",
+    goodbye: "Goodbye",
+    response: "Reply",
+    more_options: "More options",
+  },
+  ms: {
+    greeting: "Selamat datang",
+    help: "Bantuan",
+    out_of_scope: "Soalan perjalanan sahaja",
+    low_confidence: "Jelaskan permintaan",
+    clarify_preferences: "Pilihan perjalanan",
+    clarify_accessibility: "Keperluan aksesibiliti",
+    recommend: "Cadangan tempat",
+    alternative: "Pilihan tambahan",
+    no_alternatives: "Tiada pilihan lagi",
+    no_results: "Tiada tempat sepadan",
+    information: "Maklumat tarikan",
+    information_unavailable: "Maklumat tarikan",
+    choose_recommendation: "Pilih tempat",
+    comparison: "Perbandingan tempat",
+    comparison_unavailable: "Perbandingan tempat",
+    request_refinement: "Ubah pilihan",
+    show_previous_options: "Pilihan terdahulu",
+    previous_options_unavailable: "Pilihan terdahulu",
+    confirm_attraction: "Sahkan tempat",
+    reset: "Perjalanan baharu",
+    reset_preferences: "Tetapkan semula pilihan",
+    preferences_unchanged: "Pilihan tidak berubah",
+    goodbye: "Selamat tinggal",
+    response: "Jawapan",
+    more_options: "Pilihan tambahan",
+  },
+  zh: {
+    greeting: "欢迎",
+    help: "帮助",
+    out_of_scope: "仅限旅游问题",
+    low_confidence: "说明请求",
+    clarify_preferences: "旅行偏好",
+    clarify_accessibility: "无障碍需求",
+    recommend: "景点推荐",
+    alternative: "更多选择",
+    no_alternatives: "没有更多选择",
+    no_results: "没有符合的地点",
+    information: "景点详情",
+    information_unavailable: "景点详情",
+    choose_recommendation: "选择地点",
+    comparison: "地点比较",
+    comparison_unavailable: "地点比较",
+    request_refinement: "更改偏好",
+    show_previous_options: "之前的选择",
+    previous_options_unavailable: "之前的选择",
+    confirm_attraction: "确认地点",
+    reset: "新旅程",
+    reset_preferences: "重设偏好",
+    preferences_unchanged: "偏好未更改",
+    goodbye: "再见",
+    response: "回复",
+    more_options: "更多选择",
   },
 };
 
@@ -435,11 +562,254 @@ if ("speechSynthesis" in window) {
   window.speechSynthesis.addEventListener("voiceschanged", refreshPreferredVoice);
 }
 
+function shortenHistoryTopic(value, maximumLength = 30) {
+  const cleaned = String(value || "").replace(/\s+/g, " ").trim();
+  if (cleaned.length <= maximumLength) return cleaned;
+  return `${cleaned.slice(0, maximumLength - 1).trimEnd()}…`;
+}
+
+function createConversationId() {
+  if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+  return `trip-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function readSavedConversations() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVED_CONVERSATIONS_KEY) || "[]");
+    return Array.isArray(saved) ? saved.filter(item => item && item.id) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function writeSavedConversations(conversations) {
+  try {
+    localStorage.setItem(
+      SAVED_CONVERSATIONS_KEY,
+      JSON.stringify(conversations.slice(0, MAX_SAVED_CONVERSATIONS)),
+    );
+    return true;
+  } catch (error) {
+    formStatus.textContent = "Saved-conversation storage is full on this browser.";
+    return false;
+  }
+}
+
+function titleCase(value) {
+  return String(value || "").replace(/\b\w/g, letter => letter.toUpperCase());
+}
+
+function automaticConversationTitle(context) {
+  const state = context?.state;
+  const interest = context?.interests?.[0];
+  const parts = [];
+  if (state) parts.push(state);
+  if (interest) parts.push(titleCase(localizeLabel(interest)));
+  return parts.length ? `${parts.join(" ")} ${t("tripTitleSuffix")}` : t("newTripTitle");
+}
+
+function conversationMessages() {
+  return Array.from(messages.querySelectorAll(".message-row"))
+    .slice(-MAX_SAVED_MESSAGES)
+    .map(row => {
+      const sender = row.classList.contains("user-row") ? "user" : "bot";
+      const text = row.querySelector(
+        sender === "user" ? ".user-message p" : ".assistant-message p",
+      )?.textContent || "";
+      return {
+        sender,
+        text,
+        chatData: sender === "bot" && row.chatData ? row.chatData : null,
+      };
+    });
+}
+
+function saveCurrentConversation() {
+  const savedMessages = conversationMessages();
+  if (!savedMessages.some(message => message.sender === "user")) return;
+
+  const conversations = readSavedConversations();
+  const existing = conversations.find(item => item.id === activeConversationId);
+  const conversation = {
+    id: activeConversationId,
+    title: existing?.customTitle
+      ? existing.title
+      : automaticConversationTitle(latestContext),
+    customTitle: Boolean(existing?.customTitle),
+    updatedAt: new Date().toISOString(),
+    language: currentLanguage,
+    context: latestContext,
+    sessionState: latestSessionState || { context: latestContext },
+    messages: savedMessages,
+  };
+  const next = [conversation, ...conversations.filter(item => item.id !== activeConversationId)]
+    .sort((first, second) => String(second.updatedAt).localeCompare(String(first.updatedAt)));
+  if (writeSavedConversations(next)) {
+    localStorage.setItem(ACTIVE_CONVERSATION_KEY, activeConversationId);
+    currentConversationTitle.textContent = conversation.title;
+    renderSavedConversations();
+  }
+}
+
+function savedDateLabel(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const locale = currentLanguage === "zh" ? "zh-CN" : currentLanguage === "ms" ? "ms-MY" : "en-MY";
+  return date.toLocaleString(locale, {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function renderSavedConversations() {
+  const conversations = readSavedConversations();
+  savedConversationsList.replaceChildren();
+  savedConversationsEmpty.hidden = conversations.length > 0;
+
+  for (const conversation of conversations) {
+    const conversationTitle = conversation.title || t("newTripTitle");
+    const item = document.createElement("li");
+    item.className = "saved-conversation-item";
+    item.classList.toggle("active", conversation.id === activeConversationId);
+
+    const openButton = document.createElement("button");
+    openButton.type = "button";
+    openButton.className = "saved-conversation-open";
+    openButton.dataset.openConversation = conversation.id;
+    openButton.setAttribute("aria-label", `Open saved trip: ${conversationTitle}`);
+    const title = document.createElement("strong");
+    title.textContent = conversationTitle;
+    const date = document.createElement("small");
+    date.textContent = savedDateLabel(conversation.updatedAt);
+    openButton.append(title, date);
+
+    const actions = document.createElement("div");
+    actions.className = "saved-conversation-actions";
+    const renameButton = document.createElement("button");
+    renameButton.type = "button";
+    renameButton.dataset.renameConversation = conversation.id;
+    renameButton.textContent = t("renameConversation");
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.dataset.deleteConversation = conversation.id;
+    deleteButton.textContent = t("deleteConversation");
+    actions.append(renameButton, deleteButton);
+
+    item.append(openButton, actions);
+    savedConversationsList.appendChild(item);
+  }
+}
+
+function clearConversationDisplay() {
+  clearGeneratedAudio();
+  messages.replaceChildren();
+  historyList.replaceChildren();
+  historyEmpty.hidden = false;
+  messageCounter = 0;
+}
+
+async function openSavedConversation(conversationId, saveCurrent = true) {
+  const conversation = readSavedConversations().find(item => item.id === conversationId);
+  if (!conversation) return;
+  if (saveCurrent && conversationId !== activeConversationId) saveCurrentConversation();
+
+  formStatus.textContent = "Opening saved trip...";
+  try {
+    const restored = await sendJson("/api/restore-session", {
+      session_state: conversation.sessionState || { context: conversation.context || {} },
+    });
+    activeConversationId = conversation.id;
+    localStorage.setItem(ACTIVE_CONVERSATION_KEY, activeConversationId);
+    latestSessionState = restored.session_state;
+    latestContext = restored.context || {};
+    if (SUPPORTED_LANGUAGES.has(conversation.language)) {
+      currentLanguage = conversation.language;
+      localStorage.setItem("jomvoyageLanguage", currentLanguage);
+      applyLanguage();
+    }
+
+    clearConversationDisplay();
+    let lastBotData = null;
+    for (const savedMessage of conversation.messages || []) {
+      const text = savedMessage.sender === "bot" && savedMessage.chatData
+        ? localizeReply(savedMessage.chatData)
+        : savedMessage.text;
+      const row = addMessage(text, savedMessage.sender);
+      if (savedMessage.sender === "bot" && savedMessage.chatData) {
+        row.chatData = savedMessage.chatData;
+        refreshHistoryItem(row);
+        showRecommendations(savedMessage.chatData.recommendations, row);
+        lastBotData = savedMessage.chatData;
+      }
+    }
+    currentConversationTitle.textContent = conversation.title;
+    showPreferences(latestContext);
+    showQuickReplies(lastBotData?.suggestions || []);
+    renderSavedConversations();
+    formStatus.textContent = "Saved trip opened.";
+  } catch (error) {
+    formStatus.textContent = error.message;
+  }
+  input.focus();
+}
+
+function userHistoryTopic(text) {
+  const normalized = text.trim();
+  const moreOptionsPattern = /(?:show|give|显示|查看|tunjukkan).*?(?:more|additional|更多|其他|lebih banyak|lain).*?(?:options?|choices?|选择|pilihan)/i;
+  if (moreOptionsPattern.test(normalized)) {
+    return HISTORY_TOPICS[currentLanguage].more_options;
+  }
+
+  const informationPatterns = [
+    /(?:tell me about|information about)\s+(.+)/i,
+    /(?:ceritakan tentang|maklumat tentang)\s+(.+)/i,
+    /(?:告诉我关于|介绍一下)\s*(.+)/,
+  ];
+  for (const pattern of informationPatterns) {
+    const match = normalized.match(pattern);
+    if (match?.[1]) return shortenHistoryTopic(match[1]);
+  }
+
+  const stateNames = normalized.match(
+    /\b(?:Kuala Lumpur|Negeri Sembilan|Johor|Kedah|Kelantan|Melaka|Malacca|Pahang|Penang|Perak|Perlis|Putrajaya|Sabah|Sarawak|Selangor|Terengganu|Labuan)\b/i,
+  );
+  if (stateNames) return stateNames[0];
+
+  if (normalized.length <= 30) return localizeLabel(normalized);
+  const words = normalized.split(/\s+/).slice(0, 5).join(" ");
+  return shortenHistoryTopic(words || normalized);
+}
+
+function historyTopic(row, text, sender) {
+  if (sender === "user") return userHistoryTopic(text);
+  const action = row.chatData?.action || "response";
+  return HISTORY_TOPICS[currentLanguage]?.[action]
+    || HISTORY_TOPICS.en[action]
+    || HISTORY_TOPICS[currentLanguage].response;
+}
+
+function refreshHistoryItem(row, text = row.historyText, sender = row.historySender) {
+  if (!text || !sender) return;
+  const button = historyList.querySelector(`[data-message-target="${row.id}"]`);
+  if (!button) return;
+  const topic = historyTopic(row, text, sender);
+  const speaker = sender === "user" ? t("you") : "Maya";
+  button.querySelector(".history-speaker").textContent = `${speaker} — ${topic}`;
+  button.setAttribute(
+    "aria-label",
+    `Return to ${sender === "user" ? "your" : "Maya's"} ${topic} message: ${text}`,
+  );
+}
+
 function registerHistoryItem(row, text, sender) {
   const messageId = `conversation-message-${messageCounter}`;
   messageCounter += 1;
   row.id = messageId;
   row.tabIndex = -1;
+  row.historyText = text;
+  row.historySender = sender;
 
   const listItem = document.createElement("li");
   const button = document.createElement("button");
@@ -449,7 +819,7 @@ function registerHistoryItem(row, text, sender) {
   button.dataset.messageTarget = messageId;
   button.setAttribute("aria-label", `Return to ${sender === "user" ? "your" : "Maya's"} message: ${text}`);
   speaker.className = "history-speaker";
-  speaker.textContent = sender === "user" ? t("you") : "Maya";
+  speaker.textContent = `${sender === "user" ? t("you") : "Maya"} — ${historyTopic(row, text, sender)}`;
   preview.className = "history-preview";
   preview.textContent = text;
   button.append(speaker, preview);
@@ -806,10 +1176,13 @@ async function submitMessage(message) {
     const localizedReply = localizeReply(data);
     const replyRow = addMessage(localizedReply, "bot");
     replyRow.chatData = data;
+    refreshHistoryItem(replyRow);
+    latestSessionState = data.session_state || latestSessionState;
     showPreferences(data.context);
     showRecommendations(data.recommendations, replyRow);
     replyRow.scrollIntoView({ block: "nearest" });
     showQuickReplies(data.suggestions);
+    saveCurrentConversation();
     formStatus.textContent = "";
   } catch (error) {
     formStatus.textContent = error.message;
@@ -857,6 +1230,102 @@ historyList.addEventListener("click", event => {
 messages.addEventListener("click", event => {
   const button = event.target.closest("button[data-speak]");
   if (button) playSpeechAudio(button);
+});
+
+savedConversationsList.addEventListener("click", async event => {
+  const openButton = event.target.closest("button[data-open-conversation]");
+  if (openButton) {
+    await openSavedConversation(openButton.dataset.openConversation);
+    return;
+  }
+
+  const renameButton = event.target.closest("button[data-rename-conversation]");
+  if (renameButton) {
+    const conversations = readSavedConversations();
+    const conversation = conversations.find(
+      item => item.id === renameButton.dataset.renameConversation,
+    );
+    if (!conversation) return;
+    const item = renameButton.closest(".saved-conversation-item");
+    const actions = item.querySelector(".saved-conversation-actions");
+    const input = document.createElement("input");
+    input.className = "saved-conversation-name-input";
+    input.value = conversation.title;
+    input.maxLength = 45;
+    input.setAttribute("aria-label", "Saved conversation name");
+    const saveButton = document.createElement("button");
+    saveButton.type = "button";
+    saveButton.dataset.saveConversationName = conversation.id;
+    saveButton.textContent = t("saveConversationName");
+    const cancelButton = document.createElement("button");
+    cancelButton.type = "button";
+    cancelButton.dataset.cancelConversationAction = "true";
+    cancelButton.textContent = t("cancelConversationAction");
+    actions.replaceChildren(input, saveButton, cancelButton);
+    input.focus();
+    input.select();
+    return;
+  }
+
+  const saveNameButton = event.target.closest("button[data-save-conversation-name]");
+  if (saveNameButton) {
+    const item = saveNameButton.closest(".saved-conversation-item");
+    const input = item.querySelector(".saved-conversation-name-input");
+    const title = input?.value.trim();
+    if (!title) return;
+    const conversations = readSavedConversations();
+    const conversation = conversations.find(
+      entry => entry.id === saveNameButton.dataset.saveConversationName,
+    );
+    if (!conversation) return;
+    conversation.title = shortenHistoryTopic(title, 45);
+    conversation.customTitle = true;
+    writeSavedConversations(conversations);
+    if (conversation.id === activeConversationId) {
+      currentConversationTitle.textContent = conversation.title;
+    }
+    renderSavedConversations();
+    return;
+  }
+
+  if (event.target.closest("button[data-cancel-conversation-action]")) {
+    renderSavedConversations();
+    return;
+  }
+
+  const deleteButton = event.target.closest("button[data-delete-conversation]");
+  if (deleteButton) {
+    const item = deleteButton.closest(".saved-conversation-item");
+    const actions = item.querySelector(".saved-conversation-actions");
+    const question = document.createElement("span");
+    question.className = "saved-conversation-confirmation";
+    question.textContent = t("deleteConversationConfirm");
+    const confirmButton = document.createElement("button");
+    confirmButton.type = "button";
+    confirmButton.dataset.confirmDeleteConversation = deleteButton.dataset.deleteConversation;
+    confirmButton.textContent = t("confirmDeleteConversation");
+    const cancelButton = document.createElement("button");
+    cancelButton.type = "button";
+    cancelButton.dataset.cancelConversationAction = "true";
+    cancelButton.textContent = t("cancelConversationAction");
+    actions.replaceChildren(question, confirmButton, cancelButton);
+    confirmButton.focus();
+    return;
+  }
+
+  const confirmDeleteButton = event.target.closest(
+    "button[data-confirm-delete-conversation]",
+  );
+  if (!confirmDeleteButton) return;
+  const conversationId = confirmDeleteButton.dataset.confirmDeleteConversation;
+  const remaining = readSavedConversations().filter(item => item.id !== conversationId);
+  writeSavedConversations(remaining);
+  if (conversationId === activeConversationId) {
+    skipCurrentSaveOnReset = true;
+    resetButton.click();
+  } else {
+    renderSavedConversations();
+  }
 });
 
 function stopActiveAudio() {
@@ -947,18 +1416,23 @@ async function playSpeechAudio(button) {
 
 resetButton.addEventListener("click", async () => {
   resetButton.disabled = true;
+  if (!skipCurrentSaveOnReset) saveCurrentConversation();
+  skipCurrentSaveOnReset = false;
   clearGeneratedAudio();
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
   try {
     const data = await sendJson("/api/reset");
-    messages.replaceChildren();
-    historyList.replaceChildren();
-    historyEmpty.hidden = false;
-    messageCounter = 0;
+    activeConversationId = createConversationId();
+    localStorage.setItem(ACTIVE_CONVERSATION_KEY, activeConversationId);
+    latestSessionState = data.session_state;
+    clearConversationDisplay();
     const replyRow = addMessage(localizeReply(data), "bot");
     replyRow.chatData = data;
+    refreshHistoryItem(replyRow);
     showPreferences({});
     showQuickReplies(data.suggestions);
+    currentConversationTitle.textContent = t("newTripTitle");
+    renderSavedConversations();
     formStatus.textContent = "";
   } catch (error) {
     formStatus.textContent = error.message;
@@ -976,9 +1450,12 @@ preferenceResetButton.addEventListener("click", async () => {
     const data = await sendJson("/api/reset-preferences");
     const replyRow = addMessage(localizeReply(data), "bot");
     replyRow.chatData = data;
+    refreshHistoryItem(replyRow);
+    latestSessionState = data.session_state || latestSessionState;
     showPreferences(data.context);
     showRecommendations(data.recommendations, replyRow);
     showQuickReplies(data.suggestions);
+    saveCurrentConversation();
     formStatus.textContent = "Trip preferences cleared.";
   } catch (error) {
     formStatus.textContent = error.message;
@@ -1076,6 +1553,11 @@ function applyLanguage() {
 
   showPreferences(latestContext);
   showQuickReplies(latestSuggestions);
+  const activeSavedConversation = readSavedConversations().find(
+    conversation => conversation.id === activeConversationId,
+  );
+  currentConversationTitle.textContent = activeSavedConversation?.title || t("newTripTitle");
+  renderSavedConversations();
   applySavedDisplaySettings();
   applySavedSidebarSetting();
   rebuildLocalizedHistory();
@@ -1090,3 +1572,16 @@ languageSelect.addEventListener("change", () => {
 });
 
 applyLanguage();
+renderSavedConversations();
+window.addEventListener("beforeunload", saveCurrentConversation);
+
+const savedActiveConversation = readSavedConversations().find(
+  conversation => conversation.id === activeConversationId,
+);
+if (savedActiveConversation) {
+  openSavedConversation(activeConversationId, false);
+} else {
+  sendJson("/api/reset")
+    .then(data => { latestSessionState = data.session_state; })
+    .catch(() => {});
+}

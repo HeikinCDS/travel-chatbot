@@ -145,7 +145,7 @@ BUDGET_PATTERNS = [
         re.IGNORECASE,
     ),
     re.compile(
-        r"budget(?:\s+of|\s+is|\s+around)?\s*(?:rm|myr)?\s*"
+        r"budget(?:\s+of|\s+is|\s+around|\s+to)?\s*(?:rm|myr)?\s*"
         r"([0-9][0-9,]*(?:\.\d{1,2})?)",
         re.IGNORECASE,
     ),

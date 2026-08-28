@@ -112,7 +112,77 @@ def create_app(
             return _error(str(error), 400)
 
         session["chatbot_session"] = chat_session.to_dict()
-        return jsonify(response.to_dict())
+        result = response.to_dict()
+        result["session_state"] = chat_session.to_dict()
+        return jsonify(result)
+
+    @app.post("/api/restore-session")
+    def restore_session():
+        """Restore one locally saved conversation after validating its state."""
+        payload = request.get_json(silent=True)
+        if not isinstance(payload, dict):
+            return _error("Send the saved conversation state as JSON.", 400)
+        values = payload.get("session_state")
+        if not isinstance(values, dict):
+            return _error("The saved conversation state is invalid.", 400)
+
+        allowed = {
+            "context",
+            "shown_attraction_ids",
+            "latest_recommendation_ids",
+            "ranking_preference",
+            "retrieval_query",
+            "accessibility_clarified",
+            "pending_attraction_id",
+        }
+        unexpected = set(values) - allowed
+        if unexpected:
+            return _error("The saved conversation contains unsupported fields.", 400)
+
+        for key in ("shown_attraction_ids", "latest_recommendation_ids"):
+            identifiers = values.get(key, [])
+            if (
+                not isinstance(identifiers, list)
+                or len(identifiers) > 100
+                or any(
+                    not isinstance(identifier, str) or len(identifier) > 80
+                    for identifier in identifiers
+                )
+            ):
+                return _error("The saved attraction history is invalid.", 400)
+        if values.get("ranking_preference") not in {
+            None,
+            "accessibility",
+            "cost",
+            "duration",
+        }:
+            return _error("The saved ranking preference is invalid.", 400)
+        retrieval_query = values.get("retrieval_query")
+        if retrieval_query is not None and (
+            not isinstance(retrieval_query, str) or len(retrieval_query) > 500
+        ):
+            return _error("The saved retrieval query is invalid.", 400)
+        if not isinstance(values.get("accessibility_clarified", False), bool):
+            return _error("The saved accessibility state is invalid.", 400)
+        pending_attraction_id = values.get("pending_attraction_id")
+        if pending_attraction_id is not None and (
+            not isinstance(pending_attraction_id, str)
+            or len(pending_attraction_id) > 80
+        ):
+            return _error("The saved pending attraction is invalid.", 400)
+
+        try:
+            restored = ChatSession.from_dict(values)
+        except (TypeError, ValueError):
+            return _error("The saved conversation state is invalid.", 400)
+        session["chatbot_session"] = restored.to_dict()
+        return jsonify(
+            {
+                "status": "restored",
+                "context": restored.context.to_dict(),
+                "session_state": restored.to_dict(),
+            }
+        )
 
     @app.post("/api/reset")
     def reset():
@@ -131,6 +201,7 @@ def create_app(
                     {"label": "Sabah", "message": "Sabah"},
                     {"label": "Sarawak", "message": "Sarawak"},
                 ],
+                "session_state": ChatSession().to_dict(),
             }
         )
 
@@ -149,6 +220,7 @@ def create_app(
                 "context": {},
                 "recommendations": [],
                 "suggestions": list(STATE_SUGGESTIONS),
+                "session_state": chat_session.to_dict(),
             }
         )
 
