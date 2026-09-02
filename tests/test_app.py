@@ -69,6 +69,24 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertIn(b'id="easy-access-start-button"', response.data)
         self.assertIn(b"Plan an elderly-friendly trip", response.data)
 
+    def test_home_page_uses_modern_design_without_public_theme_picker(self):
+        response = self.client.get("/")
+        self.assertNotIn(b'id="design-select"', response.data)
+        self.assertNotIn(b'class="hero-art"', response.data)
+        self.assertIn(b'class="brand-mark" aria-hidden="true">JV</span>', response.data)
+        self.assertIn(b'id="modern-design-styles"', response.data)
+        self.assertIn(b'/static/styles.css', response.data)
+        self.assertIn(b'/static/modern.css', response.data)
+        self.assertIn(b'/static/design.js', response.data)
+
+    def test_design_assets_are_served(self):
+        for asset in ("modern.css", "design.js"):
+            with self.subTest(asset=asset):
+                response = self.client.get(f"/static/{asset}")
+                self.addCleanup(response.close)
+                self.assertEqual(response.status_code, 200)
+                self.assertGreater(len(response.data), 100)
+
     def test_chat_script_attaches_cards_to_their_maya_reply(self):
         response = self.client.get("/static/chat.js")
         self.addCleanup(response.close)

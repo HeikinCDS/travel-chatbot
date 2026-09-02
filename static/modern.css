@@ -1,0 +1,186 @@
+/* Optional visual layer. styles.css is the unchanged, recoverable Classic design. */
+:root {
+  --page: #f6f7f4;
+  --surface: #ffffff;
+  --surface-soft: #edf2ee;
+  --text: #243b37;
+  --muted: #596962;
+  --line: #d9e2dc;
+  --accent: #176858;
+  --accent-dark: #105346;
+  --accent-soft: #e7f1eb;
+  --focus: #b87312;
+  --header-height: 100px;
+  --composer-height: 160px;
+  --sidebar-width: 280px;
+  --layout-gap: 32px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 18px;
+}
+body { padding-bottom: calc(var(--composer-height) + 32px); line-height: 1.65; }
+button, select, textarea, summary { -webkit-tap-highlight-color: transparent; }
+button, select { touch-action: manipulation; }
+button { transition: background-color .15s, border-color .15s, box-shadow .15s; }
+.top-bar {
+  min-height: 94px;
+  padding: 16px max(24px, calc((100% - 1440px) / 2));
+  gap: 24px;
+  background: var(--surface);
+  backdrop-filter: none;
+}
+.brand { gap: 12px; flex-shrink: 0; }
+.brand-mark { border-radius: 15px; width: 48px; height: 48px; font-size: 17px; }
+.brand strong { font-size: 22px; letter-spacing: -.7px; }
+.brand small { max-width: 260px; font-size: 12px; margin-top: 4px; line-height: 1.4; }
+.accessibility-controls { align-items: stretch; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.language-control { min-width: 132px; padding: 5px 10px; border-radius: 9px; font-weight: 600; }
+.language-control select { min-height: 26px; font-weight: 600; cursor: pointer; }
+.control-button { border: 1px solid var(--line); background: var(--surface); font-size: 14px; font-weight: 600; padding: 10px; }
+#reset-button { background: var(--accent); color: white; padding-inline: 16px; border-color: var(--accent); }
+#reset-button:hover { background: var(--accent-dark); }
+.app-layout {
+  width: min(1440px, calc(100% - 48px));
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  gap: var(--layout-gap);
+  margin-top: 28px;
+}
+.sidebar-hidden { --sidebar-width: 180px; }
+.sidebar-hidden .app-layout { width: min(1440px, calc(100% - 48px)); grid-template-columns: var(--sidebar-width) minmax(0, 1fr); }
+.sidebar-region { top: calc(var(--header-height) + 20px); }
+.sidebar-toggle-button { text-align: left; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; padding: 0 12px 12px; margin-bottom: 16px; font-size: 15px; font-weight: 600; }
+.sidebar-toggle-button span:first-child { display: inline-block; margin-right: 8px; font-size: 11px; }
+.trip-sidebar { max-height: calc(100dvh - var(--header-height) - 96px); padding-right: 6px; scrollbar-width: thin; }
+.sidebar-card { padding: 16px; border-radius: 12px; margin-bottom: 14px; }
+.sidebar-card summary { min-height: 40px; font-size: 15px; font-weight: 650; color: var(--text); }
+.sidebar-help, .history-empty { font-size: 13px; line-height: 1.6; }
+.preference-list { gap: 0; }
+.preference-list div { padding: 10px 0; border-radius: 0; border-bottom: 1px solid var(--line); background: transparent; }
+.preference-list dt { color: var(--muted); font-size: 12px; font-weight: 600; }
+.preference-list dd { font-size: 15px; font-weight: 600; }
+.sidebar-reset-button { border-width: 1px; min-height: 44px; font-size: 13px; border-radius: 8px; }
+.current-conversation-title { font-size: 14px; }
+.saved-conversation-item { padding: 10px; background: var(--page); border-radius: 8px; }
+.saved-conversation-item.active { border-width: 1px; background: var(--accent-soft); }
+.saved-conversation-open { font-size: 14px; }
+.saved-conversation-open small { font-size: 12px; }
+.saved-conversation-actions button { min-height: 44px; font-weight: 600; font-size: 12px; }
+.chat-history button { padding: 12px; background: transparent; border-bottom-color: var(--line); border-radius: 6px; }
+.history-speaker { font-size: 13px; }
+.history-preview { font-size: 13px; line-height: 1.55; margin-top: 4px; }
+.conversation-shell { padding: 0 12px; }
+.intro-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  padding: 36px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--accent-soft);
+  margin-bottom: 30px;
+}
+.intro-card > div { position: relative; max-width: 680px; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; margin-bottom: 12px; }
+h1 { font-size: clamp(28px, 3.1vw, 43px); line-height: 1.16; letter-spacing: -1.5px; font-weight: 650; max-width: 520px; }
+.intro-card p:not(.eyebrow) { color: var(--muted); font-size: 16px; line-height: 1.65; max-width: 490px; margin-top: 16px; }
+.easy-access-start-button { background: var(--surface); border-width: 1px; border-color: var(--line); border-radius: 10px; padding: 12px 16px; font-size: 15px; font-weight: 650; margin-top: 22px; }
+.help-details { margin-top: 18px; position: relative; }
+.help-details summary { display: list-item; width: fit-content; min-height: 44px; padding-block: 8px; font-size: 14px; font-weight: 600; }
+.help-details p { max-width: 620px !important; }
+.messages { padding: 8px 0; min-height: 180px; }
+.message-row { gap: 14px; margin-bottom: 30px; scroll-margin-top: calc(var(--header-height) + 24px); }
+.assistant-mark { width: 36px; height: 36px; font-size: 12px; border-radius: 12px; }
+.speaker-name { font-size: 14px; color: var(--accent-dark); margin: 3px 0 8px; font-weight: 650; }
+.message-content { max-width: 800px; }
+.assistant-row .message-content.has-recommendations { max-width: calc(100% - 50px); }
+.assistant-message { line-height: 1.8; }
+.user-message { background: var(--accent-soft); border: 1px solid var(--line); border-radius: 16px 16px 4px 16px; padding: 14px 20px; }
+.speak-button { font-size: 14px; padding-inline: 0; font-weight: 600; margin-top: 6px; }
+.speak-button::before { content: "\25B7"; margin-right: 7px; }
+.recommendations { gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); margin-top: 18px; align-items: start; }
+.recommendation-card { min-width: 0; overflow: hidden; padding: 20px; border-radius: 16px; box-shadow: 0 3px 14px #203c3010; overflow-wrap: anywhere; }
+.recommendation-card h3 { font-size: 20px; line-height: 1.4; font-weight: 650; letter-spacing: -.3px; }
+.recommendation-card p { font-size: 16px; line-height: 1.7; }
+.recommendation-card h3 + p { color: var(--muted); font-size: 14px; }
+.recommendation-image { margin: -20px -20px 18px; }
+.recommendation-image img { aspect-ratio: 16/10; border-radius: 0; }
+.recommendation-image figcaption { padding: 8px 20px 0; font-size: 12px; }
+.recommendation-card a { font-weight: 600; text-underline-offset: 3px; }
+.recommendation-facts { font-size: 15px; padding-left: 20px; }
+.accessibility-feature { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); font-size: 13px; padding: 9px; }
+.accessibility-feature dd { overflow-wrap: anywhere; }
+.accessibility-reason, .accessibility-note { border-radius: 0 8px 8px 0; }
+.source-links { font-size: 14px; border-top: 1px solid var(--line); padding-top: 12px; }
+.source-links a { min-height: 32px; padding-block: 3px; }
+.choice-area { margin-left: 50px; }
+.choice-area h2 { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+.quick-replies { gap: 10px; }
+.quick-replies button { border-width: 1px; border-color: var(--line); border-radius: 10px; font-size: 15px; font-weight: 600; padding: 10px 17px; min-height: 48px; }
+.quick-replies button:hover { border-color: var(--accent); }
+.composer-area, .sidebar-hidden .composer-area {
+  left: calc(max(24px, (100vw - 1440px) / 2) + var(--sidebar-width) + var(--layout-gap) + 12px);
+  right: calc(max(24px, (100vw - 1440px) / 2) + 12px);
+  padding: 20px 0 12px;
+  background: linear-gradient(transparent, var(--page) 18%);
+}
+.chat-form { width: 100%; max-width: 1000px; padding: 9px; border-width: 1px; border-radius: 17px; gap: 10px; box-shadow: 0 6px 30px #223c3012; align-items: center; }
+.chat-form textarea { font-size: 17px; min-width: 0; padding-inline: 12px; }
+.chat-form textarea::placeholder { color: var(--muted); opacity: 1; }
+.voice-input-button, .send-button { height: 52px; min-width: 94px; border-radius: 10px; flex-shrink: 0; font-size: 15px; font-weight: 650; padding: 10px 16px; }
+.voice-input-button { border-width: 1px; border-color: var(--line); }
+.form-status { font-size: 14px; width: 100%; }
+.form-status:empty { min-height: 8px; margin: 0; }
+.safety-note { font-size: 12px; max-width: 700px; line-height: 1.5; }
+button:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.large-text .assistant-message, .large-text .user-message { font-size: 1.22rem; }
+.large-text .sidebar-card, .large-text .sidebar-card p, .large-text .sidebar-card summary,
+.large-text .preference-list dt, .large-text .preference-list dd, .large-text .history-speaker,
+.large-text .history-preview, .large-text .recommendation-card p, .large-text .recommendation-facts,
+.large-text .accessibility-feature, .large-text .quick-replies button, .large-text .control-button,
+.large-text .chat-form textarea, .large-text .intro-card p, .large-text .speak-button { font-size: 1.08rem; }
+.large-text .history-speaker { white-space: normal; }
+.high-contrast #reset-button, .high-contrast .easy-access-start-button:hover,
+.high-contrast .voice-input-button.is-listening { color: #000; }
+.high-contrast .recommendation-card { box-shadow: none; }
+@media (min-width: 1001px) and (max-width: 1250px) {
+  :root { --sidebar-width: 245px; --layout-gap: 20px; }
+  .top-bar { flex-wrap: wrap; gap: 14px; }
+  .accessibility-controls { margin-left: auto; }
+}
+@media (max-width: 1000px) {
+  .top-bar { position: relative; flex-direction: column; align-items: stretch; padding: 20px 24px; gap: 16px; }
+  .accessibility-controls { justify-content: flex-start; }
+  .app-layout, .sidebar-hidden .app-layout { display: block; width: calc(100% - 40px); margin-top: 20px; }
+  .sidebar-region { position: static; }
+  .sidebar-toggle-button { width: auto; min-width: 175px; }
+  .trip-sidebar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-height: 300px; overflow-y: auto; gap: 12px; margin-bottom: 20px; }
+  .sidebar-card { margin: 0; }
+  .conversation-shell { padding: 0; }
+  .composer-area, .sidebar-hidden .composer-area { left: 20px; right: 20px; padding: 16px 0 10px; }
+  .message-row { scroll-margin-top: 20px; }
+}
+@media (max-width: 600px) {
+  .top-bar { padding: 18px 16px; }
+  .brand small { max-width: none; }
+  .accessibility-controls { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+  .language-control { grid-column: 1 / -1; min-width: 0; }
+  .control-button { grid-column: span 2; padding: 7px 4px; font-size: 13px; border: 1px solid var(--line); }
+  .control-label { display: inline; font-size: inherit; }
+  .app-layout, .sidebar-hidden .app-layout { width: calc(100% - 28px); }
+  .trip-sidebar { display: block; max-height: 270px; }
+  .sidebar-card { margin-bottom: 12px; }
+  .intro-card { padding: 24px; border-radius: 16px; margin-bottom: 24px; }
+  h1 { font-size: 32px; letter-spacing: -.8px; }
+  .intro-card p:not(.eyebrow) { font-size: 16px; }
+  .message-row { gap: 10px; }
+  .assistant-mark { width: 30px; height: 30px; border-radius: 10px; font-size: 10px; }
+  .message-content, .assistant-row .message-content.has-recommendations { max-width: calc(100% - 40px); }
+  .user-message { max-width: 100%; padding: 12px 16px; }
+  .choice-area { margin-left: 40px; }
+  .recommendations { grid-template-columns: 1fr; }
+  .composer-area, .sidebar-hidden .composer-area { left: 10px; right: 10px; }
+  .chat-form { flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding: 8px; }
+  .chat-form textarea { flex: 1 0 100%; min-height: 48px; }
+  .voice-input-button, .send-button { min-width: 100px; height: 48px; }
+  .safety-note { font-size: 11px; padding-inline: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { button { transition: none; } }
