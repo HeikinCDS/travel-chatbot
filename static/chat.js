@@ -373,6 +373,55 @@ function localizeLabel(label) {
 }
 
 function localizeReply(data) {
+  const reply = localizeReplyBody(data);
+  const unchanged = data.unchanged_preferences || {};
+  if (currentLanguage === "en" || !Object.keys(unchanged).length) return reply;
+  const interestOnly = Object.keys(unchanged).length === 1 && unchanged.interests;
+  const interests = translatedInterests(data.context || {});
+  if (currentLanguage === "ms") {
+    return (interestOnly ? `Minat anda sudah ditetapkan kepada ${interests}. `
+      : "Pilihan tersebut sudah disimpan. ") + reply;
+  }
+  return (interestOnly ? `您的兴趣已经设为${interests}。`
+    : "这些偏好已经保存。") + reply;
+}
+
+function translatedInterests(context) {
+  return (context.interests || []).map(value =>
+    localizeLabel(value.replace(/^./, letter => letter.toUpperCase())),
+  ).join(currentLanguage === "zh" ? "、" : ", ");
+}
+
+function localizedNoResults(data) {
+  const context = data.context || {};
+  const chinese = currentLanguage === "zh";
+  const state = context.state || (chinese ? "该州属" : "negeri tersebut");
+  const interests = translatedInterests(context);
+  const needs = [];
+  if (context.wheelchair_accessible) needs.push(chinese ? "已记录的轮椅通行设施" : "akses kerusi roda yang direkodkan");
+  if (context.elderly_friendly) needs.push(chinese ? "已记录的长者适宜度" : "kesesuaian warga emas yang direkodkan");
+  if (context.family_friendly) needs.push(chinese ? "适合家庭" : "mesra keluarga");
+  if (context.maximum_fee != null) needs.push(chinese ? `入场费不超过 RM${context.maximum_fee}` : `bayaran masuk tidak melebihi RM${context.maximum_fee}`);
+  const accessLabels = {
+    low_walking: ["少量步行", "berjalan minimum"],
+    step_free: ["无台阶通道", "akses tanpa tangga"],
+    seating: ["休息座椅", "tempat duduk rehat"],
+    accessible_toilet: ["无障碍厕所", "tandas mesra OKU"],
+    nearby_parking: ["附近停车位", "tempat letak kereta berdekatan"],
+    shelter: ["遮阳或有盖空间", "tempat berteduh"],
+  };
+  for (const need of context.accessibility_needs || []) {
+    needs.push(accessLabels[need]?.[chinese ? 0 : 1] || need);
+  }
+  if (chinese) {
+    const requirements = needs.length ? `，并同时符合以下需求：${needs.join("、")}` : "";
+    return `在现有记录中，我找不到位于${state}的${interests}景点${requirements}。这不代表这样的地点不存在。您的偏好仍已保存，请尝试其他景点类型或州属。`;
+  }
+  const requirements = needs.length ? ` yang memenuhi semua keperluan ini: ${needs.join("; ")}` : "";
+  return `Dalam maklumat yang direkodkan, saya tidak menemui padanan tepat untuk tarikan ${interests} di ${state}${requirements}. Ini tidak bermakna tempat sedemikian tidak wujud. Pilihan anda masih disimpan. Cuba jenis tarikan atau negeri yang lain.`;
+}
+
+function localizeReplyBody(data) {
   if (currentLanguage === "en") return data.reply;
   const names = (data.recommendations || [])
     .map(item => item.attraction_name)
@@ -409,7 +458,7 @@ function localizeReply(data) {
         : "Negeri manakah di Malaysia yang ingin anda lawati?";
     }
     if (data.action === "no_results") {
-      return `Saya tidak menemui padanan tepat di ${state}. Pilihan anda masih disimpan. Cuba jenis tarikan atau negeri yang lain.`;
+      return localizedNoResults(data);
     }
     if (data.action === "comparison" && names) {
       return `${names} ialah padanan paling kuat berdasarkan maklumat yang direkodkan. Berikut ialah butirannya untuk membantu anda membuat keputusan.`;
@@ -444,7 +493,7 @@ function localizeReply(data) {
       : "您想前往马来西亚的哪个州属？";
   }
   if (data.action === "no_results") {
-    return `我在${state}找不到完全符合条件的景点。您的偏好仍已保存，请尝试其他景点类型或州属。`;
+    return localizedNoResults(data);
   }
   if (data.action === "comparison" && names) {
     return `根据已记录的资料，${names}是最符合条件的选择。以下详情可帮助您决定是否合适。`;

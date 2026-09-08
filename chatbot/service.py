@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from difflib import SequenceMatcher
 import os
 import re
@@ -512,6 +512,7 @@ class ChatbotResponse:
     context: Mapping[str, Any]
     recommendations: tuple[Mapping[str, Any], ...] = ()
     suggestions: tuple[Mapping[str, str], ...] = ()
+    unchanged_preferences: Mapping[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -522,6 +523,7 @@ class ChatbotResponse:
             "context": dict(self.context),
             "recommendations": [dict(item) for item in self.recommendations],
             "suggestions": [dict(item) for item in self.suggestions],
+            "unchanged_preferences": dict(self.unchanged_preferences),
         }
 
 
@@ -778,9 +780,13 @@ class ChatbotService:
                     if part
                 )[-500:]
 
-        # A short slot answer such as "Penang" may have a weak or unexpected
-        # intent prediction. Recognised structured preferences take priority.
-        if changes:
+        # An explicit update is still meaningful when the value is already saved.
+        # Do not mistake an empty change set for an absence of recognised values.
+        recognised_refinement = bool(message_preferences.to_dict()) and (
+            intent == "refine_preferences"
+            or bool(REPLACE_INTEREST_PATTERN.search(text))
+        )
+        if changes or recognised_refinement:
             if not session.context.is_ready_for_recommendation():
                 return self._clarification_response(prediction, session)
             if self._needs_accessibility_clarification(session):
@@ -788,11 +794,25 @@ class ChatbotService:
                     prediction,
                     session,
                 )
-            return self._recommendation_response(
+            response = self._recommendation_response(
                 prediction,
                 session,
                 sort_by=session.ranking_preference,
             )
+            if not changes:
+                supplied = message_preferences.to_dict()
+                acknowledgement = "Those preferences are already saved. "
+                if set(supplied) == {"interests"}:
+                    acknowledgement = (
+                        "Your interest is already set to "
+                        + ", ".join(session.context.interests) + ". "
+                    )
+                response = replace(
+                    response,
+                    reply=acknowledgement + response.reply,
+                    unchanged_preferences=supplied,
+                )
+            return response
 
         if no_special_access:
             if not session.context.is_ready_for_recommendation():
@@ -997,9 +1017,34 @@ class ChatbotService:
                 if self.enable_live_discovery
                 else "the saved collection"
             )
+            requirements = []
+            if session.context.wheelchair_accessible:
+                requirements.append("recorded wheelchair access")
+            if session.context.elderly_friendly:
+                requirements.append("recorded elderly suitability")
+            if session.context.family_friendly:
+                requirements.append("family-friendly places")
+            if session.context.maximum_fee is not None:
+                requirements.append(
+                    f"an entrance fee of at most RM{session.context.maximum_fee:g}"
+                )
+            need_labels = {
+                "low_walking": "minimal walking", "step_free": "step-free access",
+                "seating": "resting seats", "accessible_toilet": "accessible toilets",
+                "nearby_parking": "nearby parking", "shelter": "shelter or shade",
+            }
+            requirements.extend(
+                need_labels.get(need, need.replace("_", " "))
+                for need in session.context.accessibility_needs
+            )
+            requirement_text = (
+                " matching your saved requirements (" + "; ".join(requirements) + ")"
+                if requirements else ""
+            )
             return self._response(
                 f"I could not find an exact match for {interest} attractions "
-                f"in {state} in {search_scope}. "
+                f"in {state}{requirement_text} in {search_scope}. "
+                "This does not mean that no such places exist. "
                 "Your preferences are still saved. Please choose another "
                 "attraction type, or tell me a different state.",
                 "no_results",

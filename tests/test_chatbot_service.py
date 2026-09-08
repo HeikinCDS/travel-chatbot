@@ -973,6 +973,100 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertIn("still saved", response.reply)
         self.assertGreater(len(response.suggestions), 0)
 
+    @patch("chatbot.service.recommend_attractions", return_value=[])
+    def test_repeated_beach_update_preserves_accessibility_and_explains_no_match(self, search):
+        session = ChatSession(context=ConversationContext(
+            state="Penang", interests=["beach"], elderly_friendly=True,
+            wheelchair_accessible=True, maximum_fee=30,
+        ), accessibility_clarified=True)
+        before = session.context.to_dict()
+        response = self.make_service("refine_preferences").process_message(
+            "Actually change my interest to beach", session,
+        )
+        self.assertEqual(response.action, "no_results")
+        self.assertIn("Your interest is already set to beach", response.reply)
+        self.assertIn("Penang", response.reply)
+        self.assertIn("recorded wheelchair access", response.reply)
+        self.assertIn("recorded elderly suitability", response.reply)
+        self.assertIn("RM30", response.reply)
+        self.assertNotIn("Which preference", response.reply)
+        self.assertEqual(session.context.to_dict(), before)
+        self.assertEqual(response.to_dict()["unchanged_preferences"], {"interests": ["beach"]})
+        self.assertEqual(search.call_count, 1)
+        self.assertTrue(search.call_args.kwargs["wheelchair_accessible"])
+        self.assertEqual(search.call_args.kwargs["maximum_fee"], 30)
+
+    @patch("chatbot.service.recommend_attractions", return_value=[])
+    def test_explicit_repeated_update_overrides_wrong_intent(self, search):
+        session = ChatSession(context=ConversationContext(state="Penang", interests=["beach"]))
+        response = self.make_service("out_of_scope", confidence=0.2).process_message(
+            "Actually change my interest to beach", session,
+        )
+        self.assertEqual(response.action, "no_results")
+        search.assert_called_once()
+
+    @patch("chatbot.service.recommend_attractions", return_value=[])
+    def test_changed_interest_replaces_old_interest_and_retains_mobility(self, search):
+        session = ChatSession(context=ConversationContext(
+            state="Penang", interests=["nature"], wheelchair_accessible=True,
+        ), accessibility_clarified=True)
+        response = self.make_service("refine_preferences").process_message(
+            "Actually change my interest to beach", session,
+        )
+        self.assertEqual(response.action, "no_results")
+        self.assertEqual(session.context.interests, ["beach"])
+        self.assertTrue(session.context.wheelchair_accessible)
+        self.assertEqual(response.unchanged_preferences, {})
+
+    def test_vague_refinement_still_asks_which_preference(self):
+        session = ChatSession(context=ConversationContext(state="Penang", interests=["beach"]))
+        response = self.make_service("refine_preferences").process_message(
+            "I want to change my preferences", session,
+        )
+        self.assertEqual(response.action, "request_refinement")
+
+    def test_repeated_interest_asks_only_for_missing_state(self):
+        session = ChatSession(context=ConversationContext(interests=["beach"]))
+        response = self.make_service("refine_preferences").process_message(
+            "Actually change my interest to beach", session,
+        )
+        self.assertEqual(response.action, "clarify_preferences")
+        self.assertIn("state", response.reply)
+
+    def test_repeated_interest_does_not_skip_accessibility_clarification(self):
+        session = ChatSession(context=ConversationContext(
+            state="Penang", interests=["beach"], elderly_friendly=True,
+        ))
+        response = self.make_service("refine_preferences").process_message(
+            "Actually change my interest to beach", session,
+        )
+        self.assertEqual(response.action, "clarify_accessibility")
+
+    @patch("chatbot.service.recommend_attractions", return_value=[])
+    def test_repeated_budget_and_wheelchair_requests_are_not_vague(self, search):
+        for message in ("Change my budget to RM30", "The traveller needs wheelchair access"):
+            with self.subTest(message=message):
+                session = ChatSession(context=ConversationContext(
+                    state="Penang", interests=["beach"], maximum_fee=30,
+                    wheelchair_accessible=True,
+                ), accessibility_clarified=True)
+                response = self.make_service("refine_preferences").process_message(message, session)
+                self.assertEqual(response.action, "no_results")
+                self.assertTrue(response.unchanged_preferences)
+
+    @patch("chatbot.service.recommend_attractions", return_value=[{
+        "attraction_id": "TEST", "attraction_name": "Test beach",
+        "state_territory": "Penang", "short_description": "A test fixture.",
+    }])
+    def test_repeated_interest_can_still_return_available_matches(self, search):
+        session = ChatSession(context=ConversationContext(state="Penang", interests=["beach"]))
+        response = self.make_service("refine_preferences").process_message(
+            "Actually change my interest to beach", session,
+        )
+        self.assertEqual(response.action, "recommend")
+        self.assertEqual(response.recommendations[0]["attraction_id"], "TEST")
+        self.assertIn("already set to beach", response.reply)
+
     def test_elderly_request_uses_verified_accessibility_collection(self):
         session = ChatSession(
             context=ConversationContext(
