@@ -15,7 +15,7 @@ from recommendation_engine.recommendation_engine import (
 
 class RecommendationEngineTests(unittest.TestCase):
 
-    def test_penang_elderly_pilot_ranks_source_supported_places(self):
+    def test_penang_elderly_dataset_ranks_reviewed_places(self):
         minimal_walking = recommend_attractions(
             state="Penang",
             interest="relaxation",
@@ -38,14 +38,17 @@ class RecommendationEngineTests(unittest.TestCase):
             limit=3,
         )
 
-        self.assertEqual(minimal_walking[0]["attraction_name"], "Penang Hill")
+        self.assertEqual(
+            minimal_walking[0]["attraction_name"],
+            "Penang Botanic Gardens",
+        )
         self.assertEqual(
             accessible_toilet[0]["attraction_name"],
             "Entopia by Penang Butterfly Farm",
         )
         self.assertEqual(nearby_seats[0]["attraction_name"], "Penang Bird Park")
 
-    def test_elderly_requests_use_only_verified_accessibility_subset(self):
+    def test_elderly_requests_use_only_reviewed_accessibility_subset(self):
         general_results = recommend_attractions(
             state="Penang",
             interest="nature",
@@ -66,7 +69,7 @@ class RecommendationEngineTests(unittest.TestCase):
         }
         self.assertIn("Penang National Park", general_names)
         self.assertNotIn("Penang National Park", elderly_names)
-        self.assertIn("Bukit Panchor State Park", elderly_names)
+        self.assertIn("The Habitat Penang Hill", elderly_names)
         self.assertTrue(
             all(
                 item["elderly_recommendation_eligibility"] == "Eligible"

@@ -10,19 +10,25 @@ from __future__ import annotations
 from pathlib import Path
 import re
 import sqlite3
+import sys
 from typing import Any
 
 import pandas as pd
 
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+if str(PROJECT_DIR) not in sys.path:
+    sys.path.insert(0, str(PROJECT_DIR))
+
 from recommendation_engine.recommendation_engine import rebuild_search_index
 
 
-PROJECT_DIR = Path(__file__).resolve().parent.parent
-MASTER_EXCEL_PATH = PROJECT_DIR / "data" / "Malaysia_Tourism_Master_Candidates.xlsx"
+MASTER_EXCEL_PATH = (
+    PROJECT_DIR / "data" / "General Dataset for Malaysian Tourism.xlsx"
+)
 LEGACY_EXCEL_PATH = PROJECT_DIR / "data" / "FYP_Malaysia_Tourism_Dataset.xlsx"
 ACCESSIBILITY_EXCEL_PATH = (
     PROJECT_DIR / "data"
-    / "Elderly_Friendly_Malaysia_Travel_Spots_Verified.xlsx"
+    / "Elderly-friendly Dataset for Malaysian Tourism.xlsx"
 )
 DATABASE_PATH = PROJECT_DIR / "instance" / "travel_recommender.db"
 
@@ -57,6 +63,11 @@ VERIFIED_ACCESSIBILITY_COLUMNS = {
     "why_it_qualifies",
     "evidence_source_s",
     "more_info_link_s",
+    "recommendation_status",
+}
+ACCESSIBILITY_RECOMMENDATION_STATUSES = {
+    "documented support - conditional",
+    "reported support - confirm",
 }
 
 
@@ -145,14 +156,21 @@ def load_verified_accessibility(
     ]["spot_id"].tolist()
     if duplicate_ids:
         raise ValueError(f"Duplicate accessibility Spot IDs: {duplicate_ids}")
-    unverified = dataframe[
-        dataframe["evidence_tier"].astype(str).str.strip().str.casefold()
-        != "verified"
+    missing_evidence = dataframe[
+        dataframe["evidence_tier"].isna()
+        | dataframe["evidence_tier"].astype(str).str.strip().eq("")
     ]
-    if not unverified.empty:
+    if not missing_evidence.empty:
         raise ValueError(
-            "Every accessibility overlay row must have Evidence Tier "
-            f"'Verified': {unverified['spot_id'].tolist()}"
+            "Every elderly recommendation row must name its evidence tier: "
+            f"{missing_evidence['spot_id'].tolist()}"
+        )
+    statuses = dataframe["recommendation_status"].astype(str).str.strip().str.casefold()
+    unsupported = dataframe[~statuses.isin(ACCESSIBILITY_RECOMMENDATION_STATUSES)]
+    if not unsupported.empty:
+        raise ValueError(
+            "Unsupported elderly recommendation status for Spot IDs: "
+            + ", ".join(unsupported["spot_id"].astype(str))
         )
     return dataframe
 
@@ -170,11 +188,17 @@ def _structured_accessibility(
     features = (feature_text or "").strip()
     folded = features.casefold()
     suitability_value = (suitability or "").strip()
-    elderly_friendly = {
-        "suitable": "Yes",
-        "suitable with assistance": "Partial",
-        "not recommended": "No",
-    }.get(suitability_value.casefold(), "Unknown")
+    suitability_folded = suitability_value.casefold()
+    if suitability_folded == "suitable":
+        elderly_friendly = "Yes"
+    elif suitability_folded == "not recommended":
+        elderly_friendly = "No"
+    elif suitability_folded == "suitable with assistance" or suitability_folded.startswith(
+        "conditional"
+    ):
+        elderly_friendly = "Partial"
+    else:
+        elderly_friendly = "Unknown"
 
     walking_match = re.search(
         r"walking difficulty:\s*(low|moderate|high)",
@@ -280,8 +304,41 @@ def _structured_accessibility(
         "accessible_toilet": toilet,
         "parking_proximity": parking,
         "shelter_available": shelter,
-        "elderly_suitability": suitability_value or "Unknown",
+        "elderly_suitability": (
+            "Suitable with assistance"
+            if suitability_folded.startswith("conditional")
+            else suitability_value or "Unknown"
+        ),
     }
+
+
+def _explicit_accessibility_value(value: Any, field: str) -> str:
+    """Normalise the reviewed workbook's structured accessibility fields."""
+
+    text = (_text(value) or "").casefold()
+    if not text or text == "unknown":
+        return "Unknown"
+    if field == "parking_proximity":
+        if "near" in text or "under 20 m" in text or "drop-off" in text:
+            return "Near"
+        if "far" in text:
+            return "Far"
+        if "distance unknown" in text:
+            return "Unknown"
+        return "Moderate"
+    if text.startswith("no"):
+        return "No"
+    if "unknown" in text or "unconfirmed" in text:
+        return "Unknown"
+    if (
+        "partial" in text
+        or "reported" in text
+        or "likely" in text
+        or "limited" in text
+        or "confirm" in text
+    ):
+        return "Partial"
+    return "Yes"
 
 
 def _apply_accessibility_overlay(
@@ -296,16 +353,37 @@ def _apply_accessibility_overlay(
     structured_text = "; ".join(
         value for value in (features, notes) if value
     )
-    record.update(_structured_accessibility(structured_text, suitability))
+    structured = _structured_accessibility(structured_text, suitability)
+    explicit_fields = {
+        "step_free_access": "step_free_access",
+        "resting_seats_available": "resting_seats",
+        "accessible_toilet": "accessible_toilet",
+        "parking_proximity": "parking",
+        "shelter_available": "shelter",
+    }
+    for target, source in explicit_fields.items():
+        value = _explicit_accessibility_value(accessibility.get(source), target)
+        if value != "Unknown":
+            structured[target] = value
+    for field, value in structured.items():
+        if value != "Unknown":
+            record[field] = value
+
+    combined_notes = "; ".join(
+        value for value in (features, notes) if value
+    ) or None
     record.update({
         "elderly_recommendation_eligibility": "Eligible",
-        "accessibility_notes": notes,
-        "elderly_accessibility_notes": notes,
+        "accessibility_notes": combined_notes,
+        "elderly_accessibility_notes": combined_notes,
         "accessibility_evidence_source": _text(
             accessibility.get("evidence_source_s")
         ),
         "accessibility_screening_notes": _text(
             accessibility.get("why_it_qualifies")
+        ),
+        "accessibility_screening_date": _date(
+            accessibility.get("latest_review_date")
         ),
     })
     info_url = _first_direct_url(accessibility.get("more_info_link_s"))
@@ -471,10 +549,14 @@ def import_attractions(
 
 def main() -> None:
     count = import_attractions()
+    accessibility_count = len(load_verified_accessibility())
     print(f"Successfully imported {count} confirmed attractions.")
     print(f"Database created at: {DATABASE_PATH}")
     print("All confirmed attractions remain available for general travel searches.")
-    print("Elderly and accessibility requests use the 66-record verified overlay.")
+    print(
+        "Elderly and accessibility requests use the "
+        f"{accessibility_count}-record reviewed overlay."
+    )
     print("Run scripts/build_semantic_index.py before enabling semantic search.")
 
 

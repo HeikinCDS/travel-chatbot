@@ -10,14 +10,17 @@ from scripts.import_attractions import (
 
 
 class ImportAttractionsTests(unittest.TestCase):
-    def test_verified_accessibility_workbook_contains_66_unique_records(self):
+    def test_reviewed_accessibility_workbook_contains_57_unique_records(self):
         accessibility = load_verified_accessibility()
 
-        self.assertEqual(len(accessibility), 66)
-        self.assertEqual(accessibility["spot_id"].nunique(), 66)
+        self.assertEqual(len(accessibility), 57)
+        self.assertEqual(accessibility["spot_id"].nunique(), 57)
         self.assertEqual(
-            set(accessibility["evidence_tier"].str.casefold()),
-            {"verified"},
+            set(accessibility["recommendation_status"].str.casefold()),
+            {
+                "documented support - conditional",
+                "reported support - confirm",
+            },
         )
 
     def test_merge_preserves_verified_legacy_fields_and_excludes_rejected(self):
@@ -182,6 +185,7 @@ class ImportAttractionsTests(unittest.TestCase):
             "why_it_qualifies": "A documented visitor route is available.",
             "evidence_source_s": "https://example.org/accessibility",
             "more_info_link_s": "https://example.org/place",
+            "recommendation_status": "Documented support - conditional",
         }])
 
         result = build_attractions(master, pd.DataFrame(), accessibility)
@@ -226,6 +230,18 @@ class ImportAttractionsTests(unittest.TestCase):
         self.assertEqual(values["elderly_friendly"], "Yes")
         self.assertEqual(values["wheelchair_accessible"], "Yes")
         self.assertEqual(values["step_free_access"], "Yes")
+
+    def test_conditional_suitability_is_available_with_assistance(self):
+        values = _structured_accessibility(
+            "Mangrove boardwalk; parking; visitor facilities",
+            "Conditional on mobility and route",
+        )
+
+        self.assertEqual(values["elderly_friendly"], "Partial")
+        self.assertEqual(
+            values["elderly_suitability"],
+            "Suitable with assistance",
+        )
 
 
 if __name__ == "__main__":

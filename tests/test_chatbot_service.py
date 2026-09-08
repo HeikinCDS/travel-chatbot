@@ -95,15 +95,11 @@ class ChatbotServiceTests(unittest.TestCase):
 
         self.assertEqual(response.action, "information")
         self.assertIn("Why it may suit elderly visitors", response.reply)
-        self.assertIn("wheelchair-accessible boardwalk", response.reply)
+        self.assertIn("Mangrove boardwalk", response.reply)
+        self.assertIn("confirm boardwalk condition", response.reply)
         self.assertEqual(
             response.recommendations[0]["accessibility_reason"],
-            (
-                "Confirmed wheelchair-accessible boardwalk for most of its "
-                "length by independent travel guide; official Johor National "
-                "Parks site confirms extensive boardwalk network with "
-                "observation towers; senior discount pricing explicitly listed."
-            ),
+            "Recorded because the source explicitly documents these facilities or restrictions.",
         )
 
     def test_specific_accessibility_need_overrides_wrong_intent_prediction(self):
@@ -1067,11 +1063,11 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertEqual(response.recommendations[0]["attraction_id"], "TEST")
         self.assertIn("already set to beach", response.reply)
 
-    def test_elderly_request_uses_verified_accessibility_collection(self):
+    def test_elderly_request_uses_reviewed_accessibility_collection(self):
         session = ChatSession(
             context=ConversationContext(
-                state="Perak",
-                interests=["history"],
+                state="Penang",
+                interests=["nature"],
                 elderly_friendly=True,
                 accessibility_needs=["low_walking"],
             ),
@@ -1085,7 +1081,7 @@ class ChatbotServiceTests(unittest.TestCase):
         self.assertEqual(response.action, "recommend")
         self.assertTrue(response.recommendations)
         self.assertTrue(all(
-            item["state_territory"] == "Perak"
+            item["state_territory"] == "Penang"
             for item in response.recommendations
         ))
         self.assertTrue(all(
