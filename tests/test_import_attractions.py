@@ -3,13 +3,65 @@ import unittest
 import pandas as pd
 
 from scripts.import_attractions import (
+    ACCESSIBILITY_EXCEL_PATH,
+    MASTER_EXCEL_PATH,
     _structured_accessibility,
+    build_attraction_image_catalogue,
     build_attractions,
+    load_image_library,
+    load_master_candidates,
     load_verified_accessibility,
 )
 
 
 class ImportAttractionsTests(unittest.TestCase):
+    def test_current_workbooks_supply_images_for_hundreds_of_attractions(self):
+        master = load_master_candidates()
+        libraries = [
+            load_image_library(MASTER_EXCEL_PATH),
+            load_image_library(ACCESSIBILITY_EXCEL_PATH),
+        ]
+
+        catalogue = build_attraction_image_catalogue(master, libraries)
+
+        self.assertGreaterEqual(len(catalogue), 388)
+        self.assertTrue(all(
+            item["image_url"].startswith("https://")
+            for item in catalogue.values()
+        ))
+        self.assertTrue(all(
+            "thumb.wikimedia.org" not in item["image_url"]
+            for item in catalogue.values()
+        ))
+
+    def test_local_curated_image_is_preferred_over_workbook_candidate(self):
+        master = pd.DataFrame([{
+            "candidate_id": "MC0001",
+            "existing_record_id": "A001",
+            "review_status": "Complete",
+        }])
+        library = pd.DataFrame([{
+            "candidate_id": "MC0001",
+            "image_number": 1,
+            "display_url": "https://example.org/remote.jpg",
+            "commons_file_page": "https://commons.wikimedia.org/wiki/File:Remote.jpg",
+            "creator": "Example creator",
+            "license": "CC BY 4.0",
+        }])
+        local = {
+            "A001": {
+                "image_url": "/static/images/attractions/A001.jpg",
+                "image_attribution": "Local curator",
+            }
+        }
+
+        catalogue = build_attraction_image_catalogue(master, [library], local)
+
+        self.assertEqual(
+            catalogue["A001"]["image_url"],
+            "/static/images/attractions/A001.jpg",
+        )
+
     def test_reviewed_accessibility_workbook_contains_57_unique_records(self):
         accessibility = load_verified_accessibility()
 

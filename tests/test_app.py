@@ -107,6 +107,11 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertIn(b'MAX_SAVED_CONVERSATIONS = 8', response.data)
         self.assertIn("Rancang percutian".encode(), response.data)
         self.assertIn("\u4e0e Maya \u4e00\u8d77\u89c4\u5212".encode(), response.data)
+        self.assertIn("Sesuai dengan bantuan".encode(), response.data)
+        self.assertIn("适合在协助下游览".encode(), response.data)
+        self.assertIn(b"function localizedCardDescription", response.data)
+        self.assertIn(b"function localizedFact", response.data)
+        self.assertIn(b"function appendOriginalEnglishDetails", response.data)
 
     def test_health_endpoint(self):
         response = self.client.get("/health")

@@ -7,6 +7,7 @@ values where the master catalogue does not provide a verified fact.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import re
 import sqlite3
@@ -31,6 +32,7 @@ ACCESSIBILITY_EXCEL_PATH = (
     / "Elderly-friendly Dataset for Malaysian Tourism.xlsx"
 )
 DATABASE_PATH = PROJECT_DIR / "instance" / "travel_recommender.db"
+IMAGE_CATALOGUE_PATH = PROJECT_DIR / "data" / "attraction_images.json"
 
 DATABASE_COLUMNS = [
     "attraction_id", "attraction_name", "state_territory", "city_district",
@@ -68,6 +70,10 @@ VERIFIED_ACCESSIBILITY_COLUMNS = {
 ACCESSIBILITY_RECOMMENDATION_STATUSES = {
     "documented support - conditional",
     "reported support - confirm",
+}
+IMAGE_LIBRARY_COLUMNS = {
+    "candidate_id", "image_number", "display_url", "commons_file_page",
+    "creator", "license",
 }
 
 
@@ -135,6 +141,122 @@ def load_master_candidates(path: Path = MASTER_EXCEL_PATH) -> pd.DataFrame:
     dataframe = pd.read_excel(path, sheet_name="Catalogue", header=2)
     dataframe = dataframe.dropna(subset=["Candidate ID", "Attraction Name"])
     return _normalise_columns(dataframe)
+
+
+def load_image_library(path: Path) -> pd.DataFrame:
+    """Load Wikimedia image candidates and their attribution metadata."""
+
+    dataframe = pd.read_excel(path, sheet_name="Image Library", header=3)
+    dataframe = _normalise_columns(dataframe)
+    missing = IMAGE_LIBRARY_COLUMNS - set(dataframe.columns)
+    if missing:
+        raise ValueError(
+            f"The image library in {path.name} is missing columns: "
+            + ", ".join(sorted(missing))
+        )
+    return dataframe.dropna(subset=["candidate_id", "display_url"])
+
+
+def build_attraction_image_catalogue(
+    master_candidates: pd.DataFrame,
+    image_libraries: list[pd.DataFrame],
+    existing_catalogue: dict[str, dict[str, Any]] | None = None,
+) -> dict[str, dict[str, str]]:
+    """Map workbook images to runtime attraction IDs.
+
+    Locally cached images remain preferred. For workbook entries, the first
+    valid Wikimedia candidate is used so every recommendation card stays
+    compact while gaining the widest available attraction coverage.
+    """
+
+    candidate_to_attraction: dict[str, str] = {}
+    for _, candidate in master_candidates.iterrows():
+        status = (_text(candidate.get("review_status")) or "").casefold()
+        candidate_id = _text(candidate.get("candidate_id"))
+        if status not in CONFIRMED_STATUSES or not candidate_id:
+            continue
+        candidate_to_attraction[candidate_id] = (
+            _text(candidate.get("existing_record_id")) or candidate_id
+        )
+
+    catalogue: dict[str, dict[str, str]] = {}
+    for attraction_id, item in (existing_catalogue or {}).items():
+        if not isinstance(item, dict):
+            continue
+        image_url = _text(item.get("image_url"))
+        if image_url and image_url.startswith("/static/images/attractions/"):
+            catalogue[str(attraction_id).strip()] = {
+                key: value.strip()
+                for key, value in item.items()
+                if key in {
+                    "image_url", "image_page_url", "image_attribution",
+                    "image_license",
+                } and isinstance(value, str) and value.strip()
+            }
+
+    for library in image_libraries:
+        ordered = library.copy()
+        ordered["image_number"] = pd.to_numeric(
+            ordered["image_number"], errors="coerce"
+        )
+        ordered = ordered.sort_values(
+            ["candidate_id", "image_number"], na_position="last"
+        )
+        for _, image in ordered.iterrows():
+            candidate_id = _text(image.get("candidate_id"))
+            attraction_id = candidate_to_attraction.get(candidate_id or "")
+            if not attraction_id or attraction_id in catalogue:
+                continue
+            image_url = _text(image.get("display_url"))
+            if not image_url or not image_url.casefold().startswith("https://"):
+                continue
+            image_url = image_url.replace(
+                "https://thumb.wikimedia.org/",
+                "https://upload.wikimedia.org/",
+            )
+            page_url = _text(image.get("commons_file_page"))
+            catalogue[attraction_id] = {
+                "image_url": image_url,
+                "image_page_url": page_url or "",
+                "image_attribution": _text(image.get("creator"))
+                or _text(image.get("credit"))
+                or "Wikimedia Commons contributor",
+                "image_license": _text(image.get("license")) or "",
+            }
+
+    return dict(sorted(catalogue.items()))
+
+
+def write_attraction_image_catalogue(
+    master_candidates: pd.DataFrame,
+    image_paths: tuple[Path, ...] = (
+        MASTER_EXCEL_PATH,
+        ACCESSIBILITY_EXCEL_PATH,
+    ),
+    catalogue_path: Path = IMAGE_CATALOGUE_PATH,
+) -> int:
+    """Rebuild the app image catalogue from the current workbooks."""
+
+    existing: dict[str, dict[str, Any]] = {}
+    if catalogue_path.exists():
+        try:
+            payload = json.loads(catalogue_path.read_text(encoding="utf-8"))
+            if isinstance(payload, dict):
+                existing = payload
+        except (OSError, json.JSONDecodeError):
+            existing = {}
+
+    libraries = [load_image_library(path) for path in image_paths]
+    catalogue = build_attraction_image_catalogue(
+        master_candidates,
+        libraries,
+        existing,
+    )
+    catalogue_path.write_text(
+        json.dumps(catalogue, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return len(catalogue)
 
 
 def load_verified_accessibility(
@@ -544,6 +666,10 @@ def import_attractions(
         connection.execute("DROP TABLE IF EXISTS attraction_embeddings")
         rebuild_search_index(connection)
         connection.commit()
+    write_attraction_image_catalogue(
+        master,
+        image_paths=(master_path, accessibility_path),
+    )
     return len(attractions)
 
 
@@ -556,6 +682,11 @@ def main() -> None:
     print(
         "Elderly and accessibility requests use the "
         f"{accessibility_count}-record reviewed overlay."
+    )
+    print(
+        f"Image catalogue contains "
+        f"{len(json.loads(IMAGE_CATALOGUE_PATH.read_text(encoding='utf-8')))} "
+        "attractions."
     )
     print("Run scripts/build_semantic_index.py before enabling semantic search.")
 

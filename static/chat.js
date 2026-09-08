@@ -93,6 +93,25 @@ const UI_TEXT = {
     accessibilityReason: "Why it may suit elderly visitors",
     sources: "Sources",
     visitorInformation: "Check visitor information",
+    photoCredit: "Photo",
+    originalRecordedDetails: "Original recorded details (English)",
+    listening: "Listening… Speak your travel request.",
+    voiceAdded: "Voice input added. Check the message, then press Send.",
+    noSpeech: "I could not hear a message. Please try again.",
+    microphoneDenied: "Microphone permission was not granted.",
+    noMicrophone: "No microphone was detected.",
+    recognitionUnavailable: "Voice recognition is temporarily unavailable.",
+    recognitionFailed: "Voice recognition could not start. Please try again.",
+    recognitionStarting: "Voice recognition is already starting.",
+    preparingMaya: "Preparing Maya...",
+    mayaReady: "Maya is ready.",
+    findingResponse: "Finding a helpful response...",
+    preferencesCleared: "Trip preferences cleared.",
+    browserVoice: "Using the browser voice because generated audio is unavailable.",
+    audioUnavailable: "Maya's audio is unavailable on this device.",
+    storageFull: "Saved-conversation storage is full on this browser.",
+    openingSavedTrip: "Opening saved trip...",
+    savedTripOpened: "Saved trip opened.",
     you: "You",
   },
   ms: {
@@ -144,6 +163,25 @@ const UI_TEXT = {
     accessibilityReason: "Mengapa tempat ini mungkin sesuai untuk warga emas",
     sources: "Sumber",
     visitorInformation: "Semak maklumat pelawat",
+    photoCredit: "Foto",
+    originalRecordedDetails: "Maklumat asal yang direkodkan (Bahasa Inggeris)",
+    listening: "Sedang mendengar… Sebut permintaan perjalanan anda.",
+    voiceAdded: "Input suara telah ditambah. Semak mesej, kemudian tekan Hantar.",
+    noSpeech: "Saya tidak dapat mendengar mesej. Sila cuba lagi.",
+    microphoneDenied: "Kebenaran mikrofon tidak diberikan.",
+    noMicrophone: "Mikrofon tidak dikesan.",
+    recognitionUnavailable: "Pengecaman suara tidak tersedia buat sementara waktu.",
+    recognitionFailed: "Pengecaman suara tidak dapat dimulakan. Sila cuba lagi.",
+    recognitionStarting: "Pengecaman suara sedang dimulakan.",
+    preparingMaya: "Maya sedang disediakan...",
+    mayaReady: "Maya sudah bersedia.",
+    findingResponse: "Sedang mencari jawapan yang sesuai...",
+    preferencesCleared: "Pilihan perjalanan telah dikosongkan.",
+    browserVoice: "Suara pelayar digunakan kerana audio janaan tidak tersedia.",
+    audioUnavailable: "Audio Maya tidak tersedia pada peranti ini.",
+    storageFull: "Ruang simpanan perbualan pada pelayar ini sudah penuh.",
+    openingSavedTrip: "Membuka perjalanan tersimpan...",
+    savedTripOpened: "Perjalanan tersimpan telah dibuka.",
     you: "Anda",
   },
   zh: {
@@ -195,6 +233,25 @@ const UI_TEXT = {
     accessibilityReason: "为何此地点可能适合长者",
     sources: "资料来源",
     visitorInformation: "查看访客资料",
+    photoCredit: "照片",
+    originalRecordedDetails: "原始记录详情（英语）",
+    listening: "正在聆听……请说出您的旅游需求。",
+    voiceAdded: "语音内容已加入。请检查消息，然后按发送。",
+    noSpeech: "没有听到语音，请重试。",
+    microphoneDenied: "未获得麦克风权限。",
+    noMicrophone: "未检测到麦克风。",
+    recognitionUnavailable: "语音识别暂时无法使用。",
+    recognitionFailed: "无法启动语音识别，请重试。",
+    recognitionStarting: "语音识别正在启动。",
+    preparingMaya: "正在准备 Maya...",
+    mayaReady: "Maya 已准备就绪。",
+    findingResponse: "正在寻找合适的回答...",
+    preferencesCleared: "旅行偏好已清除。",
+    browserVoice: "生成语音不可用，现正使用浏览器语音。",
+    audioUnavailable: "此设备无法播放 Maya 的语音。",
+    storageFull: "此浏览器的对话储存空间已满。",
+    openingSavedTrip: "正在打开已保存的旅程...",
+    savedTripOpened: "已打开保存的旅程。",
     you: "您",
   },
 };
@@ -313,6 +370,15 @@ const LOCALIZED_LABELS = {
     "Walking difficulty": "Kesukaran berjalan",
     Shelter: "Tempat berteduh",
     "Overall elderly suitability": "Kesesuaian keseluruhan untuk warga emas",
+    "Suitable with assistance": "Sesuai dengan bantuan",
+    "Not recommended": "Tidak disyorkan",
+    Low: "Rendah",
+    Moderate: "Sederhana",
+    High: "Tinggi",
+    Near: "Dekat",
+    Far: "Jauh",
+    Unknown: "Tidak diketahui",
+    "Not measured": "Tidak diukur",
     "Not recorded": "Tidak direkodkan",
     "Visitor information": "Maklumat pelawat",
     "Accessibility information": "Maklumat aksesibiliti",
@@ -326,6 +392,24 @@ const LOCALIZED_LABELS = {
     "Elderly friendly": "Mesra warga emas",
     "Wheelchair accessible": "Boleh diakses kerusi roda",
     "Accessibility needs": "Keperluan aksesibiliti",
+    "Elderly access needs": "Keperluan akses warga emas",
+    Adventure: "Pengembaraan",
+    "Beach and Island": "Pantai dan pulau",
+    Culture: "Budaya",
+    "Family Attraction": "Tarikan keluarga",
+    "Farm and Visitor Experience": "Ladang dan pengalaman pelawat",
+    Food: "Makanan",
+    "Heritage and History": "Warisan dan sejarah",
+    "Heritage and Visitor Attraction": "Warisan dan tarikan pelawat",
+    "Museum and Gallery": "Muzium dan galeri",
+    "Park and Recreation": "Taman dan rekreasi",
+    "Performance and Culture": "Persembahan dan budaya",
+    "Religious Site": "Tempat keagamaan",
+    "Scenic Transport": "Pengangkutan pemandangan",
+    Shopping: "Membeli-belah",
+    "Theme Park": "Taman tema",
+    "Urban Attraction": "Tarikan bandar",
+    "Wellness and Relaxation": "Kesejahteraan dan santai",
   },
   zh: {
     "Show me more options": "显示更多选择",
@@ -352,6 +436,15 @@ const LOCALIZED_LABELS = {
     "Walking difficulty": "步行难度",
     Shelter: "遮蔽处",
     "Overall elderly suitability": "整体长者适宜度",
+    "Suitable with assistance": "适合在协助下游览",
+    "Not recommended": "不建议",
+    Low: "低",
+    Moderate: "中等",
+    High: "高",
+    Near: "附近",
+    Far: "较远",
+    Unknown: "未知",
+    "Not measured": "未测量",
     "Not recorded": "未记录",
     "Visitor information": "访客资料",
     "Accessibility information": "无障碍资料",
@@ -365,11 +458,102 @@ const LOCALIZED_LABELS = {
     "Elderly friendly": "长者友善",
     "Wheelchair accessible": "轮椅无障碍",
     "Accessibility needs": "无障碍需求",
+    "Elderly access needs": "长者通行需求",
+    Adventure: "探险",
+    "Beach and Island": "海滩与岛屿",
+    Culture: "文化",
+    "Family Attraction": "家庭景点",
+    "Farm and Visitor Experience": "农场与参观体验",
+    Food: "美食",
+    "Heritage and History": "文化遗产与历史",
+    "Heritage and Visitor Attraction": "文化遗产景点",
+    "Museum and Gallery": "博物馆与美术馆",
+    "Park and Recreation": "公园与休闲",
+    "Performance and Culture": "表演与文化",
+    "Religious Site": "宗教场所",
+    "Scenic Transport": "观景交通",
+    Shopping: "购物",
+    "Theme Park": "主题乐园",
+    "Urban Attraction": "城市景点",
+    "Wellness and Relaxation": "康养与休闲",
   },
 };
 
 function localizeLabel(label) {
   return LOCALIZED_LABELS[currentLanguage]?.[label] || label;
+}
+
+function localizedCardDescription(item) {
+  const original = item.display_description || item.short_description || "";
+  if (currentLanguage === "en" || !original) return original;
+  const name = item.attraction_name || (currentLanguage === "zh" ? "该景点" : "Tempat ini");
+  const category = localizeLabel(item.primary_category || (currentLanguage === "zh" ? "旅游" : "pelancongan"));
+  const location = [item.city_district, item.state_territory].filter(Boolean)
+    .join(currentLanguage === "zh" ? "、" : ", ");
+  if (currentLanguage === "zh") {
+    return location
+      ? `${name}是位于${location}的${category}景点。`
+      : `${name}属于${category}景点。`;
+  }
+  return location
+    ? `${name} ialah tarikan ${String(category).toLocaleLowerCase("ms-MY")} di ${location}.`
+    : `${name} ialah tarikan ${String(category).toLocaleLowerCase("ms-MY")}.`;
+}
+
+function localizedFact(fact) {
+  if (currentLanguage === "en" || !fact) return fact;
+  let match = String(fact).match(/^Recorded entrance fee: RM(.+)$/i);
+  if (match) return currentLanguage === "zh"
+    ? `记录的入场费：RM${match[1]}`
+    : `Bayaran masuk yang direkodkan: RM${match[1]}`;
+  match = String(fact).match(/^Recorded entrance-fee range: RM(.+)-RM(.+)$/i);
+  if (match) return currentLanguage === "zh"
+    ? `记录的入场费范围：RM${match[1]}–RM${match[2]}`
+    : `Julat bayaran masuk yang direkodkan: RM${match[1]}–RM${match[2]}`;
+  match = String(fact).match(/^Recorded entrance fee starts from RM(.+)$/i);
+  if (match) return currentLanguage === "zh"
+    ? `记录的入场费从 RM${match[1]} 起`
+    : `Bayaran masuk yang direkodkan bermula dari RM${match[1]}`;
+  match = String(fact).match(/^Suggested visit duration: about (.+) hour\(s\)$/i);
+  if (match) return currentLanguage === "zh"
+    ? `建议游览时间：约 ${match[1]} 小时`
+    : `Tempoh lawatan yang dicadangkan: kira-kira ${match[1]} jam`;
+  if (/^Free entry is recorded$/i.test(String(fact))) {
+    return currentLanguage === "zh" ? "记录为免费入场" : "Kemasukan percuma direkodkan";
+  }
+  return fact;
+}
+
+function localizedAccessibilityReason() {
+  if (currentLanguage === "ms") {
+    return "Sumber merekodkan kemudahan atau batasan akses yang diringkaskan dalam jadual di atas.";
+  }
+  if (currentLanguage === "zh") {
+    return "资料来源记录了上表所概述的无障碍设施或限制。";
+  }
+  return "";
+}
+
+function localizedAccessibilityNote() {
+  if (currentLanguage === "ms") {
+    return "Jadual di atas menunjukkan maklumat akses yang direkodkan. Buka maklumat asal di bawah untuk membaca butiran dan batasan khusus.";
+  }
+  if (currentLanguage === "zh") {
+    return "上表显示已记录的无障碍资料。展开下方的原始记录，可查看具体详情和限制。";
+  }
+  return "";
+}
+
+function appendOriginalEnglishDetails(card, text) {
+  if (currentLanguage === "en" || !text) return;
+  const details = document.createElement("details");
+  details.className = "original-recorded-details";
+  const summary = document.createElement("summary");
+  summary.textContent = t("originalRecordedDetails");
+  const paragraph = document.createElement("p");
+  paragraph.textContent = text;
+  details.append(summary, paragraph);
+  card.appendChild(details);
 }
 
 function localizeReply(data) {
@@ -523,7 +707,7 @@ if (SpeechRecognition) {
 
   speechRecognition.addEventListener("start", () => {
     setVoiceInputState(true);
-    formStatus.textContent = "Listening… Speak your travel request.";
+    formStatus.textContent = t("listening");
   });
 
   speechRecognition.addEventListener("result", event => {
@@ -538,21 +722,21 @@ if (SpeechRecognition) {
   speechRecognition.addEventListener("end", () => {
     setVoiceInputState(false);
     formStatus.textContent = input.value.trim()
-      ? "Voice input added. Check the message, then press Send."
-      : "I could not hear a message. Please try again.";
+      ? t("voiceAdded")
+      : t("noSpeech");
     input.focus();
   });
 
   speechRecognition.addEventListener("error", event => {
     setVoiceInputState(false);
     const messages = {
-      "not-allowed": "Microphone permission was not granted.",
-      "no-speech": "I could not hear any speech. Please try again.",
-      "audio-capture": "No microphone was detected.",
-      network: "Voice recognition is temporarily unavailable.",
+      "not-allowed": t("microphoneDenied"),
+      "no-speech": t("noSpeech"),
+      "audio-capture": t("noMicrophone"),
+      network: t("recognitionUnavailable"),
     };
     formStatus.textContent = messages[event.error]
-      || "Voice recognition could not start. Please try again.";
+      || t("recognitionFailed");
   });
 
   voiceInputButton.addEventListener("click", () => {
@@ -564,7 +748,7 @@ if (SpeechRecognition) {
     try {
       speechRecognition.start();
     } catch (error) {
-      formStatus.textContent = "Voice recognition is already starting.";
+      formStatus.textContent = t("recognitionStarting");
     }
   });
 } else {
@@ -639,7 +823,7 @@ function writeSavedConversations(conversations) {
     );
     return true;
   } catch (error) {
-    formStatus.textContent = "Saved-conversation storage is full on this browser.";
+    formStatus.textContent = t("storageFull");
     return false;
   }
 }
@@ -654,7 +838,17 @@ function automaticConversationTitle(context) {
   const parts = [];
   if (state) parts.push(state);
   if (interest) parts.push(titleCase(localizeLabel(interest)));
-  return parts.length ? `${parts.join(" ")} ${t("tripTitleSuffix")}` : t("newTripTitle");
+  if (!parts.length) return t("newTripTitle");
+  if (currentLanguage === "zh") return `${parts.join(" · ")}${t("tripTitleSuffix")}`;
+  if (currentLanguage === "ms") return `${t("tripTitleSuffix")}: ${parts.join(" · ")}`;
+  return `${parts.join(" ")} ${t("tripTitleSuffix")}`;
+}
+
+function displayedConversationTitle(conversation) {
+  if (!conversation) return t("newTripTitle");
+  return conversation.customTitle
+    ? (conversation.title || t("newTripTitle"))
+    : automaticConversationTitle(conversation.context || {});
 }
 
 function conversationMessages() {
@@ -718,7 +912,7 @@ function renderSavedConversations() {
   savedConversationsEmpty.hidden = conversations.length > 0;
 
   for (const conversation of conversations) {
-    const conversationTitle = conversation.title || t("newTripTitle");
+    const conversationTitle = displayedConversationTitle(conversation);
     const item = document.createElement("li");
     item.className = "saved-conversation-item";
     item.classList.toggle("active", conversation.id === activeConversationId);
@@ -764,7 +958,7 @@ async function openSavedConversation(conversationId, saveCurrent = true) {
   if (!conversation) return;
   if (saveCurrent && conversationId !== activeConversationId) saveCurrentConversation();
 
-  formStatus.textContent = "Opening saved trip...";
+  formStatus.textContent = t("openingSavedTrip");
   try {
     const restored = await sendJson("/api/restore-session", {
       session_state: conversation.sessionState || { context: conversation.context || {} },
@@ -793,11 +987,11 @@ async function openSavedConversation(conversationId, saveCurrent = true) {
         lastBotData = savedMessage.chatData;
       }
     }
-    currentConversationTitle.textContent = conversation.title;
+    currentConversationTitle.textContent = displayedConversationTitle(conversation);
     showPreferences(latestContext);
     showQuickReplies(lastBotData?.suggestions || []);
     renderSavedConversations();
-    formStatus.textContent = "Saved trip opened.";
+    formStatus.textContent = t("savedTripOpened");
   } catch (error) {
     formStatus.textContent = error.message;
   }
@@ -935,17 +1129,17 @@ if (initialMessageRow && initialMessageText) {
 
 // Loading the NLP model can be the slowest part of the first message. Start it
 // while the welcome screen is visible so the first reply feels faster.
-formStatus.textContent = "Preparing Maya...";
+formStatus.textContent = t("preparingMaya");
 fetch("/api/warmup")
   .then(response => {
     if (!response.ok) throw new Error("Warm-up failed");
-    formStatus.textContent = "Maya is ready.";
+    formStatus.textContent = t("mayaReady");
     window.setTimeout(() => {
-      if (formStatus.textContent === "Maya is ready.") formStatus.textContent = "";
+      if (formStatus.textContent === t("mayaReady")) formStatus.textContent = "";
     }, 2500);
   })
   .catch(() => {
-    if (formStatus.textContent === "Preparing Maya...") formStatus.textContent = "";
+    if (formStatus.textContent === t("preparingMaya")) formStatus.textContent = "";
   });
 
 function labelFor(key) {
@@ -1052,6 +1246,7 @@ function showRecommendations(items, messageRow) {
       image.alt = `Source photograph of ${item.attraction_name || "the attraction"}`;
       image.loading = "lazy";
       image.referrerPolicy = "no-referrer";
+      image.addEventListener("error", () => figure.remove(), { once: true });
       figure.appendChild(image);
       if (item.image_attribution || item.image_license) {
         const caption = document.createElement("figcaption");
@@ -1063,10 +1258,10 @@ function showRecommendations(items, messageRow) {
           creditLink.href = item.image_page_url;
           creditLink.target = "_blank";
           creditLink.rel = "noopener noreferrer";
-          creditLink.textContent = `Photo: ${attribution}`;
+          creditLink.textContent = `${t("photoCredit")}: ${attribution}`;
           caption.appendChild(creditLink);
         } else {
-          caption.textContent = `Photo: ${attribution}`;
+          caption.textContent = `${t("photoCredit")}: ${attribution}`;
         }
         figure.appendChild(caption);
       }
@@ -1083,7 +1278,7 @@ function showRecommendations(items, messageRow) {
       : "";
     const description = document.createElement("p");
     description.className = "recommendation-description";
-    description.textContent = item.display_description || item.short_description || "";
+    description.textContent = localizedCardDescription(item);
     card.append(title, location, category, description);
 
     const facts = [
@@ -1098,7 +1293,7 @@ function showRecommendations(items, messageRow) {
       factList.className = "recommendation-facts";
       for (const fact of facts) {
         const listItem = document.createElement("li");
-        listItem.textContent = fact;
+        listItem.textContent = localizedFact(fact);
         factList.appendChild(listItem);
       }
       card.appendChild(factList);
@@ -1134,7 +1329,9 @@ function showRecommendations(items, messageRow) {
       const reasonHeading = document.createElement("h4");
       reasonHeading.textContent = t("accessibilityReason");
       const reasonText = document.createElement("p");
-      reasonText.textContent = item.accessibility_reason;
+      reasonText.textContent = currentLanguage === "en"
+        ? item.accessibility_reason
+        : localizedAccessibilityReason();
       reasonSection.append(reasonHeading, reasonText);
       card.appendChild(reasonSection);
     }
@@ -1142,9 +1339,17 @@ function showRecommendations(items, messageRow) {
     if (item.accessibility_notes) {
       const accessNote = document.createElement("p");
       accessNote.className = "accessibility-note";
-      accessNote.textContent = item.accessibility_notes;
+      accessNote.textContent = currentLanguage === "en"
+        ? item.accessibility_notes
+        : localizedAccessibilityNote();
       card.appendChild(accessNote);
     }
+
+    const originalAccessibilityDetails = [
+      item.accessibility_reason,
+      item.accessibility_notes,
+    ].filter((value, index, values) => value && values.indexOf(value) === index).join("\n\n");
+    appendOriginalEnglishDetails(card, originalAccessibilityDetails);
 
     if (item.verification_note) {
       const note = document.createElement("p");
@@ -1213,7 +1418,7 @@ async function submitMessage(message) {
   addMessage(message, "user");
   input.value = "";
   input.style.height = "auto";
-  formStatus.textContent = "Finding a helpful response...";
+  formStatus.textContent = t("findingResponse");
   sendButton.disabled = true;
   quickReplies.querySelectorAll("button").forEach(button => { button.disabled = true; });
 
@@ -1453,9 +1658,9 @@ async function playSpeechAudio(button) {
     button.textContent = t("readAloud");
   } catch (error) {
     if (useBrowserSpeechFallback(button.dataset.speak)) {
-      formStatus.textContent = "Using the browser voice because generated audio is unavailable.";
+      formStatus.textContent = t("browserVoice");
     } else {
-      formStatus.textContent = "Maya's audio is unavailable on this device.";
+      formStatus.textContent = t("audioUnavailable");
     }
     button.textContent = t("readAloud");
   } finally {
@@ -1505,7 +1710,7 @@ preferenceResetButton.addEventListener("click", async () => {
     showRecommendations(data.recommendations, replyRow);
     showQuickReplies(data.suggestions);
     saveCurrentConversation();
-    formStatus.textContent = "Trip preferences cleared.";
+    formStatus.textContent = t("preferencesCleared");
   } catch (error) {
     formStatus.textContent = error.message;
   } finally {
@@ -1584,6 +1789,11 @@ function applyLanguage() {
   });
 
   refreshPreferredVoice();
+  if (speechRecognition) {
+    speechRecognition.lang = currentLanguage === "zh"
+      ? "zh-CN"
+      : currentLanguage === "ms" ? "ms-MY" : "en-MY";
+  }
 
   messages.querySelectorAll(".assistant-row").forEach(row => {
     if (!row.chatData) return;
@@ -1605,7 +1815,7 @@ function applyLanguage() {
   const activeSavedConversation = readSavedConversations().find(
     conversation => conversation.id === activeConversationId,
   );
-  currentConversationTitle.textContent = activeSavedConversation?.title || t("newTripTitle");
+  currentConversationTitle.textContent = displayedConversationTitle(activeSavedConversation);
   renderSavedConversations();
   applySavedDisplaySettings();
   applySavedSidebarSetting();
