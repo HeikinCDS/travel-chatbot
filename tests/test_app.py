@@ -209,7 +209,11 @@ class FlaskApplicationTests(unittest.TestCase):
         reset_response = self.client.post("/api/reset", json={})
         self.client.post("/api/chat", json={"message": "Nature"})
         self.assertEqual(reset_response.status_code, 200)
-        self.assertGreater(len(reset_response.get_json()["suggestions"]), 0)
+        reset_data = reset_response.get_json()
+        self.assertGreater(len(reset_data["suggestions"]), 0)
+        self.assertEqual(reset_data["action"], "greeting")
+        self.assertIn("Hello, I am Maya", reset_data["reply"])
+        self.assertNotIn("cleared", reset_data["reply"].casefold())
         self.assertEqual(self.service.received_contexts[1]["context"], {})
 
     def test_preference_reset_keeps_endpoint_separate_from_new_chat(self):
@@ -220,6 +224,13 @@ class FlaskApplicationTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["action"], "reset_preferences")
         self.assertEqual(response.get_json()["context"], {})
+        self.assertIn(
+            "Switch to elderly-friendly trip",
+            {
+                suggestion["label"]
+                for suggestion in response.get_json()["suggestions"]
+            },
+        )
         self.assertEqual(self.service.received_contexts[1]["context"], {})
 
     def test_saved_conversation_session_can_be_restored(self):
@@ -229,11 +240,13 @@ class FlaskApplicationTests(unittest.TestCase):
                 "session_state": {
                     "context": {"state": "Johor", "interests": ["nature"]},
                     "shown_attraction_ids": ["A001"],
+                    "shown_destination_group_ids": ["johor:a001"],
                     "latest_recommendation_ids": ["A001"],
                     "ranking_preference": None,
                     "retrieval_query": "nature in Johor",
                     "accessibility_clarified": False,
                     "pending_attraction_id": None,
+                    "pending_preference_field": "interest",
                 }
             },
         )

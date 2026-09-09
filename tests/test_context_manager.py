@@ -54,6 +54,23 @@ class ConversationContextTests(unittest.TestCase):
         self.assertEqual(changes, {"interests": ["beach"]})
         self.assertEqual(context.interests, ["beach"])
 
+    def test_accessibility_change_replaces_previous_needs(self):
+        context = ConversationContext(
+            elderly_friendly=True,
+            wheelchair_accessible=True,
+            accessibility_needs=["seating", "accessible_toilet"],
+        )
+
+        changes = context.update(
+            TravelPreferences(accessibility_needs=["low_walking"]),
+            replace_accessibility_needs=True,
+        )
+
+        self.assertEqual(changes["accessibility_needs"], ["low_walking"])
+        self.assertEqual(context.accessibility_needs, ["low_walking"])
+        self.assertIsNone(context.wheelchair_accessible)
+        self.assertTrue(context.elderly_friendly)
+
     def test_new_state_replaces_previous_state(self):
         context = ConversationContext(state="Penang")
         context.update_from_text("Change the destination to Perak")

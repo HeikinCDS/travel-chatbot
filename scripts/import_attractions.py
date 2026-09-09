@@ -45,10 +45,12 @@ DATABASE_COLUMNS = [
     "shelter_available", "elderly_suitability",
     "elderly_accessibility_notes", "latitude", "longitude", "official_url",
     "source_url", "date_verified", "verification_status", "completeness",
-    "reviewer_notes", "candidate_id", "coverage_lens", "source_basis",
+    "reviewer_notes", "candidate_id", "canonical_id",
+    "record_relationship", "related_site_id", "coverage_lens", "source_basis",
     "source_status", "state_tourism_guide_url", "origin_batch",
     "elderly_recommendation_eligibility", "accessibility_evidence_source",
-    "accessibility_screening_notes", "accessibility_screening_date",
+    "accessibility_screening_notes", "documented_accessibility_features",
+    "accessibility_screening_date",
 ]
 
 CONFIRMED_STATUSES = {"approved", "complete", "completed", "confirmed"}
@@ -504,6 +506,7 @@ def _apply_accessibility_overlay(
         "accessibility_screening_notes": _text(
             accessibility.get("why_it_qualifies")
         ),
+        "documented_accessibility_features": features,
         "accessibility_screening_date": _date(
             accessibility.get("latest_review_date")
         ),
@@ -579,6 +582,10 @@ def build_attractions(
             "verification_status": "Confirmed",
             "reviewer_notes": _text(candidate.get("reviewer_notes")),
             "candidate_id": candidate_id,
+            "canonical_id": _text(candidate.get("canonical_id")) or candidate_id,
+            "record_relationship": _text(candidate.get("record_relationship"))
+            or "Distinct candidate",
+            "related_site_id": _text(candidate.get("related_site_id")),
             "coverage_lens": _text(candidate.get("coverage_lens")),
             "source_basis": _text(candidate.get("source_basis")),
             "source_status": _text(candidate.get("source_status")),

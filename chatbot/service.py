@@ -116,6 +116,11 @@ NEW_TRIP_REQUEST_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+EXPLICIT_FRESH_TRIP_PATTERN = re.compile(
+    r"\b(?:new\s+(?:trip|journey|search)|start\s+over|begin\s+again)\b",
+    re.IGNORECASE,
+)
+
 STATE_SUGGESTIONS = (
     {"label": "Johor", "message": "Johor"},
     {"label": "Penang", "message": "Penang"},
@@ -143,6 +148,11 @@ INTEREST_SUGGESTIONS = (
     {"label": "Relaxation", "message": "Relaxation"},
 )
 
+ELDERLY_TRIP_SUGGESTION = {
+    "label": "Switch to elderly-friendly trip",
+    "message": "I am planning a comfortable trip for an elderly traveller",
+}
+
 ACCESSIBILITY_SUGGESTIONS = (
     {"label": "Minimal walking", "message": "The traveller needs minimal walking"},
     {"label": "Wheelchair access", "message": "The traveller needs wheelchair access"},
@@ -151,12 +161,23 @@ ACCESSIBILITY_SUGGESTIONS = (
     {"label": "No special requirements", "message": "No special accessibility requirements"},
 )
 
-CHANGE_INTEREST_SUGGESTIONS = tuple(
-    {
-        "label": suggestion["label"],
-        "message": f"Actually change my interest to {suggestion['message'].lower()}",
-    }
-    for suggestion in INTEREST_SUGGESTIONS[:-1]
+PREFERENCE_CHANGE_SUGGESTIONS = (
+    {"label": "Location", "message": "Change my location"},
+    {"label": "Interest", "message": "Change my interest"},
+    {"label": "Accessibility", "message": "Change my accessibility needs"},
+)
+
+BUDGET_SUGGESTIONS = (
+    {"label": "Up to RM20", "message": "Change my budget to RM20"},
+    {"label": "Up to RM50", "message": "Change my budget to RM50"},
+    {"label": "Up to RM100", "message": "Change my budget to RM100"},
+)
+
+PREFERENCE_FIELD_PATTERN = re.compile(
+    r"^\s*(?:(?:change|update|edit)(?:\s+my)?\s+)?"
+    r"(?P<field>location|state|destination|interest|budget|cost|fee|"
+    r"accessibility(?:\s+needs?)?|mobility(?:\s+needs?)?)\s*[.!?]?\s*$",
+    re.IGNORECASE,
 )
 
 SELECTION_PATTERNS = (
@@ -376,6 +397,27 @@ def _accessibility_features(
     return tuple(features)
 
 
+def _elderly_suitability_reason(attraction: Mapping[str, Any]) -> str | None:
+    """Summarise the attraction's recorded support without inventing claims."""
+
+    documented = str(
+        attraction.get("documented_accessibility_features") or ""
+    ).strip().rstrip(".")
+    if documented:
+        return f"Recorded accessibility features: {documented}."
+
+    screening_note = str(
+        attraction.get("accessibility_screening_notes") or ""
+    ).strip()
+    generic_prefixes = (
+        "recorded because the source",
+        "recorded because the sources",
+    )
+    if screening_note and not screening_note.casefold().startswith(generic_prefixes):
+        return screening_note
+    return None
+
+
 def _display_description(attraction: Mapping[str, Any]) -> str:
     description = str(attraction.get("short_description") or "").strip()
     if description and not description.casefold().startswith("ai-generated candidate"):
@@ -434,10 +476,7 @@ def _present_attraction(attraction: Mapping[str, Any]) -> dict[str, Any]:
             if unique_evidence_urls
             else []
         )
-        reason = str(
-            attraction.get("accessibility_screening_notes") or ""
-        ).strip()
-        result["accessibility_reason"] = reason or None
+        result["accessibility_reason"] = _elderly_suitability_reason(attraction)
     else:
         result["accessibility_evidence_badge"] = None
         result["accessibility_evidence_links"] = []
@@ -454,11 +493,13 @@ class ChatSession:
 
     context: ConversationContext = field(default_factory=ConversationContext)
     shown_attraction_ids: list[str] = field(default_factory=list)
+    shown_destination_group_ids: list[str] = field(default_factory=list)
     latest_recommendation_ids: list[str] = field(default_factory=list)
     ranking_preference: str | None = None
     retrieval_query: str | None = None
     accessibility_clarified: bool = False
     pending_attraction_id: str | None = None
+    pending_preference_field: str | None = None
 
     @classmethod
     def from_dict(cls, values: Mapping[str, Any] | None) -> "ChatSession":
@@ -469,6 +510,9 @@ class ChatSession:
         return cls(
             context=ConversationContext.from_dict(values.get("context")),
             shown_attraction_ids=list(values.get("shown_attraction_ids", [])),
+            shown_destination_group_ids=list(
+                values.get("shown_destination_group_ids", [])
+            ),
             latest_recommendation_ids=list(
                 values.get("latest_recommendation_ids", [])
             ),
@@ -478,27 +522,34 @@ class ChatSession:
                 values.get("accessibility_clarified", False)
             ),
             pending_attraction_id=values.get("pending_attraction_id"),
+            pending_preference_field=values.get("pending_preference_field"),
         )
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "context": self.context.to_dict(),
             "shown_attraction_ids": list(self.shown_attraction_ids),
+            "shown_destination_group_ids": list(
+                self.shown_destination_group_ids
+            ),
             "latest_recommendation_ids": list(self.latest_recommendation_ids),
             "ranking_preference": self.ranking_preference,
             "retrieval_query": self.retrieval_query,
             "accessibility_clarified": self.accessibility_clarified,
             "pending_attraction_id": self.pending_attraction_id,
+            "pending_preference_field": self.pending_preference_field,
         }
 
     def reset(self) -> None:
         self.context.reset()
         self.shown_attraction_ids.clear()
+        self.shown_destination_group_ids.clear()
         self.latest_recommendation_ids.clear()
         self.ranking_preference = None
         self.retrieval_query = None
         self.accessibility_clarified = False
         self.pending_attraction_id = None
+        self.pending_preference_field = None
 
 
 @dataclass(frozen=True)
@@ -633,9 +684,22 @@ class ChatbotService:
             message_preferences.state
             and NEW_TRIP_REQUEST_PATTERN.search(text)
         )
-        if starts_new_trip and session.context.to_dict():
-            # An explicit new-trip phrase should not silently reuse the
-            # previous destination's interests, budget or accessibility needs.
+        has_previous_destination = session.context.state is not None
+        changes_destination = bool(
+            has_previous_destination
+            and message_preferences.state != session.context.state
+        )
+        explicitly_requests_fresh_trip = bool(
+            EXPLICIT_FRESH_TRIP_PATTERN.search(text)
+        )
+        if (
+            starts_new_trip
+            and session.context.to_dict()
+            and (changes_destination or explicitly_requests_fresh_trip)
+        ):
+            # Reset an established itinerary, but do not erase accessibility
+            # needs merely because the user phrases their first destination as
+            # "I would like to visit Penang".
             session.reset()
 
         intent = prediction.label
@@ -687,7 +751,7 @@ class ChatbotService:
             state = str(named_attraction.get("state_territory") or "").strip()
             if state:
                 session.context.state = state
-            if attraction_id not in session.latest_recommendation_ids:
+            if not session.latest_recommendation_ids:
                 session.latest_recommendation_ids = [attraction_id]
             if attraction_id not in session.shown_attraction_ids:
                 session.shown_attraction_ids.append(attraction_id)
@@ -748,10 +812,24 @@ class ChatbotService:
         # Extract recognised travel details before trusting the classifier.
         # A short answer such as "Relaxation" can otherwise be mistaken for
         # "reset conversation" and unexpectedly erase the user's choices.
-        replace_interests = bool(REPLACE_INTEREST_PATTERN.search(text)) or bool(
-            message_preferences.state and message_preferences.interests
+        pending_preference_field = session.pending_preference_field
+        replace_interests = (
+            bool(REPLACE_INTEREST_PATTERN.search(text))
+            or bool(message_preferences.state and message_preferences.interests)
+            or bool(
+                pending_preference_field == "interest"
+                and message_preferences.interests
+            )
         )
         no_special_access = bool(NO_SPECIAL_ACCESS_PATTERN.fullmatch(text))
+        replace_accessibility_needs = bool(
+            pending_preference_field == "accessibility"
+            and (
+                message_preferences.wheelchair_accessible
+                or message_preferences.accessibility_needs
+                or no_special_access
+            )
+        )
         if (
             message_preferences.elderly_friendly
             and not message_preferences.wheelchair_accessible
@@ -767,9 +845,32 @@ class ChatbotService:
         changes = session.context.update(
             message_preferences,
             replace_interests=replace_interests,
+            replace_accessibility_needs=replace_accessibility_needs,
         )
+        resolved_pending_field = bool(
+            (pending_preference_field == "location" and message_preferences.state)
+            or (
+                pending_preference_field == "interest"
+                and message_preferences.interests
+            )
+            or (
+                pending_preference_field == "budget"
+                and message_preferences.maximum_fee is not None
+            )
+            or (
+                pending_preference_field == "accessibility"
+                and (
+                    message_preferences.wheelchair_accessible
+                    or message_preferences.accessibility_needs
+                    or no_special_access
+                )
+            )
+        )
+        if resolved_pending_field:
+            session.pending_preference_field = None
         if changes:
             session.shown_attraction_ids.clear()
+            session.shown_destination_group_ids.clear()
             session.latest_recommendation_ids.clear()
             if state_changed or message_preferences.interests:
                 session.retrieval_query = text
@@ -821,6 +922,47 @@ class ChatbotService:
                 prediction,
                 session,
                 sort_by=session.ranking_preference,
+            )
+
+        preference_field_match = PREFERENCE_FIELD_PATTERN.fullmatch(text)
+        if preference_field_match:
+            field = preference_field_match.group("field").casefold()
+            if field in {"location", "state", "destination"}:
+                session.pending_preference_field = "location"
+                return self._response(
+                    "Which Malaysian state or federal territory would you like "
+                    "to visit instead?",
+                    "change_location",
+                    prediction,
+                    session,
+                    suggestions=STATE_SUGGESTIONS,
+                )
+            if field == "interest":
+                session.pending_preference_field = "interest"
+                return self._response(
+                    "What type of attraction would you prefer instead?",
+                    "change_interest",
+                    prediction,
+                    session,
+                    suggestions=INTEREST_SUGGESTIONS,
+                )
+            if field in {"budget", "cost", "fee"}:
+                session.pending_preference_field = "budget"
+                return self._response(
+                    "What is your new maximum entrance-fee budget? Choose an "
+                    "amount below or type another amount in RM.",
+                    "change_budget",
+                    prediction,
+                    session,
+                    suggestions=BUDGET_SUGGESTIONS,
+                )
+            session.pending_preference_field = "accessibility"
+            return self._response(
+                "What accessibility or mobility support is most important?",
+                "change_accessibility",
+                prediction,
+                session,
+                suggestions=ACCESSIBILITY_SUGGESTIONS,
             )
 
         # Recommendation pagination is a direct conversational command.  It
@@ -911,17 +1053,19 @@ class ChatbotService:
             if not session.context.is_ready_for_recommendation():
                 return self._clarification_response(prediction, session)
             return self._response(
-                "Which preference would you like to change: location, interest, "
-                "budget or accessibility?",
+                "Which preference would you like to change: location, interest "
+                "or accessibility?",
                 "request_refinement",
                 prediction,
                 session,
+                suggestions=PREFERENCE_CHANGE_SUGGESTIONS,
             )
 
         if intent == "request_recommendation":
             if not session.context.is_ready_for_recommendation():
                 return self._clarification_response(prediction, session)
             session.shown_attraction_ids.clear()
+            session.shown_destination_group_ids.clear()
             session.retrieval_query = " ".join(
                 part
                 for part in (session.retrieval_query, text)
@@ -1045,18 +1189,20 @@ class ChatbotService:
                 f"I could not find an exact match for {interest} attractions "
                 f"in {state}{requirement_text} in {search_scope}. "
                 "This does not mean that no such places exist. "
-                "Your preferences are still saved. Please choose another "
-                "attraction type, or tell me a different state.",
+                "Your preferences are still saved. Which preference would you "
+                "like to change: location, interest or accessibility?",
                 "no_results",
                 prediction,
                 session,
-                suggestions=CHANGE_INTEREST_SUGGESTIONS,
+                suggestions=PREFERENCE_CHANGE_SUGGESTIONS,
             )
 
+        shown_groups = set(session.shown_destination_group_ids)
         unseen = [
             item
             for item in candidates
             if item["attraction_id"] not in session.shown_attraction_ids
+            and self._destination_group_id(item) not in shown_groups
         ]
         if alternative and not unseen:
             result_scope = (
@@ -1064,10 +1210,12 @@ class ChatbotService:
             )
             return self._response(
                 f"There are no more matching alternatives in the {result_scope} "
-                "results. Try changing one of your preferences.",
+                "results. Which preference would you like to change: location, "
+                "interest or accessibility?",
                 "no_alternatives",
                 prediction,
                 session,
+                suggestions=PREFERENCE_CHANGE_SUGGESTIONS,
             )
 
         selected = (unseen or candidates)[: self.recommendation_limit]
@@ -1075,6 +1223,10 @@ class ChatbotService:
         for attraction_id in selected_ids:
             if attraction_id not in session.shown_attraction_ids:
                 session.shown_attraction_ids.append(attraction_id)
+        for item in selected:
+            group_id = self._destination_group_id(item)
+            if group_id not in session.shown_destination_group_ids:
+                session.shown_destination_group_ids.append(group_id)
         session.latest_recommendation_ids = selected_ids
 
         presented = [_present_attraction(item) for item in selected]
@@ -1110,6 +1262,15 @@ class ChatbotService:
             "Choose a place by name, or ask for the easiest access, lowest "
             "cost or shortest visit."
         )
+        requested_accessibility_need_count = (
+            len(session.context.accessibility_needs)
+            + int(bool(session.context.wheelchair_accessible))
+        )
+        if requested_accessibility_need_count > 1:
+            reply += (
+                " Each place matches at least one of your selected accessibility "
+                "needs, and places matching more needs are ranked first."
+            )
         if accessibility_unknown:
             reply += (
                 " Some accessibility details are not recorded in the saved "
@@ -1120,6 +1281,13 @@ class ChatbotService:
             "label": "Show me more options",
             "message": "Show me more options",
         },)
+        general_recommendation = not (
+            session.context.elderly_friendly
+            or session.context.wheelchair_accessible
+            or session.context.accessibility_needs
+        )
+        if general_recommendation:
+            suggestions += (ELDERLY_TRIP_SUGGESTION,)
         return self._response(
             reply,
             "alternative" if alternative else "recommend",
@@ -1130,21 +1298,40 @@ class ChatbotService:
         )
 
     @staticmethod
+    def _destination_group_id(item: Mapping[str, Any]) -> str:
+        """Return the stable place group used to avoid repeated venues."""
+        state = _normalise_name(str(item.get("state_territory") or ""))
+        identifier = str(
+            item.get("related_site_id")
+            or item.get("canonical_id")
+            or item.get("attraction_id")
+            or item.get("attraction_name")
+            or ""
+        )
+        return f"{state}:{_normalise_name(identifier)}"
+
+    @staticmethod
     def _merge_candidates(
         local: list[Mapping[str, Any]],
         web: list[Mapping[str, Any]],
     ) -> list[Mapping[str, Any]]:
-        """Combine both sources without repeating the same named place."""
+        """Combine sources without repeating aliases or one destination group."""
         merged: list[Mapping[str, Any]] = []
-        seen: set[tuple[str, str]] = set()
+        seen_names: set[tuple[str, str]] = set()
+        seen_groups: set[tuple[str, str]] = set()
         for item in [*web, *local]:
-            key = (
+            name_key = (
                 _normalise_name(str(item.get("attraction_name") or "")),
                 _normalise_name(str(item.get("state_territory") or "")),
             )
-            if key in seen:
+            group_key = ChatbotService._destination_group_id(item)
+            if (
+                name_key in seen_names
+                or group_key in seen_groups
+            ):
                 continue
-            seen.add(key)
+            seen_names.add(name_key)
+            seen_groups.add(group_key)
             merged.append(item)
         return merged
 
@@ -1271,12 +1458,23 @@ class ChatbotService:
         reply = f"{attraction['attraction_name']}: " + " ".join(
             f"{str(detail).rstrip('.')}." for detail in details if detail
         )
+        previous = self._latest_attractions(session)
+        suggestions = self._result_suggestions(
+            previous,
+            include_refinements=False,
+        )
+        if len(previous) > 1:
+            suggestions += ({
+                "label": "Back to recommendations",
+                "message": "Show the previous options",
+            },)
         return self._response(
             reply,
             "information",
             prediction,
             session,
             [attraction],
+            suggestions,
         )
 
     @staticmethod

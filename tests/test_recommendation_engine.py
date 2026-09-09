@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 from recommendation_engine import recommendation_engine as engine
 from recommendation_engine.recommendation_engine import (
+    _accessibility_need_match_count,
     _accessibility_score,
     recommend_attractions,
     recommend_from_text,
@@ -106,6 +107,41 @@ class RecommendationEngineTests(unittest.TestCase):
             _accessibility_score(difficult, accessibility_needs=needs),
         )
 
+    def test_multiple_accessibility_needs_require_at_least_one_match(self):
+        needs = ("seating", "accessible_toilet")
+        results = recommend_attractions(
+            state="Penang",
+            elderly_friendly=True,
+            accessibility_needs=needs,
+            limit=50,
+        )
+
+        self.assertGreater(len(results), 0)
+        match_counts = [
+            _accessibility_need_match_count(item, needs)
+            for item in results
+        ]
+        self.assertTrue(all(count >= 1 for count in match_counts))
+        self.assertEqual(match_counts, sorted(match_counts, reverse=True))
+
+    def test_wheelchair_and_another_need_are_alternative_matches(self):
+        needs = ("wheelchair", "seating")
+        results = recommend_attractions(
+            state="Penang",
+            elderly_friendly=True,
+            wheelchair_accessible=True,
+            accessibility_needs=("seating",),
+            limit=50,
+        )
+
+        self.assertGreater(len(results), 0)
+        self.assertTrue(
+            all(
+                _accessibility_need_match_count(item, needs) >= 1
+                for item in results
+            )
+        )
+
     def test_fts_ranks_matching_description_after_hard_filters(self):
         with tempfile.TemporaryDirectory() as temporary_directory:
             database_path = Path(temporary_directory) / "search.db"
@@ -114,6 +150,9 @@ class RecommendationEngineTests(unittest.TestCase):
                     CREATE TABLE attractions (
                         attraction_id TEXT,
                         attraction_name TEXT,
+                        canonical_id TEXT,
+                        record_relationship TEXT,
+                        related_site_id TEXT,
                         state_territory TEXT,
                         city_district TEXT,
                         primary_category TEXT,
@@ -138,6 +177,7 @@ class RecommendationEngineTests(unittest.TestCase):
                         elderly_recommendation_eligibility TEXT,
                         accessibility_evidence_source TEXT,
                         accessibility_screening_notes TEXT,
+                        documented_accessibility_features TEXT,
                         official_url TEXT,
                         source_url TEXT,
                         date_verified TEXT,

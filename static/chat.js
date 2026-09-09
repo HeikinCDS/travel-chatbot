@@ -274,6 +274,10 @@ const HISTORY_TOPICS = {
     comparison: "Place comparison",
     comparison_unavailable: "Place comparison",
     request_refinement: "Change preferences",
+    change_location: "Change location",
+    change_interest: "Change interest",
+    change_budget: "Change budget",
+    change_accessibility: "Change accessibility",
     show_previous_options: "Previous options",
     previous_options_unavailable: "Previous options",
     confirm_attraction: "Confirm place",
@@ -301,6 +305,10 @@ const HISTORY_TOPICS = {
     comparison: "Perbandingan tempat",
     comparison_unavailable: "Perbandingan tempat",
     request_refinement: "Ubah pilihan",
+    change_location: "Ubah lokasi",
+    change_interest: "Ubah minat",
+    change_budget: "Ubah bajet",
+    change_accessibility: "Ubah aksesibiliti",
     show_previous_options: "Pilihan terdahulu",
     previous_options_unavailable: "Pilihan terdahulu",
     confirm_attraction: "Sahkan tempat",
@@ -328,6 +336,10 @@ const HISTORY_TOPICS = {
     comparison: "地点比较",
     comparison_unavailable: "地点比较",
     request_refinement: "更改偏好",
+    change_location: "更改地点",
+    change_interest: "更改兴趣",
+    change_budget: "更改预算",
+    change_accessibility: "更改无障碍需求",
     show_previous_options: "之前的选择",
     previous_options_unavailable: "之前的选择",
     confirm_attraction: "确认地点",
@@ -347,6 +359,14 @@ function t(key) {
 const LOCALIZED_LABELS = {
   ms: {
     "Show me more options": "Tunjukkan lebih banyak pilihan",
+    "Switch to elderly-friendly trip": "Tukar kepada perjalanan mesra warga emas",
+    Location: "Lokasi",
+    Interest: "Minat",
+    Budget: "Bajet",
+    Accessibility: "Aksesibiliti",
+    "Up to RM20": "Sehingga RM20",
+    "Up to RM50": "Sehingga RM50",
+    "Up to RM100": "Sehingga RM100",
     "Minimal walking": "Sedikit berjalan",
     "Wheelchair access": "Akses kerusi roda",
     "Nearby seats": "Tempat duduk berdekatan",
@@ -413,6 +433,14 @@ const LOCALIZED_LABELS = {
   },
   zh: {
     "Show me more options": "显示更多选择",
+    "Switch to elderly-friendly trip": "切换为长者友善旅程",
+    Location: "地点",
+    Interest: "兴趣",
+    Budget: "预算",
+    Accessibility: "无障碍需求",
+    "Up to RM20": "最高 RM20",
+    "Up to RM50": "最高 RM50",
+    "Up to RM100": "最高 RM100",
     "Minimal walking": "少量步行",
     "Wheelchair access": "轮椅通道",
     "Nearby seats": "附近休息座椅",
@@ -599,10 +627,10 @@ function localizedNoResults(data) {
   }
   if (chinese) {
     const requirements = needs.length ? `，并同时符合以下需求：${needs.join("、")}` : "";
-    return `在现有记录中，我找不到位于${state}的${interests}景点${requirements}。这不代表这样的地点不存在。您的偏好仍已保存，请尝试其他景点类型或州属。`;
+    return `在现有记录中，我找不到位于${state}的${interests}景点${requirements}。这不代表这样的地点不存在。您的偏好仍已保存。您想更改地点、兴趣还是无障碍需求？`;
   }
   const requirements = needs.length ? ` yang memenuhi semua keperluan ini: ${needs.join("; ")}` : "";
-  return `Dalam maklumat yang direkodkan, saya tidak menemui padanan tepat untuk tarikan ${interests} di ${state}${requirements}. Ini tidak bermakna tempat sedemikian tidak wujud. Pilihan anda masih disimpan. Cuba jenis tarikan atau negeri yang lain.`;
+  return `Dalam maklumat yang direkodkan, saya tidak menemui padanan tepat untuk tarikan ${interests} di ${state}${requirements}. Ini tidak bermakna tempat sedemikian tidak wujud. Pilihan anda masih disimpan. Pilihan manakah yang ingin anda ubah: lokasi, minat atau aksesibiliti?`;
 }
 
 function localizeReplyBody(data) {
@@ -616,13 +644,17 @@ function localizeReplyBody(data) {
 
   if (currentLanguage === "ms") {
     const replies = {
-      greeting: "Helo! Beritahu saya negeri di Malaysia yang ingin anda lawati.",
+      greeting: UI_TEXT.ms.welcome,
       help: "Anda boleh memberitahu saya negeri, minat, bajet bayaran masuk serta keperluan keluarga, warga emas atau akses kerusi roda.",
       out_of_scope: "Saya direka untuk membantu perancangan perjalanan dan tarikan di Malaysia. Sila masukkan mesej berkaitan perjalanan.",
       low_confidence: "Saya kurang memahami permintaan itu. Sila tanya tentang perjalanan di Malaysia, seperti negeri dan jenis tarikan yang anda minati.",
-      request_refinement: "Pilihan manakah yang ingin anda ubah: lokasi, minat, bajet atau aksesibiliti?",
+      request_refinement: "Pilihan manakah yang ingin anda ubah: lokasi, minat atau aksesibiliti?",
+      change_location: "Negeri atau wilayah persekutuan manakah yang ingin anda lawati sebagai ganti?",
+      change_interest: "Apakah jenis tarikan lain yang anda minati?",
+      change_budget: "Apakah bajet maksimum baharu untuk bayaran masuk? Pilih jumlah di bawah atau taip jumlah lain dalam RM.",
+      change_accessibility: "Apakah bantuan aksesibiliti atau mobiliti yang paling penting?",
       clarify_accessibility: "Apakah keperluan akses yang paling penting untuk pelancong tersebut? Pilih satu di bawah atau taipkan beberapa keperluan.",
-      no_alternatives: "Tiada lagi pilihan lain yang sepadan. Cuba ubah salah satu pilihan perjalanan anda.",
+      no_alternatives: "Tiada lagi pilihan lain yang sepadan. Pilihan manakah yang ingin anda ubah: lokasi, minat atau aksesibiliti?",
       previous_options_unavailable: "Belum ada cadangan terdahulu dalam perbualan ini. Beritahu saya negeri dan jenis tempat yang anda minati.",
       show_previous_options: "Sudah tentu. Berikut ialah pilihan terdahulu. Anda boleh memilih nama tempat atau meminta saya membandingkannya.",
       information_unavailable: "Sila minta cadangan terlebih dahulu, kemudian saya boleh menerangkan salah satu tempat yang dicadangkan.",
@@ -634,7 +666,13 @@ function localizeReplyBody(data) {
     };
     if (data.action === "recommend" || data.action === "alternative") {
       const prefix = data.action === "alternative" ? "Berikut ialah pilihan tambahan" : "Saya menemui";
-      return `${prefix}: ${names}. Saya telah membandingkan kos, tempoh lawatan dan aksesibiliti yang direkodkan. Pilihan manakah paling sesuai? Pilih nama tempat atau minta akses termudah, kos terendah atau lawatan tersingkat.`;
+      const accessibilityNeedCount =
+        (data.context?.accessibility_needs || []).length
+        + (data.context?.wheelchair_accessible ? 1 : 0);
+      const multipleNeeds = accessibilityNeedCount > 1
+        ? " Setiap tempat memenuhi sekurang-kurangnya satu keperluan aksesibiliti yang dipilih. Tempat yang memenuhi lebih banyak keperluan disenaraikan dahulu."
+        : "";
+      return `${prefix}: ${names}. Saya telah membandingkan kos, tempoh lawatan dan aksesibiliti yang direkodkan. Pilihan manakah paling sesuai? Pilih nama tempat atau minta akses termudah, kos terendah atau lawatan tersingkat.${multipleNeeds}`;
     }
     if (data.action === "clarify_preferences") {
       return hasState
@@ -651,13 +689,17 @@ function localizeReplyBody(data) {
   }
 
   const replies = {
-    greeting: "您好！请告诉我您想前往马来西亚的哪个州属。",
+    greeting: UI_TEXT.zh.welcome,
     help: "您可以告诉我州属、兴趣、入场费预算，以及家庭、长者或轮椅通行需求。",
     out_of_scope: "我的功能是协助规划马来西亚旅游和景点。请输入与旅游相关的消息。",
     low_confidence: "我不太明白这个旅游请求。请说明马来西亚的州属和您喜欢的景点类型。",
-    request_refinement: "您想更改哪项偏好：地点、兴趣、预算还是无障碍需求？",
+    request_refinement: "您想更改哪项偏好：地点、兴趣还是无障碍需求？",
+    change_location: "您想改去马来西亚的哪个州属或联邦直辖区？",
+    change_interest: "您想改选哪一种景点类型？",
+    change_budget: "您的新入场费上限是多少？请选择下方金额，或输入其他 RM 金额。",
+    change_accessibility: "哪项无障碍或行动辅助对旅客最重要？",
     clarify_accessibility: "旅客最重要的无障碍需求是什么？请选择下方一项，或输入多项需求。",
-    no_alternatives: "没有更多符合条件的选择。请尝试更改其中一项旅行偏好。",
+    no_alternatives: "没有更多符合条件的选择。您想更改地点、兴趣还是无障碍需求？",
     previous_options_unavailable: "这次对话中还没有较早的推荐。请告诉我州属和您喜欢的地点类型。",
     show_previous_options: "当然可以。以下是之前的选择。您可以选择地点名称，或让我进行比较。",
     information_unavailable: "请先要求推荐，然后我才能说明其中一个建议景点。",
@@ -669,7 +711,13 @@ function localizeReplyBody(data) {
   };
   if (data.action === "recommend" || data.action === "alternative") {
     const prefix = data.action === "alternative" ? "这里有更多选择" : "我找到了";
-    return `${prefix}：${names}。我已比较所记录的费用、建议游览时间和无障碍情况。哪个选择最适合您？请选择地点名称，或询问最容易到达、费用最低或游览时间最短的地点。`;
+    const accessibilityNeedCount =
+      (data.context?.accessibility_needs || []).length
+      + (data.context?.wheelchair_accessible ? 1 : 0);
+    const multipleNeeds = accessibilityNeedCount > 1
+      ? " 每个地点至少符合一项您选择的无障碍需求，符合较多需求的地点会优先显示。"
+      : "";
+    return `${prefix}：${names}。我已比较所记录的费用、建议游览时间和无障碍情况。哪个选择最适合您？请选择地点名称，或询问最容易到达、费用最低或游览时间最短的地点。${multipleNeeds}`;
   }
   if (data.action === "clarify_preferences") {
     return hasState

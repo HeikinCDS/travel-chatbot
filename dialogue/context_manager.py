@@ -130,6 +130,7 @@ class ConversationContext:
         preferences: TravelPreferences,
         *,
         replace_interests: bool = False,
+        replace_accessibility_needs: bool = False,
     ) -> dict[str, Any]:
         """Merge recognised values and return only the fields that changed."""
         if not isinstance(preferences, TravelPreferences):
@@ -160,9 +161,14 @@ class ConversationContext:
             if value is not None:
                 setattr(self, field_name, value)
 
-        for need in preferences.accessibility_needs:
-            if need not in self.accessibility_needs:
-                self.accessibility_needs.append(need)
+        if replace_accessibility_needs:
+            self.accessibility_needs = list(preferences.accessibility_needs)
+            if preferences.wheelchair_accessible is None:
+                self.wheelchair_accessible = None
+        else:
+            for need in preferences.accessibility_needs:
+                if need not in self.accessibility_needs:
+                    self.accessibility_needs.append(need)
 
         after = self.to_dict(omit_empty=False)
         return {

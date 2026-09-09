@@ -90,6 +90,9 @@ class ImportAttractionsTests(unittest.TestCase):
         master = pd.DataFrame([
             {
                 "candidate_id": "MC0001",
+                "canonical_id": "MC0001",
+                "record_relationship": "Related site or component",
+                "related_site_id": "MC0099",
                 "existing_record_id": "A001",
                 "attraction_name": "Confirmed Name",
                 "state_territory": "Johor",
@@ -117,6 +120,12 @@ class ImportAttractionsTests(unittest.TestCase):
         self.assertEqual(attraction["min_fee_myr"], 10.0)
         self.assertEqual(attraction["elderly_friendly"], "Yes")
         self.assertEqual(attraction["official_url"], "https://example.org/place")
+        self.assertEqual(attraction["canonical_id"], "MC0001")
+        self.assertEqual(
+            attraction["record_relationship"],
+            "Related site or component",
+        )
+        self.assertEqual(attraction["related_site_id"], "MC0099")
 
     def test_new_candidate_uses_unknown_for_unconfirmed_facts(self):
         master = pd.DataFrame([{
@@ -256,6 +265,11 @@ class ImportAttractionsTests(unittest.TestCase):
         self.assertEqual(
             verified["accessibility_evidence_source"],
             "https://example.org/accessibility",
+        )
+        self.assertEqual(
+            verified["documented_accessibility_features"],
+            "Step-free access (partial); Resting seats; Accessible toilet; "
+            "Accessible parking",
         )
         self.assertEqual(
             general["elderly_recommendation_eligibility"],

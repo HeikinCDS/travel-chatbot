@@ -321,6 +321,36 @@ def _accessibility_score(
     return score
 
 
+def _accessibility_need_match_count(attraction, accessibility_needs=()):
+    """Count requested needs supported by a positive or partial record."""
+
+    needs = set(accessibility_needs or ())
+    checks = {
+        "wheelchair": str(
+            attraction.get("wheelchair_accessible") or ""
+        ).casefold() in {"yes", "partial"},
+        "low_walking": str(
+            attraction.get("walking_difficulty") or ""
+        ).casefold() == "low",
+        "step_free": str(
+            attraction.get("step_free_access") or ""
+        ).casefold() in {"yes", "partial"},
+        "seating": str(
+            attraction.get("resting_seats_available") or ""
+        ).casefold() in {"yes", "partial"},
+        "accessible_toilet": str(
+            attraction.get("accessible_toilet") or ""
+        ).casefold() in {"yes", "partial"},
+        "nearby_parking": str(
+            attraction.get("parking_proximity") or ""
+        ).casefold() in {"near", "moderate"},
+        "shelter": str(
+            attraction.get("shelter_available") or ""
+        ).casefold() in {"yes", "partial"},
+    }
+    return sum(bool(checks.get(need)) for need in needs)
+
+
 def recommend_attractions(
     state=None,
     interest=None,
@@ -367,6 +397,10 @@ def recommend_attractions(
     accessibility_requested = bool(
         elderly_friendly or wheelchair_accessible or accessibility_needs
     )
+    requested_accessibility_needs = tuple(dict.fromkeys(
+        tuple(accessibility_needs or ())
+        + (("wheelchair",) if wheelchair_accessible else ())
+    ))
 
     if accessibility_requested:
         conditions.append("""
@@ -380,7 +414,7 @@ def recommend_attractions(
             IN ('yes', 'partial')
         """)
 
-    if wheelchair_accessible:
+    if wheelchair_accessible and len(requested_accessibility_needs) == 1:
         conditions.append("""
             LOWER(COALESCE(NULLIF(TRIM(wheelchair_accessible), ''), 'unknown'))
             IN ('yes', 'partial')
@@ -395,6 +429,9 @@ def recommend_attractions(
         SELECT
             attraction_id,
             attraction_name,
+            canonical_id,
+            record_relationship,
+            related_site_id,
             state_territory,
             city_district,
             primary_category,
@@ -419,6 +456,7 @@ def recommend_attractions(
             elderly_recommendation_eligibility,
             accessibility_evidence_source,
             accessibility_screening_notes,
+            documented_accessibility_features,
             official_url,
             source_url,
             date_verified,
@@ -439,6 +477,19 @@ def recommend_attractions(
             parameters
         ).fetchall()
         results = [dict(result) for result in rows]
+        if len(requested_accessibility_needs) > 1:
+            # Multiple needs are alternatives, not an all-or-nothing filter.
+            # Keep places with at least one recorded match, then let the score
+            # rank places satisfying more of the requested needs first.
+            results = [
+                attraction
+                for attraction in results
+                if _accessibility_need_match_count(
+                    attraction,
+                    requested_accessibility_needs,
+                )
+                > 0
+            ]
         results = _rank_by_search(
             connection,
             results,
@@ -450,11 +501,17 @@ def recommend_attractions(
 
     if elderly_friendly or wheelchair_accessible or accessibility_needs:
         results.sort(
-            key=lambda attraction: _accessibility_score(
-                attraction,
-                elderly_friendly=elderly_friendly,
-                wheelchair_accessible=wheelchair_accessible,
-                accessibility_needs=accessibility_needs,
+            key=lambda attraction: (
+                _accessibility_need_match_count(
+                    attraction,
+                    requested_accessibility_needs,
+                ),
+                _accessibility_score(
+                    attraction,
+                    elderly_friendly=elderly_friendly,
+                    wheelchair_accessible=wheelchair_accessible,
+                    accessibility_needs=accessibility_needs,
+                ),
             ),
             reverse=True,
         )
@@ -488,6 +545,9 @@ def get_attraction_by_id(attraction_id):
         SELECT
             attraction_id,
             attraction_name,
+            canonical_id,
+            record_relationship,
+            related_site_id,
             state_territory,
             city_district,
             primary_category,
@@ -512,6 +572,7 @@ def get_attraction_by_id(attraction_id):
             elderly_recommendation_eligibility,
             accessibility_evidence_source,
             accessibility_screening_notes,
+            documented_accessibility_features,
             official_url,
             source_url
         FROM attractions
@@ -538,6 +599,9 @@ def find_attraction_by_name_in_text(text):
         SELECT
             attraction_id,
             attraction_name,
+            canonical_id,
+            record_relationship,
+            related_site_id,
             state_territory,
             city_district,
             primary_category,
@@ -562,6 +626,7 @@ def find_attraction_by_name_in_text(text):
             elderly_recommendation_eligibility,
             accessibility_evidence_source,
             accessibility_screening_notes,
+            documented_accessibility_features,
             official_url,
             source_url
         FROM attractions

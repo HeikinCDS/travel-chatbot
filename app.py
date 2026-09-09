@@ -17,7 +17,12 @@ from flask import (
     session,
 )
 
-from chatbot.service import ChatSession, ChatbotService, STATE_SUGGESTIONS
+from chatbot.service import (
+    ChatSession,
+    ChatbotService,
+    ELDERLY_TRIP_SUGGESTION,
+    STATE_SUGGESTIONS,
+)
 from nlp.multilingual_normalizer import normalize_user_input
 from speech import SpeechSynthesisError, synthesize_speech
 
@@ -129,17 +134,23 @@ def create_app(
         allowed = {
             "context",
             "shown_attraction_ids",
+            "shown_destination_group_ids",
             "latest_recommendation_ids",
             "ranking_preference",
             "retrieval_query",
             "accessibility_clarified",
             "pending_attraction_id",
+            "pending_preference_field",
         }
         unexpected = set(values) - allowed
         if unexpected:
             return _error("The saved conversation contains unsupported fields.", 400)
 
-        for key in ("shown_attraction_ids", "latest_recommendation_ids"):
+        for key in (
+            "shown_attraction_ids",
+            "shown_destination_group_ids",
+            "latest_recommendation_ids",
+        ):
             identifiers = values.get(key, [])
             if (
                 not isinstance(identifiers, list)
@@ -170,6 +181,14 @@ def create_app(
             or len(pending_attraction_id) > 80
         ):
             return _error("The saved pending attraction is invalid.", 400)
+        if values.get("pending_preference_field") not in {
+            None,
+            "location",
+            "interest",
+            "budget",
+            "accessibility",
+        }:
+            return _error("The saved preference-change state is invalid.", 400)
 
         try:
             restored = ChatSession.from_dict(values)
@@ -189,8 +208,11 @@ def create_app(
         session.pop("chatbot_session", None)
         return jsonify(
             {
-                "reply": "Your travel preferences have been cleared. Where would you like to go?",
-                "action": "reset",
+                "reply": (
+                    "Hello, I am Maya, your JomVoyage travel companion. "
+                    "Which Malaysian state would you like to visit?"
+                ),
+                "action": "greeting",
                 "context": {},
                 "recommendations": [],
                 "suggestions": [
@@ -219,7 +241,7 @@ def create_app(
                 "action": "reset_preferences",
                 "context": {},
                 "recommendations": [],
-                "suggestions": list(STATE_SUGGESTIONS),
+                "suggestions": [*STATE_SUGGESTIONS, ELDERLY_TRIP_SUGGESTION],
                 "session_state": chat_session.to_dict(),
             }
         )
